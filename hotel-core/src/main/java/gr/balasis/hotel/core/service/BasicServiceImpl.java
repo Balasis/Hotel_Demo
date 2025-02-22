@@ -6,6 +6,10 @@ import gr.balasis.hotel.core.base.BaseComponent;
 import gr.balasis.hotel.core.entity.BaseEntity;
 import gr.balasis.hotel.core.mapper.entitydomain.EDbaseMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
