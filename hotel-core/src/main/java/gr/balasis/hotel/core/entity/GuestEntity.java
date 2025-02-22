@@ -9,8 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
-
+import org.hibernate.annotations.DynamicUpdate;
 
 
 @Getter
@@ -19,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @Entity
 public class GuestEntity extends BaseEntity{
 

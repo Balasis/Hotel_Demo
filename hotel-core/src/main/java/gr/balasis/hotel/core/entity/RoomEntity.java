@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @Entity
 public class RoomEntity extends BaseEntity{
 

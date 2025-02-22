@@ -7,11 +7,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
+@DynamicUpdate
 @Entity
 public class ReservationEntity extends BaseEntity{
 
