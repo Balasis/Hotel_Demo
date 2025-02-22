@@ -10,20 +10,61 @@
     </parent>
 
     <artifactId>hotel-core</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hotel-core-reservations</module>
-        <module>hotel-core-rooms</module>
-        <module>hotel-core-guests</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
+            <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-context-base-domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-context-web-domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-mappers</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-mappers</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
