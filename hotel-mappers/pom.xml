@@ -5,13 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>gr.balasis.hotel</groupId>
-        <artifactId>hotel-context</artifactId>
+        <artifactId>hotel-demo</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hotel-context-base</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hotel-context-base-domain</module>
-    </modules>
+    <artifactId>hotel-mappers</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

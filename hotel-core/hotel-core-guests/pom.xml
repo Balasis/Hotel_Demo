@@ -5,13 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>gr.balasis.hotel</groupId>
-        <artifactId>hotel-context</artifactId>
+        <artifactId>hotel-core</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hotel-context-base</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hotel-context-base-domain</module>
-    </modules>
+    <artifactId>hotel-core-guests</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 </project>
