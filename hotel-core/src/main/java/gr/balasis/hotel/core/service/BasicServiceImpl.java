@@ -4,11 +4,9 @@ import gr.balasis.hotel.context.base.domain.BaseDomain;
 import gr.balasis.hotel.core.base.BaseComponent;
 
 import gr.balasis.hotel.core.entity.BaseEntity;
+import gr.balasis.hotel.core.exception.EntityNotFoundException;
 import gr.balasis.hotel.core.mapper.entitydomain.EDbaseMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +36,8 @@ public abstract class BasicServiceImpl<T extends BaseDomain, E extends BaseEntit
 
     @Override
     public T findById(Long id) {
-        E entity = getRepository().findById(id).orElseThrow();
+        E entity = getRepository().findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Entity not found with id: " + id));
         return getMapper().toDomain(entity);
     }
 
