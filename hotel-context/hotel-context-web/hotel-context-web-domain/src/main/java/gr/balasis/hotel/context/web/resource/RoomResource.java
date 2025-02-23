@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @ToString
 @Builder
 @AllArgsConstructor
-public class RoomResource {
+public class RoomResource extends BaseResource{
     private Long id;
     private String roomNumber;
     private boolean available;

@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 @ToString
 @Builder
 @AllArgsConstructor
-public class ReservationResource {
+public class ReservationResource extends BaseResource{
     private Long id;
     private Long guestId;
     private Long roomId;
