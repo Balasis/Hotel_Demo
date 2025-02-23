@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:devDB #sample to be changed...
+    driver-class-name: org.h2.Driver
+    username: prodUsername
+  jpa:
+    hibernate:
+      ddl-auto: validate
+logging:
+  level:
+    root: info
+    gr.balasis.hotel.core: trace
+customMessage: "Production environment is up..."
