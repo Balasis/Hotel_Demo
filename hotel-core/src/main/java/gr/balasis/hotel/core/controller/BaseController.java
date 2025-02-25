@@ -25,15 +25,6 @@ public abstract class BaseController<T extends BaseDomain,R extends BaseResource
         return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(id) ));
     }
 
-    @GetMapping
-    public ResponseEntity<List<R>> findAll() {
-        List<R> resources = getBaseService().findAll()
-                .stream()
-                .map(getMapper()::toResource)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resources);
-    }
-
     @PostMapping
     public ResponseEntity<R> create(@RequestBody R resource) {
         T domain = getMapper().toDomainFromResource(resource);
