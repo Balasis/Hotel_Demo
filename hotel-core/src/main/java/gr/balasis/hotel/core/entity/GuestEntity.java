@@ -3,14 +3,9 @@ package gr.balasis.hotel.core.entity;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
-
 
 @Getter
 @Setter
@@ -31,6 +26,5 @@ public class GuestEntity extends BaseEntity{
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private LocalDate createdAt;
 }

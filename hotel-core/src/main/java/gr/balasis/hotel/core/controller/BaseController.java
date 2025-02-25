@@ -3,7 +3,8 @@ package gr.balasis.hotel.core.controller;
 import gr.balasis.hotel.context.base.domain.BaseDomain;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.core.base.BaseComponent;
-import gr.balasis.hotel.core.mapper.resourcedomain.RDbaseMapper;
+import gr.balasis.hotel.core.entity.BaseEntity;
+import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.service.BaseService;
 
 import java.util.List;
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-public abstract class BaseController<T extends BaseDomain,R extends BaseResource> extends BaseComponent {
+public abstract class BaseController<T extends BaseDomain,R extends BaseResource, E extends BaseEntity> extends BaseComponent {
     protected abstract BaseService<T, Long> getBaseService();
-    protected abstract RDbaseMapper<R,T> getMapper();
+    protected abstract BaseMapper<T,R,E> getMapper();
 
     @GetMapping("/{findById}")
     public ResponseEntity<R> findById(@PathVariable("findById") final Long id) {
@@ -38,14 +39,14 @@ public abstract class BaseController<T extends BaseDomain,R extends BaseResource
 
     @PostMapping
     public ResponseEntity<R> create(@RequestBody R resource) {
-        T domain = getMapper().toDomain(resource);
+        T domain = getMapper().toDomainFromResource(resource);
         T created = getBaseService().create(domain);
         return ResponseEntity.ok(getMapper().toResource(created));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<R> update(@PathVariable Long id, @RequestBody R resource) {
-        T domain = getMapper().toDomain(resource);
+        T domain = getMapper().toDomainFromResource(resource);
         getBaseService().update(domain);
         return ResponseEntity.ok(getMapper().toResource(domain));
     }
