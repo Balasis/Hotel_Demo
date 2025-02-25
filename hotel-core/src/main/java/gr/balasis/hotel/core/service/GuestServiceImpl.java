@@ -10,13 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,GuestEntity> implements GuestService{
     private final GuestRepository guestRepository;
     private final GuestMapper guestMapper;
-
 
     @Override
     public JpaRepository<GuestEntity,Long> getRepository() {

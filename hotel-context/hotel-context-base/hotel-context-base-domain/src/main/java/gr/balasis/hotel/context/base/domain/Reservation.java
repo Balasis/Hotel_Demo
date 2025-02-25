@@ -2,9 +2,8 @@ package gr.balasis.hotel.context.base.domain;
 
 import java.time.LocalDate;
 
-
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+
 
 @Getter
 @Setter

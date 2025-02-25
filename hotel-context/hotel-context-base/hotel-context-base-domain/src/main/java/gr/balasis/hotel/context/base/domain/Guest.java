@@ -1,7 +1,6 @@
 package gr.balasis.hotel.context.base.domain;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 

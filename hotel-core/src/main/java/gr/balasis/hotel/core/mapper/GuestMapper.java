@@ -6,7 +6,6 @@ import gr.balasis.hotel.core.entity.GuestEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
-
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface GuestMapper extends BaseMapper<Guest, GuestResource, GuestEntity> {
 
