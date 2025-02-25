@@ -1,10 +1,8 @@
 package gr.balasis.hotel.context.base.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,6 +10,7 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Guest extends BaseDomain{
     private String firstName;
     private String lastName;

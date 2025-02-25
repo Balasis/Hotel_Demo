@@ -2,8 +2,9 @@ package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.context.web.resource.GuestResource;
-import gr.balasis.hotel.core.mapper.resourcedomain.RDbaseMapper;
-import gr.balasis.hotel.core.mapper.resourcedomain.RDguestMapper;
+import gr.balasis.hotel.core.entity.GuestEntity;
+import gr.balasis.hotel.core.mapper.BaseMapper;
+import gr.balasis.hotel.core.mapper.GuestMapper;
 import gr.balasis.hotel.core.service.BaseService;
 import gr.balasis.hotel.core.service.GuestService;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/guests")
-public class GuestController extends BaseController<Guest, GuestResource>{
+public class GuestController extends BaseController<Guest, GuestResource, GuestEntity>{
     private final GuestService guestService;
-    private final RDguestMapper rDguestMapper;
+    private final GuestMapper guestMapper;
 
     @Override
     public BaseService<Guest, Long> getBaseService() {
@@ -23,7 +24,7 @@ public class GuestController extends BaseController<Guest, GuestResource>{
     }
 
     @Override
-    public RDbaseMapper<GuestResource, Guest> getMapper() {
-        return rDguestMapper;
+    public BaseMapper<Guest, GuestResource, GuestEntity> getMapper() {
+        return guestMapper;
     }
 }

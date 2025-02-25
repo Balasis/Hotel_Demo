@@ -3,16 +3,16 @@ package gr.balasis.hotel.core.entity;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
 @ToString
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @DynamicUpdate
 @Entity
 public class ReservationEntity extends BaseEntity{
@@ -23,7 +23,6 @@ public class ReservationEntity extends BaseEntity{
     @Column(nullable = false)
     private Long roomId;
 
-    @Column(nullable = false)
     private LocalDate checkInDate;
 
     private LocalDate checkOutDate;
