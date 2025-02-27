@@ -6,8 +6,6 @@ import gr.balasis.hotel.core.base.BaseComponent;
 import gr.balasis.hotel.core.entity.BaseEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.service.BaseService;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,17 +19,8 @@ public abstract class BaseController<T extends BaseDomain,R extends BaseResource
     protected abstract BaseMapper<T,R,E> getMapper();
 
     @GetMapping("/{findById}")
-    public ResponseEntity<R> findById(@PathVariable("findById") final Long id) {
-        return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(id) ));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<R>> findAll() {
-        List<R> resources = getBaseService().findAll()
-                .stream()
-                .map(getMapper()::toResource)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resources);
+    public ResponseEntity<R> findById(@PathVariable final Long findById) {
+        return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(findById) ));
     }
 
     @PostMapping

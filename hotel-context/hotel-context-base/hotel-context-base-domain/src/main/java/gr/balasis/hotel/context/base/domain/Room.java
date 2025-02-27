@@ -12,6 +12,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Room extends BaseDomain{
     private String roomNumber;
-    private boolean available;
+    private boolean reserved;
     private BigDecimal pricePerNight;
 }

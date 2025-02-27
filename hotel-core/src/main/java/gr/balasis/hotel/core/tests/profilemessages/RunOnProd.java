@@ -25,6 +25,6 @@ public class RunOnProd {
     public void logMessage() {
         logger.trace(aBriefMessage
                 + ", code written on "
-                + messageSource.getMessage("app.written.date",null, Locale.getDefault()));
+                + messageSource.getMessage("app.written.date", null, Locale.getDefault()));
     }
 }

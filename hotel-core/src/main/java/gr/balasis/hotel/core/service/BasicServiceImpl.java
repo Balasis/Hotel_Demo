@@ -18,7 +18,6 @@ public abstract class BasicServiceImpl<T extends BaseDomain,R extends BaseResour
     public T create(final T item) {
         E entity = getMapper().toEntity(item);
         E savedEntity = getRepository().save(entity);
-        System.out.println("Saved entity ID: " + savedEntity.getId());
         return getMapper().toDomainFromEntity(savedEntity);
     }
 
