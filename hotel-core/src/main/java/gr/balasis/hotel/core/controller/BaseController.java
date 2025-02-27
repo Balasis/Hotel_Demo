@@ -21,8 +21,8 @@ public abstract class BaseController<T extends BaseDomain,R extends BaseResource
     protected abstract BaseMapper<T,R,E> getMapper();
 
     @GetMapping("/{findById}")
-    public ResponseEntity<R> findById(@PathVariable("findById") final Long id) {
-        return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(id) ));
+    public ResponseEntity<R> findById(@PathVariable final Long findById) {
+        return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(findById) ));
     }
 
     @PostMapping
