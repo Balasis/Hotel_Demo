@@ -12,8 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation extends BaseDomain{
-    private Long guestId;
-    private Long roomId;
+    private Guest guest;
+    private Room room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 
