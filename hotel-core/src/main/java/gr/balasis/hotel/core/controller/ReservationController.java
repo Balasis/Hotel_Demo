@@ -1,9 +1,7 @@
 package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-import gr.balasis.hotel.context.web.resource.RoomResource;
 import gr.balasis.hotel.core.entity.ReservationEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.ReservationMapper;
@@ -12,7 +10,6 @@ import gr.balasis.hotel.core.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
