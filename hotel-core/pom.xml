@@ -44,7 +44,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-
+        </dependency>
+        <dependency>
+            <groupId>com.thedeanda</groupId>
+            <artifactId>lorem</artifactId>
         </dependency>
     </dependencies>
 

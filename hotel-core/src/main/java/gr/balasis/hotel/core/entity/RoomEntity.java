@@ -25,7 +25,7 @@ public class RoomEntity extends BaseEntity{
     private String roomNumber;
 
     @Column(nullable = false)
-    private boolean available;
+    private boolean reserved;
 
     @Column(nullable = false)
     private BigDecimal pricePerNight;
