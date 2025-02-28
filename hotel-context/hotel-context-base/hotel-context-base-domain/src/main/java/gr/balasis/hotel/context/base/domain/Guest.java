@@ -3,6 +3,7 @@ package gr.balasis.hotel.context.base.domain;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +16,5 @@ public class Guest extends BaseDomain{
     private String lastName;
     private String email;
     private LocalDateTime createdAt;
+    private List<Reservation> reservations;
 }

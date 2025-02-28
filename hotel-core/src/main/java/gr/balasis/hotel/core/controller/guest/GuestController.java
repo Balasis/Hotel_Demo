@@ -1,7 +1,8 @@
-package gr.balasis.hotel.core.controller;
+package gr.balasis.hotel.core.controller.guest;
 
 import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.context.web.resource.GuestResource;
+import gr.balasis.hotel.core.controller.BaseController;
 import gr.balasis.hotel.core.entity.GuestEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.GuestMapper;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/guests")
-public class GuestController extends BaseController<Guest, GuestResource, GuestEntity>{
+public class GuestController extends BaseController<Guest, GuestResource, GuestEntity> {
     private final GuestService guestService;
     private final GuestMapper guestMapper;
 
