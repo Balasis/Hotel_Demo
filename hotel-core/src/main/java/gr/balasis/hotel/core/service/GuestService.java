@@ -9,4 +9,5 @@ public interface GuestService extends BaseService<Guest,Long>{
     List<Guest> findByFirstNameAndLastName(String firstName, String lastName);
     List<Guest> findByFirstName(String firstName);
     List<Guest> findByLastName(String lastName);
+    boolean existsById(Long guestId);
 }

@@ -1,5 +1,6 @@
 package gr.balasis.hotel.core.service;
 
+import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.base.domain.ReservationCharge;
 import gr.balasis.hotel.context.web.resource.ReservationChargeResource;
 import gr.balasis.hotel.core.entity.ReservationChargeEntity;
@@ -7,6 +8,7 @@ import gr.balasis.hotel.core.entity.ReservationEntity;
 import gr.balasis.hotel.core.exception.EntityNotFoundException;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.ReservationChargeMapper;
+import gr.balasis.hotel.core.mapper.ReservationMapper;
 import gr.balasis.hotel.core.repository.ReservationChargeRepository;
 import gr.balasis.hotel.core.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ import java.util.Optional;
 public class ReservationChargeServiceImpl extends BasicServiceImpl<ReservationCharge,
         ReservationChargeResource, ReservationChargeEntity> implements ReservationChargeService {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservationMapper reservationMapper;
     private final ReservationChargeRepository reservationChargeRepository;
     private final ReservationChargeMapper reservationChargeMapper;
 
@@ -36,11 +38,9 @@ public class ReservationChargeServiceImpl extends BasicServiceImpl<ReservationCh
         ));
     }
 
-    public ReservationCharge createCharge(Long reservationId, ReservationCharge reservationCharge) {
+    public ReservationCharge createCharge(Reservation reservation, ReservationCharge reservationCharge) {
         ReservationChargeEntity reservationChargeEntity = reservationChargeMapper.toEntity(reservationCharge);
-        reservationChargeEntity.setReservation(reservationRepository.findById(reservationId).orElseThrow(
-                () -> new EntityNotFoundException("Could not find reservation with id: " + reservationId)
-        ));
+        reservationChargeEntity.setReservation(reservationMapper.toEntity(reservation));
         reservationChargeEntity = reservationChargeRepository.save(reservationChargeEntity);
 
         return reservationChargeMapper.toDomainFromEntity(reservationChargeEntity);

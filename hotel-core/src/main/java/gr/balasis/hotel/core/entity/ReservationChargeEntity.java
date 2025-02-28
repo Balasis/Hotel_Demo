@@ -2,19 +2,18 @@ package gr.balasis.hotel.core.entity;
 
 import gr.balasis.context.base.enums.ChargeStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationChargeEntity extends BaseEntity{
+
 
     @OneToOne
     @JoinColumn(nullable = false, unique = true)
@@ -25,9 +24,6 @@ public class ReservationChargeEntity extends BaseEntity{
 
     @Column(nullable = false)
     private BigDecimal roomCharge;
-
-    @Column(nullable = false)
-    private BigDecimal amenitiesCharge;
 
     @Column(nullable = false)
     private BigDecimal tax;
