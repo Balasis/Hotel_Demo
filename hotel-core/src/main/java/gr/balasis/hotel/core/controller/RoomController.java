@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.controller.room;
+package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.context.web.resource.RoomResource;
