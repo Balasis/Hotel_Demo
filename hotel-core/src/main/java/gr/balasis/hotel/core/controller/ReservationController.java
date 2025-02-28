@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.controller.reservation;
+package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.ReservationResource;

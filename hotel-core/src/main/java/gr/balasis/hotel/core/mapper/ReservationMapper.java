@@ -11,4 +11,5 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true), uses = {RoomMapper.class,GuestMapper.class})
 public interface ReservationMapper extends BaseMapper<Reservation, ReservationResource, ReservationEntity> {
+
 }

@@ -10,20 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationResource, ReservationEntity> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationMapper reservationMapper;
-
-    public List<Reservation> findByGuestId(Long guestId){
-        return reservationRepository.findByGuestId(guestId).stream()
-                .map(reservationMapper::toDomainFromEntity)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public JpaRepository<ReservationEntity, Long> getRepository() {

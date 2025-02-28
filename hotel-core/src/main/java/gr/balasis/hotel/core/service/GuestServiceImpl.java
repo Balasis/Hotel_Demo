@@ -1,11 +1,17 @@
 package gr.balasis.hotel.core.service;
 
 import gr.balasis.hotel.context.base.domain.Guest;
+import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.core.entity.GuestEntity;
+import gr.balasis.hotel.core.entity.ReservationEntity;
+import gr.balasis.hotel.core.exception.EntityNotFoundException;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.GuestMapper;
+import gr.balasis.hotel.core.mapper.ReservationMapper;
 import gr.balasis.hotel.core.repository.GuestRepository;
+import gr.balasis.hotel.core.repository.ReservationRepository;
+import gr.balasis.hotel.core.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -17,33 +23,88 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,GuestEntity> implements GuestService{
     private final GuestRepository guestRepository;
+    private final ReservationRepository reservationRepository;
     private final GuestMapper guestMapper;
+    private final ReservationMapper reservationMapper;
+    private final RoomRepository roomRepository;
 
-    public Guest findByEmail(String email) {
-        return guestMapper.toDomainFromEntity( guestRepository.findByEmail(email) )   ;
-    }
+    @Override
+    public List<Reservation> findReservationsByGuestId(Long id) {
+        GuestEntity guestEntity =
+                guestRepository.findById(id).orElseThrow(
+                        () -> new EntityNotFoundException("Guest entity not found"));
 
-    public List<Guest> findByFirstNameAndLastName(String firstName, String lastName) {
-        return guestRepository.findByFirstNameAndLastName(firstName, lastName).stream()
-                .map(guestMapper::toDomainFromEntity)
+        return reservationRepository.findByGuest(guestEntity).stream()
+                .map(reservationMapper::toDomainFromEntity)
                 .collect(Collectors.toList());
     }
 
-    public List<Guest> findByFirstName(String firstName) {
-        return guestRepository.findByFirstName(firstName).stream()
-                .map(guestMapper::toDomainFromEntity)
-                .collect(Collectors.toList());
+    @Override
+    public Reservation createReservationForGuest(Long id, Reservation reservation) {
+
+        guestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Guest not found"));
+        roomRepository.findById(reservation.getRoom().getId()).orElseThrow(() -> new EntityNotFoundException("Room not found"));
+
+        ReservationEntity SavedReservationEntity = reservationRepository.save(reservationMapper.toEntity(reservation));
+
+        return reservationMapper.toDomainFromEntity(SavedReservationEntity);
     }
 
-    public List<Guest> findByLastName(String lastName) {
-        return guestRepository.findByLastName(lastName).stream()
-                .map(guestMapper::toDomainFromEntity)
-                .collect(Collectors.toList());
+    @Override
+    public void cancelReservation(Long id, Long reservationId) {
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
+
+        if (!reservationEntity.getGuest().getId().equals(id)) {
+            throw new IllegalArgumentException("Reservation does not belong to the guest");
+        }
+
+        reservationRepository.delete(reservationEntity);
     }
 
-    public boolean existsById(Long guestId) {
-        return guestRepository.existsById(guestId);
+    @Override
+    public void deleteById(Long id) {
+        if (!guestRepository.existsById(id)) {
+            throw new EntityNotFoundException("Guest not found");
+        }
+        guestRepository.deleteById(id);
     }
+
+    @Override
+    public Guest updateEmail(Long id, String email) {
+        GuestEntity guestEntity = guestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
+        guestEntity.setEmail(email);
+        return guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
+    }
+
+//    public Guest findByEmail(String email) {
+//        return guestMapper.toDomainFromEntity( guestRepository.findByEmail(email) )   ;
+//    }
+//
+//    public List<Guest> findByFirstNameAndLastName(String firstName, String lastName) {
+//        return guestRepository.findByFirstNameAndLastName(firstName, lastName).stream()
+//                .map(guestMapper::toDomainFromEntity)
+//                .collect(Collectors.toList());
+//    }
+//
+//    public List<Guest> findByFirstName(String firstName) {
+//        return guestRepository.findByFirstName(firstName).stream()
+//                .map(guestMapper::toDomainFromEntity)
+//                .collect(Collectors.toList());
+//    }
+//
+//    public List<Guest> findByLastName(String lastName) {
+//        return guestRepository.findByLastName(lastName).stream()
+//                .map(guestMapper::toDomainFromEntity)
+//                .collect(Collectors.toList());
+//    }
+//
+//    public boolean existsById(Long guestId) {
+//        return guestRepository.existsById(guestId);
+//    }
+
+
 
     @Override
     public JpaRepository<GuestEntity,Long> getRepository() {
