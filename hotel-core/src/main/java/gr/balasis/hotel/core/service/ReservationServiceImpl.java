@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public List<Reservation> findByGuestId(Long guestId){
         return reservationRepository.findByGuestId(guestId).stream()
                 .map(reservationMapper::toDomainFromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override

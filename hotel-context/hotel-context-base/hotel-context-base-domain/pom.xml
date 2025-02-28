@@ -10,6 +10,11 @@
     </parent>
 
     <artifactId>hotel-context-base-domain</artifactId>
-
+    <dependencies>
+        <dependency>
+            <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-context-base-enums</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

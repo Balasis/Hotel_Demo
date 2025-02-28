@@ -1,8 +1,8 @@
 package gr.balasis.hotel.core.entity;
 
 import java.time.LocalDate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
+
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,11 +16,13 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 public class ReservationEntity extends BaseEntity{
 
-    @Column(nullable = false)
-    private Long guestId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private GuestEntity guest;
 
-    @Column(nullable = false)
-    private Long roomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private RoomEntity room;
 
     private LocalDate checkInDate;
 

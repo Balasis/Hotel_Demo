@@ -41,6 +41,10 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
                 .collect(Collectors.toList());
     }
 
+    public boolean existsById(Long guestId) {
+        return guestRepository.existsById(guestId);
+    }
+
     @Override
     public JpaRepository<GuestEntity,Long> getRepository() {
         return guestRepository;

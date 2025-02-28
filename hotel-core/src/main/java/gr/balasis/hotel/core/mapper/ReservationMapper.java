@@ -6,7 +6,7 @@ import gr.balasis.hotel.core.entity.ReservationEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true), uses = {GuestMapper.class, RoomMapper.class})
 public interface ReservationMapper extends BaseMapper<Reservation, ReservationResource, ReservationEntity> {
 
 }
