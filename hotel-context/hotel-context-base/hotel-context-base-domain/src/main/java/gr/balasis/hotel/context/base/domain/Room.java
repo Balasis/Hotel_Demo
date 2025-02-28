@@ -1,10 +1,7 @@
 package gr.balasis.hotel.context.base.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
 
 @Getter
@@ -12,8 +9,9 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Room extends BaseDomain{
     private String roomNumber;
-    private boolean available;
+    private boolean reserved;
     private BigDecimal pricePerNight;
 }

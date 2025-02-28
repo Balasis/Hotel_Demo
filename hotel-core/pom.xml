@@ -21,6 +21,11 @@
 
         <dependency>
             <groupId>gr.balasis.hotel</groupId>
+            <artifactId>hotel-context-base-enums</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>gr.balasis.hotel</groupId>
             <artifactId>hotel-context-web-domain</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -44,7 +49,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-
+        </dependency>
+        <dependency>
+            <groupId>com.thedeanda</groupId>
+            <artifactId>lorem</artifactId>
         </dependency>
     </dependencies>
 

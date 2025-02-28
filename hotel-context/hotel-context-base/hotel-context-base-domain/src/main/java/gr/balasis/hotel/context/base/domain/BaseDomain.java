@@ -1,7 +1,6 @@
 package gr.balasis.hotel.context.base.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter

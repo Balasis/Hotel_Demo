@@ -5,14 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>gr.balasis.hotel</groupId>
-        <artifactId>hotel-context</artifactId>
+        <artifactId>hotel-modules</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hotel-context-base</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hotel-context-base-domain</module>
-        <module>hotel-context-base-enums</module>
-    </modules>
+    <groupId>gr.balasis.hotel.module.extra.amenities</groupId>
+    <artifactId>hotel-module-extra-amenities</artifactId>
+
 </project>

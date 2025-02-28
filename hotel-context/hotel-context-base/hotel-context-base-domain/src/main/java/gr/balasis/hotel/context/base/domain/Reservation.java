@@ -2,21 +2,18 @@ package gr.balasis.hotel.context.base.domain;
 
 import java.time.LocalDate;
 
+import lombok.*;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Reservation extends BaseDomain{
-    private Long guestId;
-    private Long roomId;
+    private Guest guest;
+    private Room room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 

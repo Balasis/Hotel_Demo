@@ -13,9 +13,8 @@ import lombok.AllArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class ReservationResource extends BaseResource{
-    private Long id;
-    private Long guestId;
-    private Long roomId;
+    private GuestResource guest;
+    private RoomResource room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 }
