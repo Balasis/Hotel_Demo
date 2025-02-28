@@ -8,9 +8,8 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ReservationChargeResource extends BaseResource{
-    private Long reservationId;
+    private ReservationResource reservation;
     private BigDecimal totalAmount;
     private BigDecimal roomCharge;
-    private BigDecimal tax;
     private String chargeStatus;
 }

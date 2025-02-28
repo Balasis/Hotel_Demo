@@ -15,9 +15,13 @@ import com.thedeanda.lorem.LoremIpsum;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -26,12 +30,13 @@ public class DataLoader implements ApplicationRunner {
     private final RoomService roomService;
     private final ReservationService reservationService;
     private static final Lorem lorem = LoremIpsum.getInstance();
+    private final Random random = new Random();
 
     @Override
     public void run(ApplicationArguments args) {
         loadRooms();
         loadGuests();
-//        loadReservations();
+        loadReservations();
     }
 
     private void loadRooms() {
@@ -66,11 +71,43 @@ public class DataLoader implements ApplicationRunner {
         }
     }
 
-//    private void loadReservations() {
-//        List<Reservation> reservations = List.of(
-//                Reservation.builder().guestId(1L).roomId(1L).checkInDate(LocalDate.now()).checkOutDate(LocalDate.now().plusDays(3)).build(),
-//                Reservation.builder().guestId(2L).roomId(2L).checkInDate(LocalDate.now()).checkOutDate(LocalDate.now().plusDays(2)).build()
-//        );
-//        reservations.forEach(reservationService::create);
-//    }
+    private void loadReservations() {
+        List<Guest> guests = guestService.findAll();
+        List<Room> availableRooms = roomService.findAll().stream()
+                .filter(room -> !room.isReserved())
+                .collect(Collectors.toList());
+
+        if (guests.isEmpty() || availableRooms.isEmpty()) {
+            System.out.println("Skipping reservations: No guests or available rooms.");
+            return;
+        }
+
+        for (int i = 0; i < 5; i++) {
+            Room room = pickRandomRoom(availableRooms);
+            reservationService.create(createReservationDomain( pickRandomGuest(guests),room) );
+            room.setReserved(true);
+            roomService.update(room);
+        }
+
+    }
+
+    private Guest pickRandomGuest(List<Guest> guests){
+        return guests.get(random.nextInt(guests.size()));
+    }
+
+    private Room pickRandomRoom(List<Room> rooms){
+        return rooms.remove(random.nextInt(rooms.size()));
+    }
+
+    private Reservation createReservationDomain(Guest guest, Room room){
+        LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
+        return Reservation.builder()
+                .guest(guest)
+                .room(room)
+                .checkInDate(checkInDate)
+                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
+                .build();
+    }
+
+
 }

@@ -38,11 +38,10 @@ public class ReservationGuestController extends BaseController<Reservation, Rese
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResource> createReservation(
-            @PathVariable final Long guestId,
+    public ResponseEntity<ReservationResource> create(
             @RequestBody ReservationResource reservationResource) {
 
-        if (!guestService.existsById(guestId)) {
+        if (!guestService.existsById(reservationResource.getGuest().getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Guest not found");
         }
 
@@ -51,9 +50,6 @@ public class ReservationGuestController extends BaseController<Reservation, Rese
         }
 
         Reservation reservation = reservationMapper.toDomainFromResource(reservationResource);
-        reservation.setGuest(guestService.findById(guestId));
-        reservation.setRoom(roomService.findById(reservationResource.getRoom().getId()));
-
         Reservation savedReservation = reservationService.create(reservation);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationMapper.toResource(savedReservation));

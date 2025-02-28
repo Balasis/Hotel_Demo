@@ -12,8 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationChargeEntity extends BaseEntity{
-
+public class ReservationChargeEntity extends BaseEntity {
 
     @OneToOne
     @JoinColumn(nullable = false, unique = true)
@@ -24,9 +23,6 @@ public class ReservationChargeEntity extends BaseEntity{
 
     @Column(nullable = false)
     private BigDecimal roomCharge;
-
-    @Column(nullable = false)
-    private BigDecimal tax;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

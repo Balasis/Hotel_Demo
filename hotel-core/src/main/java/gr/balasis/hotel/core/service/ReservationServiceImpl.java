@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public List<Reservation> findByGuestId(Long guestId){
         return reservationRepository.findByGuestId(guestId).stream()
                 .map(reservationMapper::toDomainFromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -37,26 +38,17 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
         long nights = ChronoUnit.DAYS.between(item.getCheckInDate(), item.getCheckOutDate());
         BigDecimal roomCharge = item.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(nights));
-        BigDecimal tax = calculateTax(roomCharge);
-        BigDecimal totalAmount = roomCharge.add(tax);
 
         ReservationChargeEntity reservationChargeEntity = ReservationChargeEntity.builder()
                 .reservation(savedReservation)
                 .roomCharge(roomCharge)
-                .tax(tax)
-                .totalAmount(totalAmount)
+                .totalAmount(roomCharge)
                 .chargeStatus(ChargeStatus.PENDING)
                 .build();
 
         reservationChargeRepository.save(reservationChargeEntity);
 
         return getMapper().toDomainFromEntity(savedReservation);
-    }
-
-    // Example tax calculation method (adjust as needed)
-    private BigDecimal calculateTax(BigDecimal amount) {
-        BigDecimal taxRate = new BigDecimal("0.10"); // 10% tax
-        return amount.multiply(taxRate);
     }
 
     @Override

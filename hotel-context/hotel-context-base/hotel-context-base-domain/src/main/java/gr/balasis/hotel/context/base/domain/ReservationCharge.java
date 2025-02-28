@@ -8,9 +8,8 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ReservationCharge extends BaseDomain{
-    private Long reservationId;
+    private Reservation reservation;
     private BigDecimal totalAmount;
     private BigDecimal roomCharge;
-    private BigDecimal tax;
     private ChargeStatus chargeStatus;
 }
