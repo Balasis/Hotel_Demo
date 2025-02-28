@@ -16,5 +16,4 @@ public class Guest extends BaseDomain{
     private String lastName;
     private String email;
     private LocalDateTime createdAt;
-    private List<Reservation> reservations;
 }
