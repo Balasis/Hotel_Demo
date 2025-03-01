@@ -36,7 +36,6 @@ public class DataLoader implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        System.out.println("do i exist?");
         loadRooms();
         loadGuests();
         loadReservations();
