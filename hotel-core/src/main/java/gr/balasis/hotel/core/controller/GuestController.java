@@ -10,6 +10,7 @@ import gr.balasis.hotel.context.base.mapper.GuestMapper;
 import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.core.service.BaseService;
 import gr.balasis.hotel.core.service.GuestService;
+import gr.balasis.hotel.core.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
     private final GuestService guestService;
     private final GuestMapper guestMapper;
     private final ReservationMapper reservationMapper;
+    private final ReservationService reservationService;
 
     @GetMapping
     public ResponseEntity<List<GuestResource>> findAll() {
@@ -38,7 +40,7 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
     @GetMapping("/{id}/reservations")
     public ResponseEntity<List<ReservationResource>> getGuestReservations(
             @PathVariable Long id) {
-        List<ReservationResource> reservations = guestService.findReservationsByGuestId(id)
+        List<ReservationResource> reservations = reservationService.findReservationsByGuestId(id)
                 .stream()
                 .map(reservationMapper::toResource)
                 .collect(Collectors.toList());
@@ -50,7 +52,7 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
             @PathVariable Long id,
             @RequestBody ReservationResource reservation) {
         Reservation newReservation =
-                guestService.createReservationForGuest(id, reservationMapper.toDomainFromResource(reservation));
+                reservationService.createReservationForGuest(id, reservationMapper.toDomainFromResource(reservation));
         return ResponseEntity.ok(reservationMapper.toResource(newReservation));
     }
 
@@ -58,7 +60,7 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
     public ResponseEntity<Void> cancelReservation(
             @PathVariable Long id,
             @PathVariable Long reservationId) {
-        guestService.cancelReservation(id, reservationId);
+        reservationService.cancelReservation(id, reservationId);
         return ResponseEntity.noContent().build();
     }
 

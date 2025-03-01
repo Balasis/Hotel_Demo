@@ -16,51 +16,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,GuestEntity> implements GuestService{
     private final GuestRepository guestRepository;
-    private final ReservationRepository reservationRepository;
     private final GuestMapper guestMapper;
-    private final ReservationMapper reservationMapper;
-    private final RoomRepository roomRepository;
 
-    @Override
-    public List<Reservation> findReservationsByGuestId(Long id) {
-        GuestEntity guestEntity =
-                guestRepository.findById(id).orElseThrow(
-                        () -> new EntityNotFoundException("Guest entity not found"));
 
-        return reservationRepository.findByGuest(guestEntity).stream()
-                .map(reservationMapper::toDomainFromEntity)
-                .collect(Collectors.toList());
-    }
 
-    @Override
-    public Reservation createReservationForGuest(Long id, Reservation reservation) {
-
-        guestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Guest not found"));
-        roomRepository.findById(reservation.getRoom().getId()).orElseThrow(() -> new EntityNotFoundException("Room not found"));
-
-        ReservationEntity SavedReservationEntity = reservationRepository.save(reservationMapper.toEntity(reservation));
-
-        return reservationMapper.toDomainFromEntity(SavedReservationEntity);
-    }
-
-    @Override
-    public void cancelReservation(Long id, Long reservationId) {
-        ReservationEntity reservationEntity = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
-
-        if (!reservationEntity.getGuest().getId().equals(id)) {
-            throw new IllegalArgumentException("Reservation does not belong to the guest");
-        }
-
-        reservationRepository.delete(reservationEntity);
-    }
 
     @Override
     public void deleteById(Long id) {
