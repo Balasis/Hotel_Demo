@@ -1,6 +1,6 @@
-package gr.balasis.hotel.core.repository;
+package gr.balasis.hotel.data.repository;
 
-import gr.balasis.hotel.core.entity.GuestEntity;
+import gr.balasis.hotel.data.entity.GuestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

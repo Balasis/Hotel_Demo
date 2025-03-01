@@ -20,6 +20,7 @@
         <module>hotel-context</module>
         <module>hotel-core</module>
         <module>hotel-modules</module>
+        <module>hotel-data</module>
     </modules>
 
     <properties>

@@ -2,10 +2,9 @@ package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-import gr.balasis.hotel.core.controller.BaseController;
-import gr.balasis.hotel.core.entity.ReservationEntity;
-import gr.balasis.hotel.core.mapper.BaseMapper;
-import gr.balasis.hotel.core.mapper.ReservationMapper;
+import gr.balasis.hotel.data.entity.ReservationEntity;
+import gr.balasis.hotel.context.base.mapper.BaseMapper;
+import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.core.service.BaseService;
 import gr.balasis.hotel.core.service.ReservationService;
 import lombok.RequiredArgsConstructor;

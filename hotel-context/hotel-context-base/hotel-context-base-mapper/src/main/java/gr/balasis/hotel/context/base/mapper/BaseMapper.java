@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.mapper;
+package gr.balasis.hotel.context.base.mapper;
 
 public interface BaseMapper<D,R,E>{
 
