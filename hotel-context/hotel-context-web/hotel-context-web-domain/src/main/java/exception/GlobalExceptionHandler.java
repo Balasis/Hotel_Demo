@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.exception;
+package exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

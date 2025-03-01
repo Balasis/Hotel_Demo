@@ -5,7 +5,7 @@ import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.data.entity.GuestEntity;
 import gr.balasis.hotel.data.entity.ReservationEntity;
-import gr.balasis.hotel.core.exception.EntityNotFoundException;
+import exception.EntityNotFoundException;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.context.base.mapper.GuestMapper;
 import gr.balasis.hotel.context.base.mapper.ReservationMapper;
