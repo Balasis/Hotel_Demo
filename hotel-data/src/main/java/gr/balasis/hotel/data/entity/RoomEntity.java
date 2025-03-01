@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.entity;
+package gr.balasis.hotel.data.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;

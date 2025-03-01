@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.entity;
+package gr.balasis.hotel.data.entity;
 
 import java.time.LocalDate;
 

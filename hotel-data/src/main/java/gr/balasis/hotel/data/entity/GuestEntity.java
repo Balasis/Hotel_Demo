@@ -1,12 +1,9 @@
-package gr.balasis.hotel.core.entity;
+package gr.balasis.hotel.data.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 

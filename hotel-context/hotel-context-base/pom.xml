@@ -14,5 +14,6 @@
     <modules>
         <module>hotel-context-base-domain</module>
         <module>hotel-context-base-enums</module>
+        <module>hotel-context-base-mapper</module>
     </modules>
 </project>

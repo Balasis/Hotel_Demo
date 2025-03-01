@@ -1,9 +1,7 @@
-package gr.balasis.hotel.core.repository;
+package gr.balasis.hotel.data.repository;
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.core.entity.GuestEntity;
-import gr.balasis.hotel.core.entity.ReservationEntity;
+import gr.balasis.hotel.data.entity.GuestEntity;
+import gr.balasis.hotel.data.entity.ReservationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
