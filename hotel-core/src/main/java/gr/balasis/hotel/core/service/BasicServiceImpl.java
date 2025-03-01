@@ -5,7 +5,7 @@ import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.core.base.BaseComponent;
 import gr.balasis.hotel.data.entity.BaseEntity;
 import gr.balasis.hotel.core.exception.EntityNotFoundException;
-import gr.balasis.hotel.core.mapper.BaseMapper;
+import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.stream.Collectors;

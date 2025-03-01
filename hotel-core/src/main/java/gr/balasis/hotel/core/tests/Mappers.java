@@ -1,8 +1,8 @@
 package gr.balasis.hotel.core.tests;
 
-import gr.balasis.hotel.core.mapper.GuestMapper;
-import gr.balasis.hotel.core.mapper.ReservationMapper;
-import gr.balasis.hotel.core.mapper.RoomMapper;
+import gr.balasis.hotel.context.base.mapper.GuestMapper;
+import gr.balasis.hotel.context.base.mapper.ReservationMapper;
+import gr.balasis.hotel.context.base.mapper.RoomMapper;
 import gr.balasis.hotel.core.service.GuestService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
