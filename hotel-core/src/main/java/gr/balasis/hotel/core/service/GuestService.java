@@ -13,9 +13,6 @@ public interface GuestService extends BaseService<Guest,Long>{
 //    List<Guest> findByLastName(String lastName);
 //    boolean existsById(Long guestId);
 
-    List<Reservation> findReservationsByGuestId(Long id);
-    Reservation createReservationForGuest(Long id, Reservation reservation);
-    void cancelReservation(Long id, Long reservationId);
     void deleteById(Long id);
     Guest updateEmail(Long id, String email);
 }
