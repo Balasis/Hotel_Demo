@@ -2,8 +2,7 @@ package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.context.web.resource.RoomResource;
-import gr.balasis.hotel.core.controller.BaseController;
-import gr.balasis.hotel.core.entity.RoomEntity;
+import gr.balasis.hotel.data.entity.RoomEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.RoomMapper;
 import gr.balasis.hotel.core.service.BaseService;

@@ -3,7 +3,7 @@ package gr.balasis.hotel.core.controller;
 import gr.balasis.hotel.context.base.domain.BaseDomain;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.core.base.BaseComponent;
-import gr.balasis.hotel.core.entity.BaseEntity;
+import gr.balasis.hotel.data.entity.BaseEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.service.BaseService;
 import org.springframework.http.ResponseEntity;

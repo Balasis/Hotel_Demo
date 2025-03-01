@@ -1,11 +1,5 @@
 package gr.balasis.hotel.core.tests;
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.domain.Room;
-import gr.balasis.hotel.core.entity.GuestEntity;
-import gr.balasis.hotel.core.entity.ReservationEntity;
-import gr.balasis.hotel.core.entity.RoomEntity;
 import gr.balasis.hotel.core.mapper.GuestMapper;
 import gr.balasis.hotel.core.mapper.ReservationMapper;
 import gr.balasis.hotel.core.mapper.RoomMapper;
@@ -14,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Component

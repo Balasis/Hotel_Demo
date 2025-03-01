@@ -2,10 +2,10 @@ package gr.balasis.hotel.core.service;
 
 import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-import gr.balasis.hotel.core.entity.ReservationEntity;
+import gr.balasis.hotel.data.entity.ReservationEntity;
 import gr.balasis.hotel.core.mapper.BaseMapper;
 import gr.balasis.hotel.core.mapper.ReservationMapper;
-import gr.balasis.hotel.core.repository.ReservationRepository;
+import gr.balasis.hotel.data.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
