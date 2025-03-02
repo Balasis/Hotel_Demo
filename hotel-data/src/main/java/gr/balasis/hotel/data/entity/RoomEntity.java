@@ -2,13 +2,13 @@ package gr.balasis.hotel.data.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 
 @Getter
@@ -17,8 +17,8 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamicUpdate
 @Entity
+@Table(name="rooms")
 public class RoomEntity extends BaseEntity{
 
     @Column(nullable = false)

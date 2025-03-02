@@ -1,6 +1,6 @@
 package gr.balasis.context.base.enums;
 
-public enum ChargeStatus {
+public enum PaymentStatus {
     PENDING,
     PAID,
     CANCELLED,
