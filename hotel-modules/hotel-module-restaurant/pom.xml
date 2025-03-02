@@ -9,7 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>gr.balasis.hotel.module.extra.amenities</groupId>
-    <artifactId>hotel-module-extra-amenities</artifactId>
+    <artifactId>hotel-module-restaurant</artifactId>
 
 </project>
