@@ -1,7 +1,7 @@
 package gr.balasis.hotel.core.service;
 
-import gr.balasis.hotel.context.base.domain.Payment;
-import gr.balasis.hotel.context.base.domain.Reservation;
+import gr.balasis.hotel.context.base.domain.domains.Payment;
+import gr.balasis.hotel.context.base.domain.domains.Reservation;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     void cancelReservation(Long id, Long reservationId);
     Payment processPaymentForReservation(Long guestId, Long reservationId, Payment domainFromResource);
     Payment getPaymentForReservation(Long id, Long reservationId);
-    List<Payment> getReservationPaymentsForGuest(Long id);
+    Reservation findReservationById(Long guestsId, Long reservationId);
 }

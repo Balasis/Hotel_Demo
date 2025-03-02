@@ -2,13 +2,12 @@ package gr.balasis.hotel.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.domain.Room;
+import gr.balasis.hotel.context.base.domain.domains.Guest;
+import gr.balasis.hotel.context.base.domain.domains.Reservation;
+import gr.balasis.hotel.context.base.domain.domains.Room;
 import gr.balasis.hotel.core.service.GuestService;
 import gr.balasis.hotel.core.service.ReservationService;
 import gr.balasis.hotel.core.service.RoomService;
-import gr.balasis.hotel.core.tests.profilemessages.RunOnProd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -26,15 +25,9 @@ public abstract class BaseDataLoader {
     public abstract ReservationService getReservationService();
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
-    private final MessageSource messageSource;
     public static final Logger logger = LoggerFactory.getLogger(BaseDataLoader.class);
 
-    protected BaseDataLoader(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
-
     protected void loadRooms() {
-
         for (int i = 0; i < 10; i++) {
             getRoomService().create(
                     Room.builder()

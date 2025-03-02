@@ -28,4 +28,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    @ExceptionHandler(GuestIdMismatchException.class)
+    public ResponseEntity<String> handleGuestIdMismatchException(GuestIdMismatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ReservationGuestIdMismatchException.class)
+    public ResponseEntity<String> handleReservationGuestIdMismatchException(ReservationGuestIdMismatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
 }

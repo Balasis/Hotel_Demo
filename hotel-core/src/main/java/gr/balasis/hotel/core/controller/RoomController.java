@@ -1,6 +1,6 @@
 package gr.balasis.hotel.core.controller;
 
-import gr.balasis.hotel.context.base.domain.Room;
+import gr.balasis.hotel.context.base.domain.domains.Room;
 import gr.balasis.hotel.context.web.resource.RoomResource;
 import gr.balasis.hotel.data.entity.RoomEntity;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
