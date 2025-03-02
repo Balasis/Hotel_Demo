@@ -8,6 +8,7 @@ import gr.balasis.hotel.core.service.ReservationService;
 import gr.balasis.hotel.core.service.RoomService;
 import gr.balasis.hotel.data.entity.ReservationEntity;
 import gr.balasis.hotel.modules.feedback.domain.Feedback;
+import gr.balasis.hotel.modules.feedback.repository.FeedbackRepository;
 import gr.balasis.hotel.modules.feedback.service.FeedbackService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRun
     private final RoomService roomService;
     private final ReservationService reservationService;
     private final FeedbackService feedbackService;
+    private final FeedbackRepository feedbackRepository;
     private final MessageSource messageSource;
 
 
@@ -67,7 +69,7 @@ public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRun
     }
 
     private boolean feedbackExistsAlready(Long reservationId){
-      return  feedbackService.feedbackExistsForReservationId(reservationId);
+      return  feedbackRepository.existsByReservationId(reservationId);
     }
 
     @Override
