@@ -2,13 +2,12 @@ package gr.balasis.hotel.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.domain.Room;
+import gr.balasis.hotel.context.base.domain.domains.Guest;
+import gr.balasis.hotel.context.base.domain.domains.Reservation;
+import gr.balasis.hotel.context.base.domain.domains.Room;
 import gr.balasis.hotel.core.service.GuestService;
 import gr.balasis.hotel.core.service.ReservationService;
 import gr.balasis.hotel.core.service.RoomService;
-import gr.balasis.hotel.core.tests.profilemessages.RunOnProd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;

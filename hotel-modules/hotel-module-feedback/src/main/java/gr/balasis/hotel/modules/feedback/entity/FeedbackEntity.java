@@ -1,6 +1,5 @@
 package gr.balasis.hotel.modules.feedback.entity;
 
-import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.data.entity.BaseEntity;
 import gr.balasis.hotel.data.entity.GuestEntity;
 import jakarta.persistence.*;
@@ -21,6 +20,8 @@ public class FeedbackEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(nullable = false)
     private GuestEntity guest;
+
+    private Long reservationId;
 
     @Column(nullable = false)
     private String message;

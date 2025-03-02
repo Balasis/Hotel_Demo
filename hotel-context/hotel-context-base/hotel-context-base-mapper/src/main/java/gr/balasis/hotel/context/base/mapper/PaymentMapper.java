@@ -1,6 +1,6 @@
 package gr.balasis.hotel.context.base.mapper;
 
-import gr.balasis.hotel.context.base.domain.Payment;
+import gr.balasis.hotel.context.base.domain.domains.Payment;
 import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.data.entity.PaymentEntity;
 import org.mapstruct.Builder;

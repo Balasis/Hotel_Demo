@@ -1,6 +1,6 @@
 package gr.balasis.hotel.context.base.mapper;
 
-import gr.balasis.hotel.context.base.domain.Room;
+import gr.balasis.hotel.context.base.domain.domains.Room;
 import gr.balasis.hotel.context.web.resource.RoomResource;
 import gr.balasis.hotel.data.entity.RoomEntity;
 import org.mapstruct.Builder;

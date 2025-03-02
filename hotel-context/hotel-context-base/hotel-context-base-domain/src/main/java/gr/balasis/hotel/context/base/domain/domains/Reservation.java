@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.domain;
+package gr.balasis.hotel.context.base.domain.domains;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

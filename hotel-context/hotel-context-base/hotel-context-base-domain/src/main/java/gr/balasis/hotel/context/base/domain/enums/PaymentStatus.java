@@ -1,4 +1,4 @@
-package gr.balasis.context.base.enums;
+package gr.balasis.hotel.context.base.domain.enums;
 
 public enum PaymentStatus {
     PENDING,

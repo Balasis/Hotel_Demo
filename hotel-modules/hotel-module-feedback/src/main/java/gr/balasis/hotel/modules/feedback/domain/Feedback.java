@@ -1,7 +1,7 @@
 package gr.balasis.hotel.modules.feedback.domain;
 
-import gr.balasis.hotel.context.base.domain.BaseDomain;
-import gr.balasis.hotel.context.base.domain.Guest;
+import gr.balasis.hotel.context.base.domain.domains.BaseDomain;
+import gr.balasis.hotel.context.base.domain.domains.Guest;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Feedback extends BaseDomain {
     private Guest guest;
+    private Long reservationId;
     private String message;
     private int rating;
     private LocalDateTime createdAt;

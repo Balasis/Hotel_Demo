@@ -1,6 +1,6 @@
-package gr.balasis.hotel.context.base.domain;
+package gr.balasis.hotel.context.base.domain.domains;
 
-import gr.balasis.context.base.enums.PaymentStatus;
+import gr.balasis.hotel.context.base.domain.enums.PaymentStatus;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
