@@ -7,14 +7,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = "gr.balasis.hotel.data.entity")
+@EntityScan(basePackages = "gr.balasis.hotel.data.entity,gr.balasis.hotel.modules.feedback.entity")
 @ComponentScan(basePackages = {
         "gr.balasis.hotel.context",
         "gr.balasis.hotel.core",
         "gr.balasis.hotel.data",
         "gr.balasis.hotel.modules"
 })
-@EnableJpaRepositories(basePackages = "gr.balasis.hotel.data.repository")
+@EnableJpaRepositories(basePackages = {
+        "gr.balasis.hotel.data.repository",
+        "gr.balasis.hotel.modules.feedback.repository"})
 public class HotelCore {
     public static void main(String[] args){
         SpringApplication.run(HotelCore.class, args);

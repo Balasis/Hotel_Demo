@@ -86,17 +86,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return paymentMapper.toDomainFromEntity(paymentEntity);
     }
 
-    public List<Payment> getReservationPaymentsForGuest(Long guestId) {
-        List<ReservationEntity> reservations = reservationRepository.findByGuestId(guestId);
-
-        return reservations.stream()
-                .map(ReservationEntity::getPayment)
-                .filter(Objects::nonNull)
-                .map(paymentMapper::toDomainFromEntity)
-                .collect(Collectors.toList());
-    }
-
-
     @Override
     public JpaRepository<ReservationEntity, Long> getRepository() {
         return reservationRepository;
@@ -127,8 +116,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     private Reservation buildReservationWithPayment(Reservation reservation) {
         Payment payment = new Payment();
-        if(reservation.getCheckOutDate() != null){
-            long daysStayed =ChronoUnit.DAYS.between(reservation.getCheckInDate(),reservation.getCheckOutDate());
+        if (reservation.getCheckOutDate() != null) {
+            long daysStayed = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
             payment.setAmount(
                     reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(daysStayed))
             );

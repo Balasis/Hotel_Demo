@@ -14,6 +14,7 @@ import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.core.service.BaseService;
 import gr.balasis.hotel.core.service.GuestService;
 import gr.balasis.hotel.core.service.ReservationService;
+import gr.balasis.hotel.modules.feedback.base.BaseComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/guests")
-public class GuestController extends BaseController<Guest, GuestResource, GuestEntity> {
+public class GuestController extends BaseComponent {
     private final GuestService guestService;
     private final ReservationService reservationService;
     private final GuestMapper guestMapper;
@@ -90,78 +91,9 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
         return ResponseEntity.ok(paymentMapper.toResource(newPayment));
     }
 
-    @GetMapping("/{guestsId}/reservations/payments")
-    public ResponseEntity<List<Payment>> getReservationPaymentsForGuest(@PathVariable Long guestsId) {
-        List<Payment> payments = reservationService.getReservationPaymentsForGuest(guestsId);
-        return ResponseEntity.ok(payments);
-    }
-
     @PutMapping("/{guestsId}/email")
     public ResponseEntity<GuestResource> updateEmail(@PathVariable Long guestsId, @RequestBody String email) {
         Guest updatedGuest = guestService.updateEmail(guestsId, email);
         return ResponseEntity.ok(guestMapper.toResource(updatedGuest));
-    }
-
-
-
-//    @GetMapping("/search")
-//    public ResponseEntity<List<GuestResource>> searchGuests(
-//            @RequestParam(required = false) String firstName,
-//            @RequestParam(required = false) String lastName) {
-//
-//        if (firstName == null && lastName == null) {
-//            throw new IllegalArgumentException("At least one of 'firstName' or 'lastName' must be provided");
-//        }
-//
-//        List<Guest> guests;
-//        if (firstName != null && lastName != null) {
-//            guests = guestService.findByFirstNameAndLastName(firstName, lastName);
-//        } else if (firstName != null) {
-//            guests = guestService.findByFirstName(firstName);
-//        } else {
-//            guests = guestService.findByLastName(lastName);
-//        }
-//
-//        return ResponseEntity.ok(guests.stream()
-//                .map(guestMapper::toResource)
-//                .collect(Collectors.toList()));
-//    }
-
-//    @GetMapping("guests/{guestId}/reservations")
-//    public ResponseEntity<List<ReservationResource>> findByGuestId(
-//            @PathVariable final Long guestId) {
-//        List<ReservationResource> resources = reservationService.findByGuestId(guestId)
-//                .stream()
-//                .map(getMapper()::toResource)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.ok(resources);
-//    }
-//
-//    @PostMapping("guests/{guestId}/reservations")
-//    public ResponseEntity<ReservationResource> create(
-//            @RequestBody ReservationResource reservationResource) {
-//
-//        if (!guestService.existsById(reservationResource.getGuest().getId())) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Guest not found");
-//        }
-//
-//        if (!roomService.existsById(reservationResource.getRoom().getId())) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
-//        }
-//
-//        Reservation reservation = reservationMapper.toDomainFromResource(reservationResource);
-//        Reservation savedReservation = reservationService.create(reservation);
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body(reservationMapper.toResource(savedReservation));
-//    }
-
-    @Override
-    public BaseService<Guest, Long> getBaseService() {
-        return guestService;
-    }
-
-    @Override
-    public BaseMapper<Guest, GuestResource, GuestEntity> getMapper() {
-        return guestMapper;
     }
 }
