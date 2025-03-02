@@ -11,7 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {
         "gr.balasis.hotel.context",
         "gr.balasis.hotel.core",
-        "gr.balasis.hotel.data"
+        "gr.balasis.hotel.data",
+        "gr.balasis.hotel.modules"
 })
 @EnableJpaRepositories(basePackages = "gr.balasis.hotel.data.repository")
 public class HotelCore {
