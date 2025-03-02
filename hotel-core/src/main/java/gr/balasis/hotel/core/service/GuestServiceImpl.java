@@ -36,6 +36,8 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
         return guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
     }
 
+
+
 //    public Guest findByEmail(String email) {
 //        return guestMapper.toDomainFromEntity( guestRepository.findByEmail(email) )   ;
 //    }

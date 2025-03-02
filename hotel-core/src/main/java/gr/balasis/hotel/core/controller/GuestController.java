@@ -1,8 +1,11 @@
 package gr.balasis.hotel.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Guest;
+import gr.balasis.hotel.context.base.domain.Payment;
 import gr.balasis.hotel.context.base.domain.Reservation;
+import gr.balasis.hotel.context.base.mapper.PaymentMapper;
 import gr.balasis.hotel.context.web.resource.GuestResource;
+import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.data.entity.GuestEntity;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
@@ -24,9 +27,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/guests")
 public class GuestController extends BaseController<Guest, GuestResource, GuestEntity> {
     private final GuestService guestService;
+    private final ReservationService reservationService;
     private final GuestMapper guestMapper;
     private final ReservationMapper reservationMapper;
-    private final ReservationService reservationService;
+    private final PaymentMapper paymentMapper;
 
     @GetMapping
     public ResponseEntity<List<GuestResource>> findAll() {
@@ -56,6 +60,8 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
         return ResponseEntity.ok(reservationMapper.toResource(newReservation));
     }
 
+
+
     @DeleteMapping("/{id}/reservations/{reservationId}")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable Long id,
@@ -64,11 +70,39 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/reservations/{reservationId}/payment")
+    public ResponseEntity<Payment> getPaymentForReservation(
+            @PathVariable Long reservationId,
+            @PathVariable Long id) {
+
+        Payment payment = reservationService.getPaymentForReservation(id, reservationId);
+        return ResponseEntity.ok(payment);
+    }
+
+    @PostMapping("/{id}/reservations/{reservationId}/payment")
+    public ResponseEntity<PaymentResource> payForReservation(
+            @PathVariable Long id,
+            @PathVariable Long reservationId,
+            @RequestBody PaymentResource paymentResource) {
+
+        Payment newPayment = reservationService.processPaymentForReservation(
+                id, reservationId, paymentMapper.toDomainFromResource(paymentResource));
+        return ResponseEntity.ok(paymentMapper.toResource(newPayment));
+    }
+
+    @GetMapping("/{id}/reservations/payments")
+    public ResponseEntity<List<Payment>> getReservationPaymentsForGuest(@PathVariable Long id) {
+        List<Payment> payments = reservationService.getReservationPaymentsForGuest(id);
+        return ResponseEntity.ok(payments);
+    }
+
     @PutMapping("/{id}/email")
     public ResponseEntity<GuestResource> updateEmail(@PathVariable Long id, @RequestBody String email) {
         Guest updatedGuest = guestService.updateEmail(id, email);
         return ResponseEntity.ok(guestMapper.toResource(updatedGuest));
     }
+
+
 
 //    @GetMapping("/search")
 //    public ResponseEntity<List<GuestResource>> searchGuests(
