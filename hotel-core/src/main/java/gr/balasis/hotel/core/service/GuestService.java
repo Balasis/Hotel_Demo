@@ -10,5 +10,5 @@ public interface GuestService extends BaseService<Guest,Long>{
 //    boolean existsById(Long guestId);
 
     void deleteById(Long id);
-    Guest updateEmail(Long id, String email);
+    void updateEmail(Long id, String email);
 }

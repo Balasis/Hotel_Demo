@@ -13,5 +13,4 @@ public class FeedbackResource extends BaseResource {
     private Guest guest;
     private Long reservationId;
     private String message;
-    private int rating;
 }

@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("guests/{guestsId}/reservation/{reservationId}/feedback")
+@RequestMapping("guests/{guestsId}/reservations/{reservationId}/feedback")
 @RequiredArgsConstructor
 public class GuestFeedbackController extends BaseComponent {
     private final FeedbackServiceImpl feedbackService;
@@ -28,32 +28,28 @@ public class GuestFeedbackController extends BaseComponent {
         return ResponseEntity.ok(feedbackMapper.toResource(feedback));
     }
 
-    @GetMapping("/{feedbackId}")
-    public ResponseEntity<FeedbackResource> getFeedbackById(
+    @PutMapping
+    public ResponseEntity<Void> updateFeedback(
             @PathVariable Long guestsId,
             @PathVariable Long reservationId,
-            @PathVariable Long feedbackId) {
-        Feedback feedback = feedbackService.getFeedbackById(guestsId, reservationId, feedbackId);
-        return ResponseEntity.ok(feedbackMapper.toResource(feedback));
-    }
-
-    @PutMapping("/{feedbackId}")
-    public ResponseEntity<FeedbackResource> updateFeedback(
-            @PathVariable Long guestsId,
-            @PathVariable Long reservationId,
-            @PathVariable Long feedbackId,
             @RequestBody FeedbackResource updatedResource) {
-        Feedback updatedFeedback = feedbackService.updateFeedback(
-                guestsId, reservationId, feedbackId, feedbackMapper.toDomainFromResource(updatedResource));
-        return ResponseEntity.ok(feedbackMapper.toResource(updatedFeedback));
+        feedbackService.updateFeedback(guestsId, reservationId,feedbackMapper.toDomainFromResource(updatedResource));
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{feedbackId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteFeedback(
             @PathVariable Long guestsId,
-            @PathVariable Long reservationId,
-            @PathVariable Long feedbackId) {
-        feedbackService.deleteFeedback(guestsId, reservationId, feedbackId);
+            @PathVariable Long reservationId) {
+        feedbackService.deleteFeedback(guestsId, reservationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<FeedbackResource> getFeedback(
+            @PathVariable Long guestsId,
+            @PathVariable Long reservationId) {
+        Feedback feedback = feedbackService.getFeedbackById(guestsId, reservationId);
+        return ResponseEntity.ok(feedbackMapper.toResource(feedback));
     }
 }

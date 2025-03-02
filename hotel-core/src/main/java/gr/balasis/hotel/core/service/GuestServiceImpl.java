@@ -26,11 +26,11 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
     }
 
     @Override
-    public Guest updateEmail(Long id, String email) {
+    public void updateEmail(Long id, String email) {
         GuestEntity guestEntity = guestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
         guestEntity.setEmail(email);
-        return guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
+        guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
     }
 
 

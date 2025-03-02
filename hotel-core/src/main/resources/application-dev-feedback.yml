@@ -10,4 +10,5 @@ logging:
   level:
     root: info
     gr.balasis.hotel.core: trace
+    gr.balasis.hotel.modules.feedback: trace
 customMessage: "Development environment is up including restaurant module"

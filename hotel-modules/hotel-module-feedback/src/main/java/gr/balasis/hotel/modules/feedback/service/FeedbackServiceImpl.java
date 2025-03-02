@@ -40,10 +40,11 @@ public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackReso
         return feedbackMapper.toDomainFromEntity(savedEntity);
     }
 
-    public Feedback getFeedbackById(Long guestId, Long reservationId, Long feedbackId) {
+    public Feedback getFeedbackById(Long guestId, Long reservationId) {
         GuestEntity guest = validateGuestExists(guestId);
         ReservationEntity reservation = validateReservationExists(reservationId);
-        FeedbackEntity feedback = validateFeedbackExists(feedbackId);
+
+        FeedbackEntity feedback = validateFeedbackExists(reservationId);
 
         validateReservationBelongsToGuest(guest, reservation);
         validateFeedbackBelongsToReservation(feedback, reservation);
@@ -52,32 +53,35 @@ public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackReso
         return feedbackMapper.toDomainFromEntity(feedback);
     }
 
-    public Feedback updateFeedback(Long guestId, Long reservationId, Long feedbackId, Feedback updatedFeedback) {
+    public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
         GuestEntity guest = validateGuestExists(guestId);
         ReservationEntity reservation = validateReservationExists(reservationId);
-        FeedbackEntity existingFeedback = validateFeedbackExists(feedbackId);
+        FeedbackEntity existingFeedback = validateFeedbackExists(reservationId);
 
         validateReservationBelongsToGuest(guest, reservation);
         validateFeedbackBelongsToReservation(existingFeedback, reservation);
         validateFeedbackBelongsToGuest(existingFeedback, guest);
 
         existingFeedback.setMessage(updatedFeedback.getMessage());
-        existingFeedback.setRating(updatedFeedback.getRating());
 
-        FeedbackEntity savedEntity = feedbackRepository.save(existingFeedback);
-        return feedbackMapper.toDomainFromEntity(savedEntity);
+        feedbackRepository.save(existingFeedback);
     }
 
-    public void deleteFeedback(Long guestId, Long reservationId, Long feedbackId) {
+    public void deleteFeedback(Long guestId, Long reservationId) {
         GuestEntity guest = validateGuestExists(guestId);
         ReservationEntity reservation = validateReservationExists(reservationId);
-        FeedbackEntity feedback = validateFeedbackExists(feedbackId);
+
+        FeedbackEntity feedback = validateFeedbackExists(reservationId);
 
         validateReservationBelongsToGuest(guest, reservation);
         validateFeedbackBelongsToReservation(feedback, reservation);
         validateFeedbackBelongsToGuest(feedback, guest);
 
         feedbackRepository.delete(feedback);
+    }
+
+    public boolean feedbackExistsForReservationId(Long reservationId){
+       return feedbackRepository.existsByReservationId(reservationId);
     }
 
     private GuestEntity validateGuestExists(Long guestId) {
@@ -115,9 +119,10 @@ public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackReso
         }
     }
 
-    private FeedbackEntity validateFeedbackExists(Long feedbackId) {
-        return feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new EntityNotFoundException("Feedback not found with ID: " + feedbackId));
+    private FeedbackEntity validateFeedbackExists(Long reservationId) {
+        return feedbackRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Feedback not found with reservationID: "
+                                                                                                    + reservationId));
     }
 
     private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {

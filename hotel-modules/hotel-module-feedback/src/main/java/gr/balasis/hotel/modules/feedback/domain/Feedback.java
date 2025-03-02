@@ -15,6 +15,5 @@ public class Feedback extends BaseDomain {
     private Guest guest;
     private Long reservationId;
     private String message;
-    private int rating;
     private LocalDateTime createdAt;
 }

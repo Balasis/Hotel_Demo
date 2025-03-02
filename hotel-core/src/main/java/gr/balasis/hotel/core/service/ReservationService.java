@@ -11,4 +11,5 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     void cancelReservation(Long id, Long reservationId);
     Payment processPaymentForReservation(Long guestId, Long reservationId, Payment domainFromResource);
     Payment getPaymentForReservation(Long id, Long reservationId);
+    Reservation findReservationById(Long guestsId, Long reservationId);
 }

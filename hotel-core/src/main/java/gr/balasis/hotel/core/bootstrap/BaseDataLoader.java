@@ -25,15 +25,9 @@ public abstract class BaseDataLoader {
     public abstract ReservationService getReservationService();
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
-    private final MessageSource messageSource;
     public static final Logger logger = LoggerFactory.getLogger(BaseDataLoader.class);
 
-    protected BaseDataLoader(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
-
     protected void loadRooms() {
-
         for (int i = 0; i < 10; i++) {
             getRoomService().create(
                     Room.builder()

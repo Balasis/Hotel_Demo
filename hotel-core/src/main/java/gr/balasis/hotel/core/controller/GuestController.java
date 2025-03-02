@@ -61,6 +61,13 @@ public class GuestController extends BaseComponent {
         return ResponseEntity.ok(reservationMapper.toResource(newReservation));
     }
 
+    @GetMapping("/{guestsId}/reservations/{reservationId}")
+    public ResponseEntity<ReservationResource> findReservationById(
+            @PathVariable Long guestsId,
+            @PathVariable Long reservationId) {
+        Reservation reservation = reservationService.findReservationById(guestsId, reservationId);
+        return ResponseEntity.ok(reservationMapper.toResource(reservation));
+    }
 
 
     @DeleteMapping("/{guestsId}/reservations/{reservationId}")
@@ -92,8 +99,8 @@ public class GuestController extends BaseComponent {
     }
 
     @PutMapping("/{guestsId}/email")
-    public ResponseEntity<GuestResource> updateEmail(@PathVariable Long guestsId, @RequestBody String email) {
-        Guest updatedGuest = guestService.updateEmail(guestsId, email);
-        return ResponseEntity.ok(guestMapper.toResource(updatedGuest));
+    public ResponseEntity<Void> updateEmail(@PathVariable Long guestsId, @RequestBody String email) {
+        guestService.updateEmail(guestsId, email);
+        return ResponseEntity.noContent().build();
     }
 }

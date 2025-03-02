@@ -41,6 +41,11 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return buildReservationWithPayment(reservation);
     }
 
+    public Reservation findReservationById(Long guestId, Long reservationId) {
+        ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
+        return reservationMapper.toDomainFromEntity(reservationEntity);
+    }
+
     @Override
     @Transactional
     public Reservation createReservationForGuest(Long guestId, Reservation reservation) {

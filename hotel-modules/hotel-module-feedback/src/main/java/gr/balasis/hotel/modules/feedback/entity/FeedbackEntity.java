@@ -26,8 +26,6 @@ public class FeedbackEntity extends BaseEntity {
     @Column(nullable = false)
     private String message;
 
-    private int rating;
-
     private LocalDateTime createdAt;
 
     @PrePersist
