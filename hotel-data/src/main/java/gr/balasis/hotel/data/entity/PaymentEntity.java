@@ -1,6 +1,7 @@
 package gr.balasis.hotel.data.entity;
 
-import gr.balasis.context.base.enums.PaymentStatus;
+
+import gr.balasis.hotel.context.base.domain.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;

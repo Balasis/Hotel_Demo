@@ -1,19 +1,20 @@
 package gr.balasis.hotel.core.controller;
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Payment;
-import gr.balasis.hotel.context.base.domain.Reservation;
+
+import gr.balasis.hotel.context.base.domain.domains.Guest;
+import gr.balasis.hotel.context.base.domain.domains.Payment;
+import gr.balasis.hotel.context.base.domain.domains.Reservation;
 import gr.balasis.hotel.context.base.mapper.PaymentMapper;
 import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-import gr.balasis.hotel.data.entity.GuestEntity;
-import gr.balasis.hotel.context.base.mapper.BaseMapper;
+
 import gr.balasis.hotel.context.base.mapper.GuestMapper;
 import gr.balasis.hotel.context.base.mapper.ReservationMapper;
-import gr.balasis.hotel.core.service.BaseService;
 import gr.balasis.hotel.core.service.GuestService;
 import gr.balasis.hotel.core.service.ReservationService;
+import gr.balasis.hotel.modules.feedback.base.BaseComponent;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/guests")
-public class GuestController extends BaseController<Guest, GuestResource, GuestEntity> {
+public class GuestController extends BaseComponent {
     private final GuestService guestService;
     private final ReservationService reservationService;
     private final GuestMapper guestMapper;
@@ -41,127 +42,82 @@ public class GuestController extends BaseController<Guest, GuestResource, GuestE
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/{id}/reservations")
+    @PostMapping
+    public ResponseEntity<GuestResource> createGuest(
+            @RequestBody @Valid GuestResource guestResource) {
+        Guest newGuest = guestService.create(guestMapper.toDomainFromResource(guestResource));
+        return ResponseEntity.ok(guestMapper.toResource(newGuest));
+    }
+
+    @PutMapping("/{guestId}")
+    public ResponseEntity<Void> updateGuest(
+            @PathVariable Long guestId,
+            @RequestBody @Valid GuestResource guestResource) {
+        guestService.updateGuest(guestId, guestMapper.toDomainFromResource(guestResource));
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{guestsId}/reservations")
     public ResponseEntity<List<ReservationResource>> getGuestReservations(
-            @PathVariable Long id) {
-        List<ReservationResource> reservations = reservationService.findReservationsByGuestId(id)
+            @PathVariable Long guestsId) {
+        List<ReservationResource> reservations = reservationService.findReservationsByGuestId(guestsId)
                 .stream()
                 .map(reservationMapper::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(reservations);
     }
 
-    @PostMapping("/{id}/reservations")
+    @PostMapping("/{guestsId}/reservations")
     public ResponseEntity<ReservationResource> createReservation(
-            @PathVariable Long id,
+            @PathVariable Long guestsId,
             @RequestBody ReservationResource reservation) {
         Reservation newReservation =
-                reservationService.createReservationForGuest(id, reservationMapper.toDomainFromResource(reservation));
+                reservationService.createReservationForGuest(guestsId, reservationMapper.toDomainFromResource(reservation));
         return ResponseEntity.ok(reservationMapper.toResource(newReservation));
     }
 
-
-
-    @DeleteMapping("/{id}/reservations/{reservationId}")
-    public ResponseEntity<Void> cancelReservation(
-            @PathVariable Long id,
+    @GetMapping("/{guestsId}/reservations/{reservationId}")
+    public ResponseEntity<ReservationResource> findReservationById(
+            @PathVariable Long guestsId,
             @PathVariable Long reservationId) {
-        reservationService.cancelReservation(id, reservationId);
+        Reservation reservation = reservationService.findReservationById(guestsId, reservationId);
+        return ResponseEntity.ok(reservationMapper.toResource(reservation));
+    }
+
+
+    @DeleteMapping("/{guestsId}/reservations/{reservationId}")
+    public ResponseEntity<Void> cancelReservation(
+            @PathVariable Long guestsId,
+            @PathVariable Long reservationId) {
+        reservationService.cancelReservation(guestsId, reservationId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/reservations/{reservationId}/payment")
+    @GetMapping("/{guestsId}/reservations/{reservationId}/payment")
     public ResponseEntity<Payment> getPaymentForReservation(
             @PathVariable Long reservationId,
-            @PathVariable Long id) {
+            @PathVariable Long guestsId) {
 
-        Payment payment = reservationService.getPaymentForReservation(id, reservationId);
+        Payment payment = reservationService.getPaymentForReservation(guestsId, reservationId);
         return ResponseEntity.ok(payment);
     }
 
-    @PostMapping("/{id}/reservations/{reservationId}/payment")
+    @PostMapping("/{guestsId}/reservations/{reservationId}/payment")
     public ResponseEntity<PaymentResource> payForReservation(
-            @PathVariable Long id,
+            @PathVariable Long guestsId,
             @PathVariable Long reservationId,
-            @RequestBody PaymentResource paymentResource) {
+            @RequestBody @Valid PaymentResource paymentResource) {
 
         Payment newPayment = reservationService.processPaymentForReservation(
-                id, reservationId, paymentMapper.toDomainFromResource(paymentResource));
+                guestsId, reservationId, paymentMapper.toDomainFromResource(paymentResource));
         return ResponseEntity.ok(paymentMapper.toResource(newPayment));
     }
 
-    @GetMapping("/{id}/reservations/payments")
-    public ResponseEntity<List<Payment>> getReservationPaymentsForGuest(@PathVariable Long id) {
-        List<Payment> payments = reservationService.getReservationPaymentsForGuest(id);
-        return ResponseEntity.ok(payments);
-    }
-
-    @PutMapping("/{id}/email")
-    public ResponseEntity<GuestResource> updateEmail(@PathVariable Long id, @RequestBody String email) {
-        Guest updatedGuest = guestService.updateEmail(id, email);
-        return ResponseEntity.ok(guestMapper.toResource(updatedGuest));
-    }
-
-
-
-//    @GetMapping("/search")
-//    public ResponseEntity<List<GuestResource>> searchGuests(
-//            @RequestParam(required = false) String firstName,
-//            @RequestParam(required = false) String lastName) {
-//
-//        if (firstName == null && lastName == null) {
-//            throw new IllegalArgumentException("At least one of 'firstName' or 'lastName' must be provided");
-//        }
-//
-//        List<Guest> guests;
-//        if (firstName != null && lastName != null) {
-//            guests = guestService.findByFirstNameAndLastName(firstName, lastName);
-//        } else if (firstName != null) {
-//            guests = guestService.findByFirstName(firstName);
-//        } else {
-//            guests = guestService.findByLastName(lastName);
-//        }
-//
-//        return ResponseEntity.ok(guests.stream()
-//                .map(guestMapper::toResource)
-//                .collect(Collectors.toList()));
-//    }
-
-//    @GetMapping("guests/{guestId}/reservations")
-//    public ResponseEntity<List<ReservationResource>> findByGuestId(
-//            @PathVariable final Long guestId) {
-//        List<ReservationResource> resources = reservationService.findByGuestId(guestId)
-//                .stream()
-//                .map(getMapper()::toResource)
-//                .collect(Collectors.toList());
-//        return ResponseEntity.ok(resources);
-//    }
-//
-//    @PostMapping("guests/{guestId}/reservations")
-//    public ResponseEntity<ReservationResource> create(
-//            @RequestBody ReservationResource reservationResource) {
-//
-//        if (!guestService.existsById(reservationResource.getGuest().getId())) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Guest not found");
-//        }
-//
-//        if (!roomService.existsById(reservationResource.getRoom().getId())) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
-//        }
-//
-//        Reservation reservation = reservationMapper.toDomainFromResource(reservationResource);
-//        Reservation savedReservation = reservationService.create(reservation);
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).body(reservationMapper.toResource(savedReservation));
-//    }
-
-    @Override
-    public BaseService<Guest, Long> getBaseService() {
-        return guestService;
-    }
-
-    @Override
-    public BaseMapper<Guest, GuestResource, GuestEntity> getMapper() {
-        return guestMapper;
+    @PutMapping("/{guestsId}/email")
+    public ResponseEntity<Void> updateEmail(
+            @PathVariable Long guestsId,
+            @RequestBody  String email) {
+        guestService.updateEmail(guestsId, email);
+        return ResponseEntity.noContent().build();
     }
 }

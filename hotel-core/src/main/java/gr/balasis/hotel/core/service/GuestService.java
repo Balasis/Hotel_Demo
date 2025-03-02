@@ -1,10 +1,6 @@
 package gr.balasis.hotel.core.service;
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.web.resource.ReservationResource;
-
-import java.util.List;
+import gr.balasis.hotel.context.base.domain.domains.Guest;
 
 public interface GuestService extends BaseService<Guest,Long>{
 //    Guest findByEmail(String email);
@@ -12,7 +8,7 @@ public interface GuestService extends BaseService<Guest,Long>{
 //    List<Guest> findByFirstName(String firstName);
 //    List<Guest> findByLastName(String lastName);
 //    boolean existsById(Long guestId);
-
+    void updateGuest(Long guestId, Guest updatedGuest);
     void deleteById(Long id);
-    Guest updateEmail(Long id, String email);
+    void updateEmail(Long id, String email);
 }
