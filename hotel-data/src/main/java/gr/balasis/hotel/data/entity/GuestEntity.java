@@ -4,8 +4,9 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
+
 
 @Getter
 @Setter
@@ -13,8 +14,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamicUpdate
 @Entity
+@Table(name = "guests")
 public class GuestEntity extends BaseEntity{
 
     @Column(nullable = false)

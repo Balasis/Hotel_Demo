@@ -6,8 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.AllArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString

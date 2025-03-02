@@ -1,17 +1,12 @@
 package gr.balasis.hotel.core.service;
 
 import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.data.entity.GuestEntity;
-import gr.balasis.hotel.data.entity.ReservationEntity;
-import exception.EntityNotFoundException;
+import gr.balasis.hotel.context.web.exception.EntityNotFoundException;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.context.base.mapper.GuestMapper;
-import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.data.repository.GuestRepository;
-import gr.balasis.hotel.data.repository.ReservationRepository;
-import gr.balasis.hotel.data.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -40,6 +35,8 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
         guestEntity.setEmail(email);
         return guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
     }
+
+
 
 //    public Guest findByEmail(String email) {
 //        return guestMapper.toDomainFromEntity( guestRepository.findByEmail(email) )   ;

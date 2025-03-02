@@ -4,8 +4,6 @@ import gr.balasis.hotel.data.entity.GuestEntity;
 import gr.balasis.hotel.data.entity.ReservationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Arrays;
 import java.util.List;
 
 @Repository
