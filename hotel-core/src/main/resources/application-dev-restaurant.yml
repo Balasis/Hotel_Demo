@@ -5,9 +5,9 @@ spring:
     username: prodUsername
   jpa:
     hibernate:
-      ddl-auto: update #validate should be...if db...
+      ddl-auto: update
 logging:
   level:
     root: info
     gr.balasis.hotel.core: trace
-customMessage: "Production environment is up..."
+customMessage: "Development environment is up including restaurant module"
