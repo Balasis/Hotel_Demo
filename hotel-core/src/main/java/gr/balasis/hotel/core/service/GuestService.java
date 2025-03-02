@@ -8,7 +8,7 @@ public interface GuestService extends BaseService<Guest,Long>{
 //    List<Guest> findByFirstName(String firstName);
 //    List<Guest> findByLastName(String lastName);
 //    boolean existsById(Long guestId);
-
+    void updateGuest(Long guestId, Guest updatedGuest);
     void deleteById(Long id);
     void updateEmail(Long id, String email);
 }

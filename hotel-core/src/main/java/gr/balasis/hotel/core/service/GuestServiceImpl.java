@@ -18,50 +18,37 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
     private final GuestMapper guestMapper;
 
     @Override
-    public void deleteById(Long id) {
-        if (!guestRepository.existsById(id)) {
-            throw new EntityNotFoundException("Guest not found");
+    public Guest create(Guest guest) {
+        if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists"); // Handle accordingly
         }
-        guestRepository.deleteById(id);
+        return guestMapper.toDomainFromEntity(guestRepository.save(guestMapper.toEntity(guest))) ;
+    }
+
+    public void updateGuest(Long guestId, Guest updatedGuest) {
+        validateGuestId(guestId, updatedGuest);
+        GuestEntity existingGuest = findExistingGuest(guestId);
+        validateEmailUniqueness(existingGuest, updatedGuest.getEmail());
+
+        existingGuest.setEmail(updatedGuest.getEmail());
+        guestRepository.save(existingGuest);
     }
 
     @Override
-    public void updateEmail(Long id, String email) {
-        GuestEntity guestEntity = guestRepository.findById(id)
+    public void deleteById(Long guestId) {
+        if (!guestRepository.existsById(guestId)) {
+            throw new EntityNotFoundException("Guest not found");
+        }
+        guestRepository.deleteById(guestId);
+    }
+
+    @Override
+    public void updateEmail(Long guestId, String email) {
+        GuestEntity guestEntity = guestRepository.findById(guestId)
                 .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
         guestEntity.setEmail(email);
         guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
     }
-
-
-
-//    public Guest findByEmail(String email) {
-//        return guestMapper.toDomainFromEntity( guestRepository.findByEmail(email) )   ;
-//    }
-//
-//    public List<Guest> findByFirstNameAndLastName(String firstName, String lastName) {
-//        return guestRepository.findByFirstNameAndLastName(firstName, lastName).stream()
-//                .map(guestMapper::toDomainFromEntity)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<Guest> findByFirstName(String firstName) {
-//        return guestRepository.findByFirstName(firstName).stream()
-//                .map(guestMapper::toDomainFromEntity)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<Guest> findByLastName(String lastName) {
-//        return guestRepository.findByLastName(lastName).stream()
-//                .map(guestMapper::toDomainFromEntity)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public boolean existsById(Long guestId) {
-//        return guestRepository.existsById(guestId);
-//    }
-
-
 
     @Override
     public JpaRepository<GuestEntity,Long> getRepository() {
@@ -72,4 +59,23 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
     public BaseMapper<Guest, GuestResource,GuestEntity> getMapper() {
         return guestMapper;
     }
+
+    private void validateGuestId(Long guestId, Guest updatedGuest) {
+        if (!guestId.equals(updatedGuest.getId())) {
+            throw new IllegalArgumentException("Guest ID mismatch");
+        }
+    }
+
+    private GuestEntity findExistingGuest(Long guestId) {
+        return guestRepository.findById(guestId)
+                .orElseThrow(() -> new IllegalArgumentException("Guest not found"));
+    }
+
+    private void validateEmailUniqueness(GuestEntity existingGuest, String newEmail) {
+        if (!existingGuest.getEmail().equals(newEmail) &&
+                guestRepository.findByEmail(newEmail).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+    }
+
 }
