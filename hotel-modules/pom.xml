@@ -12,7 +12,7 @@
     <artifactId>hotel-modules</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>hotel-module-restaurant</module>
+        <module>hotel-module-feedback</module>
     </modules>
 
 </project>

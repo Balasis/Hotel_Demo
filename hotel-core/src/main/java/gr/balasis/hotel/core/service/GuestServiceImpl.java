@@ -17,9 +17,6 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource,Gues
     private final GuestRepository guestRepository;
     private final GuestMapper guestMapper;
 
-
-
-
     @Override
     public void deleteById(Long id) {
         if (!guestRepository.existsById(id)) {

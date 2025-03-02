@@ -5,7 +5,6 @@ import gr.balasis.hotel.core.service.GuestService;
 import gr.balasis.hotel.core.service.ReservationService;
 import gr.balasis.hotel.core.service.RoomService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,16 +15,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("dev-restaurant")
-public class DataLoaderRestaurant extends BaseDataLoader implements ApplicationRunner {
+public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRunner {
     private final GuestService guestService;
     private final RoomService roomService;
     private final ReservationService reservationService;
 
     @Autowired
-    public DataLoaderRestaurant(MessageSource messageSource,
-                      GuestService guestService,
-                      RoomService roomService,
-                      ReservationService reservationService) {
+    public DataLoaderFeedback(MessageSource messageSource,
+                              GuestService guestService,
+                              RoomService roomService,
+                              ReservationService reservationService) {
         super(messageSource);
         this.guestService = guestService;
         this.roomService = roomService;
