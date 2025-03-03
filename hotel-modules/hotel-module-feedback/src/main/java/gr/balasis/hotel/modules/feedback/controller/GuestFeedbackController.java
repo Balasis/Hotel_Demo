@@ -1,12 +1,9 @@
 package gr.balasis.hotel.modules.feedback.controller;
 
-import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.modules.feedback.base.BaseComponent;
 import gr.balasis.hotel.modules.feedback.domain.Feedback;
-import gr.balasis.hotel.modules.feedback.entity.FeedbackEntity;
 import gr.balasis.hotel.modules.feedback.mapper.FeedbackMapper;
 import gr.balasis.hotel.modules.feedback.resource.FeedbackResource;
-import gr.balasis.hotel.modules.feedback.service.BaseService;
 import gr.balasis.hotel.modules.feedback.service.FeedbackServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +31,7 @@ public class GuestFeedbackController extends BaseComponent {
             @PathVariable Long guestsId,
             @PathVariable Long reservationId,
             @RequestBody FeedbackResource updatedResource) {
-        feedbackService.updateFeedback(guestsId, reservationId,feedbackMapper.toDomainFromResource(updatedResource));
+        feedbackService.updateFeedback(guestsId, reservationId, feedbackMapper.toDomainFromResource(updatedResource));
         return ResponseEntity.noContent().build();
     }
 

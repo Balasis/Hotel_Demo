@@ -1,10 +1,10 @@
 package gr.balasis.hotel.data.entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "reservations")
-public class ReservationEntity extends BaseEntity{
+public class ReservationEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)

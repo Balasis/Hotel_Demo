@@ -18,10 +18,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import java.util.List;
 
 
 @Component
@@ -47,28 +46,28 @@ public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRun
         logger.info("dev-feedback runs");
     }
 
-    public void loadFeedbackMessages(){
+    public void loadFeedbackMessages() {
         Random random = new Random();
         List<Reservation> reservations = reservationService.findAll();
-        for(Reservation reservation:reservations){
-            if(feedbackExistsAlready(reservation.getId())){
+        for (Reservation reservation : reservations) {
+            if (feedbackExistsAlready(reservation.getId())) {
                 continue;
             }
             Guest guest = reservation.getGuest();
             int messageNumber = random.nextInt(10) + 1;
-            String theMessage = "feedback.message"+messageNumber;
+            String theMessage = "feedback.message" + messageNumber;
             Feedback feedback = Feedback.builder()
                     .guest(guest)
                     .createdAt(LocalDateTime.now())
                     .reservationId(reservation.getId())
-                    .message( messageSource.getMessage( theMessage,new Object[]{guest.getFirstName()}, Locale.getDefault()) )
+                    .message(messageSource.getMessage(theMessage, new Object[]{guest.getFirstName()}, Locale.getDefault()))
                     .build();
-            feedbackService.createFeedback(guest.getId(),reservation.getId(),feedback);
+            feedbackService.createFeedback(guest.getId(), reservation.getId(), feedback);
         }
     }
 
-    private boolean feedbackExistsAlready(Long reservationId){
-      return  feedbackRepository.existsByReservationId(reservationId);
+    private boolean feedbackExistsAlready(Long reservationId) {
+        return feedbackRepository.existsByReservationId(reservationId);
     }
 
     @Override

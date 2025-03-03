@@ -1,6 +1,7 @@
 package gr.balasis.hotel.context.web.resource;
 
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

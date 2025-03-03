@@ -19,12 +19,15 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public abstract class BaseDataLoader {
-    public abstract GuestService getGuestService();
-    public abstract RoomService getRoomService();
-    public abstract ReservationService getReservationService();
+    public static final Logger logger = LoggerFactory.getLogger(BaseDataLoader.class);
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
-    public static final Logger logger = LoggerFactory.getLogger(BaseDataLoader.class);
+
+    public abstract GuestService getGuestService();
+
+    public abstract RoomService getRoomService();
+
+    public abstract ReservationService getReservationService();
 
     protected void loadRooms() {
         for (int i = 0; i < 10; i++) {
@@ -63,7 +66,7 @@ public abstract class BaseDataLoader {
         }
 
         for (int i = 0; i < 5; i++) {
-            if(guests.isEmpty() || availableRooms.isEmpty()) return;
+            if (guests.isEmpty() || availableRooms.isEmpty()) return;
             Room room = pickRandomRoom(availableRooms);
             getReservationService().create(createReservationDomain(pickRandomGuest(guests), room));
             room.setReserved(true);
