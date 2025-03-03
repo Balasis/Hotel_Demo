@@ -74,7 +74,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     @Transactional
-    public Payment processPaymentForReservation(Long guestId, Long reservationId, Payment payment) {
+    public Payment finalizePaymentForReservation(Long guestId, Long reservationId, Payment payment) {
         ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
         PaymentEntity paymentEntity = getValidPayment(reservationEntity);
         paymentEntity.setPaymentDate(LocalDateTime.now());

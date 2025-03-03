@@ -44,6 +44,7 @@ public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRun
         loadRooms();
         loadGuests();
         loadReservations();
+        loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedbackMessages();
         BaseDataLoader.logger.info("dev-feedback runs");
     }

@@ -8,6 +8,7 @@ import gr.balasis.hotel.modules.feedback.mapper.FeedbackMapper;
 import gr.balasis.hotel.modules.feedback.resource.FeedbackResource;
 import gr.balasis.hotel.modules.feedback.service.BaseService;
 import gr.balasis.hotel.modules.feedback.service.FeedbackServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class GuestFeedbackController extends BaseComponent {
     public ResponseEntity<FeedbackResource> submitFeedback(
             @PathVariable Long guestsId,
             @PathVariable Long reservationId,
-            @RequestBody FeedbackResource resource) {
+            @RequestBody @Valid FeedbackResource resource) {
         Feedback feedback = feedbackService.createFeedback(guestsId, reservationId, feedbackMapper.toDomainFromResource(resource));
         return ResponseEntity.ok(feedbackMapper.toResource(feedback));
     }
