@@ -27,6 +27,7 @@ public class DataLoader extends BaseDataLoader implements ApplicationRunner {
         loadRooms();
         loadGuests();
         loadReservations();
+        loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         BaseDataLoader.logger.info("Default dev DataLoader started");
     }
 

@@ -9,7 +9,7 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     List<Reservation> findReservationsByGuestId(Long id);
     Reservation createReservationForGuest(Long id, Reservation reservation);
     void cancelReservation(Long id, Long reservationId);
-    Payment processPaymentForReservation(Long guestId, Long reservationId, Payment domainFromResource);
+    Payment finalizePaymentForReservation(Long guestId, Long reservationId, Payment domainFromResource);
     Payment getPaymentForReservation(Long id, Long reservationId);
     Reservation findReservationById(Long guestsId, Long reservationId);
 }

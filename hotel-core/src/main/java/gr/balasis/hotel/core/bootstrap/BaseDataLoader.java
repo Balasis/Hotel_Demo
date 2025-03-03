@@ -10,7 +10,6 @@ import gr.balasis.hotel.core.service.ReservationService;
 import gr.balasis.hotel.core.service.RoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -69,6 +68,20 @@ public abstract class BaseDataLoader {
             getReservationService().create(createReservationDomain(pickRandomGuest(guests), room));
             room.setReserved(true);
             getRoomService().update(room);
+        }
+    }
+
+    protected void loadPayments() {
+        List<Reservation> reservations = getReservationService().findAll();
+
+        for (Reservation reservation : reservations) {
+            if (random.nextBoolean()) {
+                getReservationService().finalizePaymentForReservation(
+                        reservation.getGuest().getId(),
+                        reservation.getId(),
+                        reservation.getPayment()
+                );
+            }
         }
     }
 

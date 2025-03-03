@@ -108,7 +108,7 @@ public class GuestController extends BaseComponent {
             @PathVariable Long reservationId,
             @RequestBody @Valid PaymentResource paymentResource) {
 
-        Payment newPayment = reservationService.processPaymentForReservation(
+        Payment newPayment = reservationService.finalizePaymentForReservation(
                 guestsId, reservationId, paymentMapper.toDomainFromResource(paymentResource));
         return ResponseEntity.ok(paymentMapper.toResource(newPayment));
     }
