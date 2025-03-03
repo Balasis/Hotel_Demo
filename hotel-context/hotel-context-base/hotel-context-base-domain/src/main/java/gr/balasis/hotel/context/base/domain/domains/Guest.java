@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Guest extends BaseDomain{
+public class Guest extends BaseDomain {
     private String firstName;
     private String lastName;
     private String email;

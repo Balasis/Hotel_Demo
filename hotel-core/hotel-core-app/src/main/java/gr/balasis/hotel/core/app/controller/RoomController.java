@@ -1,12 +1,12 @@
 package gr.balasis.hotel.core.app.controller;
 
 import gr.balasis.hotel.context.base.domain.domains.Room;
-import gr.balasis.hotel.context.web.resource.RoomResource;
-import gr.balasis.hotel.data.entity.RoomEntity;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.context.base.mapper.RoomMapper;
+import gr.balasis.hotel.context.web.resource.RoomResource;
 import gr.balasis.hotel.core.app.service.BaseService;
 import gr.balasis.hotel.core.app.service.RoomService;
+import gr.balasis.hotel.data.entity.RoomEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")
-public class RoomController extends BaseController<Room, RoomResource , RoomEntity> {
+public class RoomController extends BaseController<Room, RoomResource, RoomEntity> {
     private final RoomService roomService;
     private final RoomMapper roomMapper;
 
@@ -38,7 +38,7 @@ public class RoomController extends BaseController<Room, RoomResource , RoomEnti
     }
 
     @Override
-    protected BaseMapper<Room, RoomResource , RoomEntity> getMapper() {
+    protected BaseMapper<Room, RoomResource, RoomEntity> getMapper() {
         return roomMapper;
     }
 }

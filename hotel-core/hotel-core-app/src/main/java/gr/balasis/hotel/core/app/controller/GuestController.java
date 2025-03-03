@@ -4,13 +4,12 @@ package gr.balasis.hotel.core.app.controller;
 import gr.balasis.hotel.context.base.domain.domains.Guest;
 import gr.balasis.hotel.context.base.domain.domains.Payment;
 import gr.balasis.hotel.context.base.domain.domains.Reservation;
+import gr.balasis.hotel.context.base.mapper.GuestMapper;
 import gr.balasis.hotel.context.base.mapper.PaymentMapper;
+import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-
-import gr.balasis.hotel.context.base.mapper.GuestMapper;
-import gr.balasis.hotel.context.base.mapper.ReservationMapper;
 import gr.balasis.hotel.core.app.service.GuestService;
 import gr.balasis.hotel.core.app.service.ReservationService;
 import gr.balasis.hotel.modules.feedback.base.BaseComponent;
@@ -18,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +45,20 @@ public class GuestController extends BaseComponent {
             @RequestBody @Valid GuestResource guestResource) {
         Guest newGuest = guestService.create(guestMapper.toDomainFromResource(guestResource));
         return ResponseEntity.ok(guestMapper.toResource(newGuest));
+    }
+
+    @GetMapping("/{guestId}")
+    public ResponseEntity<GuestResource> findGuestById(
+            @PathVariable Long guestId) {
+        Guest guest = guestService.findGuestById(guestId);
+        return ResponseEntity.ok(guestMapper.toResource(guest));
+    }
+
+    @DeleteMapping("/{guestId}")
+    public ResponseEntity<Void> deleteGuestById(
+            @PathVariable Long guestId) {
+        guestService.deleteGuestById(guestId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{guestId}")
@@ -116,7 +128,7 @@ public class GuestController extends BaseComponent {
     @PutMapping("/{guestsId}/email")
     public ResponseEntity<Void> updateEmail(
             @PathVariable Long guestsId,
-            @RequestBody  String email) {
+            @RequestBody String email) {
         guestService.updateEmail(guestsId, email);
         return ResponseEntity.noContent().build();
     }
