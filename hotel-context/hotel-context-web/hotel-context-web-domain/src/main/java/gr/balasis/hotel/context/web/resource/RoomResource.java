@@ -1,10 +1,7 @@
 package gr.balasis.hotel.context.web.resource;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
 
 @Getter
@@ -12,7 +9,7 @@ import java.math.BigDecimal;
 @ToString
 @Builder
 @AllArgsConstructor
-public class RoomResource extends BaseResource{
+public class RoomResource extends BaseResource {
     private Long id;
     private String roomNumber;
     private boolean reserved;

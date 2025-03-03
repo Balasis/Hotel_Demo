@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackResource,FeedbackEntity> implements FeedbackService{
+public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackResource, FeedbackEntity> implements FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final FeedbackMapper feedbackMapper;
     private final GuestRepository guestRepository;
@@ -80,8 +80,8 @@ public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackReso
         feedbackRepository.delete(feedback);
     }
 
-    public boolean feedbackExistsForReservationId(Long reservationId){
-       return feedbackRepository.existsByReservationId(reservationId);
+    public boolean feedbackExistsForReservationId(Long reservationId) {
+        return feedbackRepository.existsByReservationId(reservationId);
     }
 
     private GuestEntity validateGuestExists(Long guestId) {
@@ -122,7 +122,7 @@ public class FeedbackServiceImpl extends BasicServiceImpl<Feedback, FeedbackReso
     private FeedbackEntity validateFeedbackExists(Long reservationId) {
         return feedbackRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Feedback not found with reservationID: "
-                                                                                                    + reservationId));
+                        + reservationId));
     }
 
     private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {

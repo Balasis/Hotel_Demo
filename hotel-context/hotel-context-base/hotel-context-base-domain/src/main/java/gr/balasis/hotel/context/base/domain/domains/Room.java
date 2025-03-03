@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Room extends BaseDomain{
+public class Room extends BaseDomain {
     private String roomNumber;
     private boolean reserved;
     private BigDecimal pricePerNight;
