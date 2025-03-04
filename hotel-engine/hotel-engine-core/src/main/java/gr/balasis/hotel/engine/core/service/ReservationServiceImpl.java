@@ -8,11 +8,17 @@ import gr.balasis.hotel.context.base.entity.GuestEntity;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.exception.*;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.base.mapper.PaymentMapper;
-import gr.balasis.hotel.context.base.mapper.ReservationMapper;
-import gr.balasis.hotel.context.web.resource.ReservationResource;
+import gr.balasis.hotel.context.base.service.BasicServiceImpl;
+
+
+
 import gr.balasis.hotel.context.base.entity.PaymentEntity;
 import gr.balasis.hotel.context.base.entity.ReservationEntity;
+import gr.balasis.hotel.engine.core.mapper.PaymentMapper;
+import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
+import gr.balasis.hotel.engine.core.mapper.FeedbackMapper;
+
+import gr.balasis.hotel.engine.core.repository.FeedbackRepository;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import gr.balasis.hotel.engine.core.repository.PaymentRepository;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
@@ -29,12 +35,15 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationResource, ReservationEntity> implements ReservationService {
+public class ReservationServiceImpl extends BasicServiceImpl<Reservation,ReservationEntity> implements ReservationService {
     private final ReservationRepository reservationRepository;
-    private final ReservationMapper reservationMapper;
-    private final PaymentMapper paymentMapper;
+    private final FeedbackRepository feedbackRepository;
     private final GuestRepository guestRepository;
     private final PaymentRepository paymentRepository;
+    private final ReservationMapper reservationMapper;
+    private final FeedbackMapper feedbackMapper;
+    private final PaymentMapper paymentMapper;
+
 
     @Override
     @Transactional
@@ -103,7 +112,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
         FeedbackEntity feedbackEntity = feedbackMapper.toEntity(feedback);
         FeedbackEntity savedEntity = feedbackRepository.save(feedbackEntity);
-        return feedbackMapper.toDomainFromEntity(savedEntity);
+        return feedbackMapper.toDomain(savedEntity);
     }
 
     public Feedback getFeedbackById(Long guestId, Long reservationId) {
@@ -116,7 +125,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         validateFeedbackBelongsToReservation(feedback, reservation);
         validateFeedbackBelongsToGuest(feedback, guest);
 
-        return feedbackMapper.toDomainFromEntity(feedback);
+        return feedbackMapper.toDomain(feedback);
     }
 
     public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
@@ -150,23 +159,19 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return feedbackRepository.existsByReservationId(reservationId);
     }
 
-
-
-
     @Override
     public JpaRepository<ReservationEntity, Long> getRepository() {
         return reservationRepository;
     }
 
     @Override
-    public BaseMapper<Reservation, ReservationResource, ReservationEntity> getMapper() {
+    public BaseMapper<Reservation,ReservationEntity> getMapper() {
         return reservationMapper;
     }
 
-    private void validateGuestExists(Long guestId) {
-        if (!guestRepository.existsById(guestId)) {
-            throw new EntityNotFoundException("Guest is not found");
-        }
+    private GuestEntity validateGuestExists(Long guestId) {
+        return guestRepository.findById(guestId)
+                .orElseThrow(() -> new EntityNotFoundException("Guest not found with ID: " + guestId));
     }
 
     private void validateGuestIdMatch(Long guestId, Reservation reservation) {
@@ -192,7 +197,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         payment.setPaymentStatus(PaymentStatus.PENDING);
         reservation.setPayment(payment);
         reservation.setCreatedAt(LocalDateTime.now());
-        return reservationMapper.toDomainFromEntity(reservationRepository.save(reservationMapper.toEntity(reservation)));
+        return reservationMapper.toDomain(reservationRepository.save(reservationMapper.toEntity(reservation)));
     }
 
     private ReservationEntity getValidReservation(Long guestId, Long reservationId) {
@@ -210,11 +215,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
             throw new PaymentNotFoundException("No payment associated with this reservation");
         }
         return paymentEntity;
-    }
-
-    private GuestEntity validateGuestExists(Long guestId) {
-        return guestRepository.findById(guestId)
-                .orElseThrow(() -> new EntityNotFoundException("Guest not found with ID: " + guestId));
     }
 
     private ReservationEntity validateReservationExists(Long reservationId) {

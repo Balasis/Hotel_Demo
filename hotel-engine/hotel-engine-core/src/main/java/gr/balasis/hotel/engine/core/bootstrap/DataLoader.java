@@ -1,23 +1,40 @@
 package gr.balasis.hotel.engine.core.bootstrap;
 
+import com.thedeanda.lorem.Lorem;
+import com.thedeanda.lorem.LoremIpsum;
+import gr.balasis.hotel.context.base.domain.Guest;
+import gr.balasis.hotel.context.base.domain.Reservation;
+import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 
 @Component
 @Profile("dev")
 @AllArgsConstructor
-public class DataLoader extends BaseDataLoader implements ApplicationRunner {
+public class DataLoader implements ApplicationRunner {
     private final GuestService guestService;
     private final RoomService roomService;
     private final ReservationService reservationService;
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
+    private static final Lorem lorem = LoremIpsum.getInstance();
+    private final Random random = new Random();
 
     @Override
     @Transactional
@@ -29,19 +46,79 @@ public class DataLoader extends BaseDataLoader implements ApplicationRunner {
         logger.info("Default dev DataLoader started");
     }
 
-    @Override
-    public GuestService getGuestService() {
-        return guestService;
+    private void loadRooms() {
+        for (int i = 0; i < 10; i++) {
+            roomService.create(
+                    Room.builder()
+                            .roomNumber("10" + (i + 1))
+                            .reserved(false)
+                            .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
+                            .build()
+            );
+        }
     }
 
-    @Override
-    public RoomService getRoomService() {
-        return roomService;
+    private void loadGuests() {
+        for (int i = 0; i < 5; i++) {
+            guestService.create(
+                    Guest.builder()
+                            .firstName(lorem.getFirstName())
+                            .lastName(lorem.getLastName())
+                            .email(lorem.getEmail())
+                            .createdAt(LocalDateTime.now())
+                            .build()
+            );
+        }
     }
 
-    @Override
-    public ReservationService getReservationService() {
-        return reservationService;
+    private void loadReservations() {
+        List<Guest> guests = guestService.findAll();
+        List<Room> availableRooms = roomService.findAll().stream()
+                .filter(room -> !room.isReserved())
+                .collect(Collectors.toList());
+
+        if (guests.isEmpty() || availableRooms.isEmpty()) {
+            System.out.println("Skipping reservations: No guests or available rooms.");
+            return;
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (guests.isEmpty() || availableRooms.isEmpty()) return;
+            Room room = pickRandomRoom(availableRooms);
+            reservationService.create(createReservationDomain(pickRandomGuest(guests), room));
+            room.setReserved(true);
+            roomService.update(room);
+        }
     }
 
+    private void loadPayments() {
+        List<Reservation> reservations = reservationService.findAll();
+        for (Reservation reservation : reservations) {
+            if (random.nextBoolean()) {
+                reservationService.finalizePaymentForReservation(
+                        reservation.getGuest().getId(),
+                        reservation.getId(),
+                        reservation.getPayment()
+                );
+            }
+        }
+    }
+
+    private Guest pickRandomGuest(List<Guest> guests) {
+        return guests.removeFirst();
+    }
+
+    private Room pickRandomRoom(List<Room> rooms) {
+        return rooms.removeFirst();
+    }
+
+    private Reservation createReservationDomain(Guest guest, Room room) {
+        LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
+        return Reservation.builder()
+                .guest(guest)
+                .room(room)
+                .checkInDate(checkInDate)
+                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
+                .build();
+    }
 }

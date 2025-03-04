@@ -6,5 +6,5 @@ import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
-public interface RoomMapper extends BaseMapper<Room, RoomResource> {
+public interface RoomWebMapper extends BaseWebMapper<Room, RoomResource> {
 }

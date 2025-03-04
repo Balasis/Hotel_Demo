@@ -1,7 +1,7 @@
 package gr.balasis.hotel.context.web.controller;
 
 import gr.balasis.hotel.context.base.domain.BaseDomain;
-import gr.balasis.hotel.context.web.mapper.BaseMapper;
+import gr.balasis.hotel.context.web.mapper.BaseWebMapper;
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.context.base.component.BaseComponent;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public abstract class BaseController<T extends BaseDomain, R extends BaseResource> extends BaseComponent {
     protected abstract BaseService<T, Long> getBaseService();
 
-    protected abstract BaseMapper<T, R> getMapper();
+    protected abstract BaseWebMapper<T, R> getMapper();
 
     @GetMapping("/{Id}")
     public ResponseEntity<R> findById(@PathVariable final Long Id) {

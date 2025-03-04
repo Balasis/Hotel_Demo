@@ -6,5 +6,5 @@ import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
-public interface PaymentMapper extends BaseMapper<Payment, PaymentResource> {
+public interface PaymentWebMapper extends BaseWebMapper<Payment, PaymentResource> {
 }

@@ -1,13 +1,13 @@
 package gr.balasis.hotel.engine.core.controller;
 
-import gr.balasis.hotel.context.web.mapper.BaseMapper;
+import gr.balasis.hotel.context.web.mapper.BaseWebMapper;
 import gr.balasis.hotel.context.web.controller.BaseController;
 import gr.balasis.hotel.context.web.resource.RoomResource;
 
 import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.context.base.service.BaseService;
+import gr.balasis.hotel.context.web.mapper.RoomWebMapper;
 
-import gr.balasis.hotel.engine.core.mapper.RoomMapper;
 import gr.balasis.hotel.engine.core.service.RoomService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/rooms")
 public class RoomController extends BaseController<Room, RoomResource> {
     private final RoomService roomService;
-    private final RoomMapper roomMapper;
+    private final RoomWebMapper roomMapper;
 
     @GetMapping
     public ResponseEntity<List<RoomResource>> findAll() {
@@ -41,7 +41,7 @@ public class RoomController extends BaseController<Room, RoomResource> {
     }
 
     @Override
-    protected BaseMapper<Room, RoomResource> getMapper() {
+    protected BaseWebMapper<Room, RoomResource> getMapper() {
         return roomMapper;
     }
 }

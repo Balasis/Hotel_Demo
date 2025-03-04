@@ -6,7 +6,7 @@ import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true),
-        uses = {RoomMapper.class, GuestMapper.class, PaymentMapper.class})
-public interface ReservationMapper extends BaseMapper<Reservation, ReservationResource> {
+        uses = {RoomWebMapper.class, GuestWebMapper.class, PaymentWebMapper.class})
+public interface ReservationWebMapper extends BaseWebMapper<Reservation, ReservationResource> {
 
 }
