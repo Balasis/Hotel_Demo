@@ -4,7 +4,7 @@ import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.base.service.BaseService;
 
 import gr.balasis.hotel.context.web.mapper.BaseWebMapper;
-import gr.balasis.hotel.context.web.mapper.ReservationWebMapper;
+import gr.balasis.hotel.engine.core.mapper.web.ReservationWebMapper;
 import gr.balasis.hotel.context.web.controller.BaseController;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
 
@@ -37,7 +37,7 @@ public class ReservationController extends BaseController<Reservation, Reservati
     }
 
     @Override
-    protected BaseService<Reservation, Long> getBaseService() {
+    protected BaseService<Reservation> getBaseService() {
         return reservationService;
     }
 

@@ -6,38 +6,50 @@ import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.context.base.component.BaseComponent;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-public abstract class BaseController<T extends BaseDomain, R extends BaseResource> extends BaseComponent {
-    protected abstract BaseService<T, Long> getBaseService();
+import java.util.List;
 
+public abstract class BaseController<T extends BaseDomain, R extends BaseResource> extends BaseComponent {
+    protected abstract BaseService<T> getBaseService();
     protected abstract BaseWebMapper<T, R> getMapper();
 
-    @GetMapping("/{Id}")
-    public ResponseEntity<R> findById(@PathVariable final Long Id) {
-        return ResponseEntity.ok(getMapper().toResource(getBaseService().findById(Id)));
+
+    @GetMapping
+    public ResponseEntity <List<R>> findAll() {
+        return ResponseEntity.ok(
+                getMapper().toResources(
+                        getBaseService().findAll())
+        );
     }
 
     @PostMapping
-    public ResponseEntity<R> create(@RequestBody R resource) {
-        T domain = getMapper().toDomain(resource);
-        T created = getBaseService().create(domain);
-        return ResponseEntity.ok(getMapper().toResource(created));
+    public ResponseEntity<R> create(
+            @RequestBody @Valid final R resource) {
+        return ResponseEntity.ok(
+                getMapper().toResource(
+                        getBaseService().create(
+                        getMapper().toDomain(resource))
+                ));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<R> update(@PathVariable Long id, @RequestBody R resource) {
-        T domain = getMapper().toDomain(resource);
-        getBaseService().update(domain);
-        return ResponseEntity.ok(getMapper().toResource(domain));
+    @PutMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(
+            @RequestBody @Valid final R resource) {
+        getBaseService().update(getMapper().toDomain(resource));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        T domain = getBaseService().findById(id);
-        getBaseService().delete(domain);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @RequestBody @Valid final R resource) {
+        if (getBaseService().exists(getMapper().toDomain(resource))) {
+            getBaseService().delete(getMapper().toDomain(resource));
+        }
     }
 
 }

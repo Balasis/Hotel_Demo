@@ -1,4 +1,4 @@
-package gr.balasis.hotel.engine.core.mapper;
+package gr.balasis.hotel.engine.core.mapper.base;
 
 import gr.balasis.hotel.context.base.domain.Payment;
 

@@ -1,4 +1,4 @@
-package gr.balasis.hotel.core.monitoring.aspect;
+package gr.balasis.hotel.engine.monitoring.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

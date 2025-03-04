@@ -7,7 +7,7 @@ import gr.balasis.hotel.context.base.service.BaseService;
 
 import java.util.List;
 
-public interface ReservationService extends BaseService<Reservation, Long> {
+public interface ReservationService extends BaseService<Reservation> {
     List<Reservation> findReservationsByGuestId(Long id);
 
     Reservation createReservationForGuest(Long id, Reservation reservation);

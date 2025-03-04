@@ -6,7 +6,7 @@ import gr.balasis.hotel.context.web.resource.RoomResource;
 
 import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.context.base.service.BaseService;
-import gr.balasis.hotel.context.web.mapper.RoomWebMapper;
+import gr.balasis.hotel.engine.core.mapper.web.RoomWebMapper;
 
 import gr.balasis.hotel.engine.core.service.RoomService;
 
@@ -36,7 +36,7 @@ public class RoomController extends BaseController<Room, RoomResource> {
     }
 
     @Override
-    protected BaseService<Room, Long> getBaseService() {
+    protected BaseService<Room> getBaseService() {
         return roomService;
     }
 

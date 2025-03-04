@@ -14,6 +14,10 @@ import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.context.web.resource.FeedbackResource;
 
+import gr.balasis.hotel.engine.core.mapper.web.FeedbackWebMapper;
+import gr.balasis.hotel.engine.core.mapper.web.GuestWebMapper;
+import gr.balasis.hotel.engine.core.mapper.web.PaymentWebMapper;
+import gr.balasis.hotel.engine.core.mapper.web.ReservationWebMapper;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
@@ -35,22 +39,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     private final ReservationWebMapper reservationMapper;
     private final PaymentWebMapper paymentMapper;
     private final FeedbackWebMapper feedbackMapper;
-
-    @GetMapping
-    public ResponseEntity<List<GuestResource>> findAll() {
-        List<GuestResource> resources = guestService.findAll()
-                .stream()
-                .map(guestMapper::toResource)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resources);
-    }
-
-    @PostMapping
-    public ResponseEntity<GuestResource> createGuest(
-            @RequestBody @Valid GuestResource guestResource) {
-        Guest newGuest = guestService.create(guestMapper.toDomain(guestResource));
-        return ResponseEntity.ok(guestMapper.toResource(newGuest));
-    }
 
     @GetMapping("/{guestId}")
     public ResponseEntity<GuestResource> findGuestById(
@@ -173,7 +161,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     }
 
     @Override
-    protected BaseService<Guest, Long> getBaseService() {
+    protected BaseService<Guest> getBaseService() {
         return guestService;
     }
 

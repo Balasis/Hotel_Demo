@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EntityScan(basePackages = "gr.balasis.hotel.context.base.entity")
 @EnableJpaRepositories(basePackages = "gr.balasis.hotel.engine.core.repository")
-public class CoreModuleConfiguration {
+public class CoreDatabaseConfiguration {
 }

@@ -6,9 +6,9 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
-        "gr.balasis.hotel.context",
-        "gr.balasis.hotel.core.app",
-        "gr.balasis.hotel.core.monitoring",
+        "gr.balasis.hotel.context.base",
+        "gr.balasis.hotel.engine.core",
+        "gr.balasis.hotel.engine.monitoring",
 })
 public class HotelCore {
     public static void main(String[] args) {

@@ -14,9 +14,9 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 
 import gr.balasis.hotel.context.base.entity.PaymentEntity;
 import gr.balasis.hotel.context.base.entity.ReservationEntity;
-import gr.balasis.hotel.engine.core.mapper.PaymentMapper;
-import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
-import gr.balasis.hotel.engine.core.mapper.FeedbackMapper;
+import gr.balasis.hotel.engine.core.mapper.base.PaymentMapper;
+import gr.balasis.hotel.engine.core.mapper.base.ReservationMapper;
+import gr.balasis.hotel.engine.core.mapper.base.FeedbackMapper;
 
 import gr.balasis.hotel.engine.core.repository.FeedbackRepository;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
