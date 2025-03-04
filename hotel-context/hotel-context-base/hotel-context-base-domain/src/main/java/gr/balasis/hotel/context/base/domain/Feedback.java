@@ -1,16 +1,19 @@
-package gr.balasis.hotel.modules.feedback.resource;
+package gr.balasis.hotel.context.base.domain;
 
+import gr.balasis.hotel.context.base.domain.BaseDomain;
 import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.web.resource.BaseResource;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FeedbackResource extends BaseResource {
+public class Feedback extends BaseDomain {
     private Guest guest;
     private Long reservationId;
     private String message;
+    private LocalDateTime createdAt;
 }

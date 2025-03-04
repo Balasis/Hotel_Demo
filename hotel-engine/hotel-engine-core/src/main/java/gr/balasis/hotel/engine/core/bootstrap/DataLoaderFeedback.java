@@ -30,8 +30,6 @@ public class DataLoaderFeedback extends BaseDataLoader implements ApplicationRun
     private final GuestService guestService;
     private final RoomService roomService;
     private final ReservationService reservationService;
-    private final FeedbackService feedbackService;
-    private final FeedbackRepository feedbackRepository;
     private final MessageSource messageSource;
 
 

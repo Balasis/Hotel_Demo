@@ -1,10 +1,10 @@
 package gr.balasis.hotel.engine.core.service;
 
+import gr.balasis.hotel.engine.core.mapper.GuestMapper;
+import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.base.mapper.GuestMapper;
 import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
-import gr.balasis.hotel.context.web.resource.GuestResource;
 import gr.balasis.hotel.context.base.entity.GuestEntity;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource, GuestEntity> implements GuestService {
+public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implements GuestService {
     private final GuestRepository guestRepository;
     private final GuestMapper guestMapper;
 
@@ -22,7 +22,7 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource, Gue
         if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists"); // Handle accordingly
         }
-        return guestMapper.toDomainFromEntity(guestRepository.save(guestMapper.toEntity(guest)));
+        return guestMapper.toDomain(guestRepository.save(guestMapper.toEntity(guest)));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource, Gue
        GuestEntity guest= guestRepository.findById(guestId)
                .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
 
-        return  guestMapper.toDomainFromEntity(guest);
+        return  guestMapper.toDomain(guest);
     }
 
     public void updateGuest(Long guestId, Guest updatedGuest) {
@@ -55,7 +55,7 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource, Gue
         GuestEntity guestEntity = guestRepository.findById(guestId)
                 .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
         guestEntity.setEmail(email);
-        guestMapper.toDomainFromEntity(guestRepository.save(guestEntity));
+        guestMapper.toDomain(guestRepository.save(guestEntity));
     }
 
 
@@ -66,7 +66,7 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestResource, Gue
     }
 
     @Override
-    public BaseMapper<Guest, GuestResource, GuestEntity> getMapper() {
+    public BaseMapper<Guest,GuestEntity> getMapper() {
         return guestMapper;
     }
 

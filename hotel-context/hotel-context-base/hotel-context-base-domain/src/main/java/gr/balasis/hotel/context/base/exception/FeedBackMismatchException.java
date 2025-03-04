@@ -1,4 +1,4 @@
-package gr.balasis.hotel.modules.feedback.exception.web;
+package gr.balasis.hotel.context.base.exception;
 
 public class FeedBackMismatchException extends RuntimeException {
     public FeedBackMismatchException(String message) {

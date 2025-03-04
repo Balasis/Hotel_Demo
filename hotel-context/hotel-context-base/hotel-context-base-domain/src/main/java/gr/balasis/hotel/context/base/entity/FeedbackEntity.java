@@ -1,4 +1,4 @@
-package gr.balasis.hotel.modules.feedback.entity;
+package gr.balasis.hotel.context.base.entity;
 
 import gr.balasis.hotel.context.base.entity.BaseEntity;
 import gr.balasis.hotel.context.base.entity.GuestEntity;

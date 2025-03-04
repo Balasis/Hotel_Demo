@@ -1,12 +1,17 @@
 package gr.balasis.hotel.engine.core.controller;
 
 import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.base.mapper.ReservationMapper;
+import gr.balasis.hotel.context.base.service.BaseService;
+
+import gr.balasis.hotel.context.web.mapper.BaseMapper;
+import gr.balasis.hotel.context.web.controller.BaseController;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
-import gr.balasis.hotel.core.app.service.BaseService;
+
+
+import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
+
 import gr.balasis.hotel.engine.core.service.ReservationService;
-import gr.balasis.hotel.context.base.entity.ReservationEntity;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
-public class ReservationController extends BaseController<Reservation, ReservationResource, ReservationEntity> {
+public class ReservationController extends BaseController<Reservation, ReservationResource> {
     private final ReservationService reservationService;
     private final ReservationMapper reservationMapper;
 
@@ -38,7 +43,7 @@ public class ReservationController extends BaseController<Reservation, Reservati
     }
 
     @Override
-    protected BaseMapper<Reservation, ReservationResource, ReservationEntity> getMapper() {
+    protected BaseMapper<Reservation, ReservationResource> getMapper() {
         return reservationMapper;
     }
 }

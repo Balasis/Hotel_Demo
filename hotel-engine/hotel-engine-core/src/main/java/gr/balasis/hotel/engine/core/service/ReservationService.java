@@ -2,6 +2,7 @@ package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.domain.Payment;
 import gr.balasis.hotel.context.base.domain.Reservation;
+import gr.balasis.hotel.context.base.service.BaseService;
 
 import java.util.List;
 

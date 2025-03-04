@@ -1,6 +1,6 @@
-package gr.balasis.hotel.modules.feedback.repository;
+package gr.balasis.hotel.engine.core.repository;
 
-import gr.balasis.hotel.modules.feedback.entity.FeedbackEntity;
+import gr.balasis.hotel.context.base.entity.FeedbackEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

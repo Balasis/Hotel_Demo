@@ -1,15 +1,15 @@
 package gr.balasis.hotel.engine.core.service;
 
+import gr.balasis.hotel.context.base.domain.Feedback;
 import gr.balasis.hotel.context.base.domain.Payment;
 import gr.balasis.hotel.context.base.domain.Reservation;
+import gr.balasis.hotel.context.base.entity.FeedbackEntity;
+import gr.balasis.hotel.context.base.entity.GuestEntity;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
+import gr.balasis.hotel.context.base.exception.*;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.context.base.mapper.PaymentMapper;
 import gr.balasis.hotel.context.base.mapper.ReservationMapper;
-import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
-import gr.balasis.hotel.context.base.exception.PaymentNotFoundException;
-import gr.balasis.hotel.context.base.exception.ReservationNotFoundException;
-import gr.balasis.hotel.context.base.exception.UnauthorizedAccessException;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.context.base.entity.PaymentEntity;
 import gr.balasis.hotel.context.base.entity.ReservationEntity;
@@ -45,7 +45,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     public Reservation findReservationById(Long guestId, Long reservationId) {
         ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
-        return reservationMapper.toDomainFromEntity(reservationEntity);
+        return reservationMapper.toDomain(reservationEntity);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public List<Reservation> findReservationsByGuestId(Long guestId) {
         validateGuestExists(guestId);
         return reservationRepository.findByGuestId(guestId).stream()
-                .map(reservationMapper::toDomainFromEntity)
+                .map(reservationMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
@@ -83,15 +83,75 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         paymentEntity.setPaymentStatus(PaymentStatus.PAID);
         paymentRepository.save(paymentEntity);
 
-        return paymentMapper.toDomainFromEntity(paymentEntity);
+        return paymentMapper.toDomain(paymentEntity);
     }
 
     public Payment getPaymentForReservation(Long guestId, Long reservationId) {
         ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
         PaymentEntity paymentEntity = getValidPayment(reservationEntity);
 
-        return paymentMapper.toDomainFromEntity(paymentEntity);
+        return paymentMapper.toDomain(paymentEntity);
     }
+
+    public Feedback createFeedback(Long guestId, Long reservationId, Feedback feedback) {
+        GuestEntity guest = validateGuestExists(guestId);
+        ReservationEntity reservation = validateReservationExists(reservationId);
+
+        validateReservationBelongsToGuest(guest, reservation);
+        validateFeedbackBelongsToReservation(feedback, reservation);
+        validateNoDuplicateFeedback(reservation);
+
+        FeedbackEntity feedbackEntity = feedbackMapper.toEntity(feedback);
+        FeedbackEntity savedEntity = feedbackRepository.save(feedbackEntity);
+        return feedbackMapper.toDomainFromEntity(savedEntity);
+    }
+
+    public Feedback getFeedbackById(Long guestId, Long reservationId) {
+        GuestEntity guest = validateGuestExists(guestId);
+        ReservationEntity reservation = validateReservationExists(reservationId);
+
+        FeedbackEntity feedback = validateFeedbackExists(reservationId);
+
+        validateReservationBelongsToGuest(guest, reservation);
+        validateFeedbackBelongsToReservation(feedback, reservation);
+        validateFeedbackBelongsToGuest(feedback, guest);
+
+        return feedbackMapper.toDomainFromEntity(feedback);
+    }
+
+    public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
+        GuestEntity guest = validateGuestExists(guestId);
+        ReservationEntity reservation = validateReservationExists(reservationId);
+        FeedbackEntity existingFeedback = validateFeedbackExists(reservationId);
+
+        validateReservationBelongsToGuest(guest, reservation);
+        validateFeedbackBelongsToReservation(existingFeedback, reservation);
+        validateFeedbackBelongsToGuest(existingFeedback, guest);
+
+        existingFeedback.setMessage(updatedFeedback.getMessage());
+
+        feedbackRepository.save(existingFeedback);
+    }
+
+    public void deleteFeedback(Long guestId, Long reservationId) {
+        GuestEntity guest = validateGuestExists(guestId);
+        ReservationEntity reservation = validateReservationExists(reservationId);
+
+        FeedbackEntity feedback = validateFeedbackExists(reservationId);
+
+        validateReservationBelongsToGuest(guest, reservation);
+        validateFeedbackBelongsToReservation(feedback, reservation);
+        validateFeedbackBelongsToGuest(feedback, guest);
+
+        feedbackRepository.delete(feedback);
+    }
+
+    public boolean feedbackExistsForReservationId(Long reservationId) {
+        return feedbackRepository.existsByReservationId(reservationId);
+    }
+
+
+
 
     @Override
     public JpaRepository<ReservationEntity, Long> getRepository() {
@@ -150,6 +210,53 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
             throw new PaymentNotFoundException("No payment associated with this reservation");
         }
         return paymentEntity;
+    }
+
+    private GuestEntity validateGuestExists(Long guestId) {
+        return guestRepository.findById(guestId)
+                .orElseThrow(() -> new EntityNotFoundException("Guest not found with ID: " + guestId));
+    }
+
+    private ReservationEntity validateReservationExists(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found with ID: " + reservationId));
+    }
+
+    private void validateReservationBelongsToGuest(GuestEntity guest, ReservationEntity reservation) {
+        if (!reservation.getGuest().getId().equals(guest.getId())) {
+            throw new UnauthorizedAccessException("Reservation does not belong to the given guest");
+        }
+    }
+
+    private void validateFeedbackBelongsToReservation(FeedbackEntity feedback, ReservationEntity reservation) {
+        if (!feedback.getReservationId().equals(reservation.getId())) {
+            throw new FeedBackMismatchException("Feedback does not belong to the provided reservation");
+        }
+    }
+
+    private void validateFeedbackBelongsToReservation(Feedback feedback, ReservationEntity reservation) {
+        if (!feedback.getReservationId().equals(reservation.getId())) {
+            throw new FeedBackMismatchException("Feedback does not belong to the provided reservation");
+        }
+    }
+
+    private void validateNoDuplicateFeedback(ReservationEntity reservation) {
+        boolean feedbackExists = feedbackRepository.existsByReservationId(reservation.getId());
+        if (feedbackExists) {
+            throw new DuplicateFeedbackException("Feedback already exists for this reservation");
+        }
+    }
+
+    private FeedbackEntity validateFeedbackExists(Long reservationId) {
+        return feedbackRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Feedback not found with reservationID: "
+                        + reservationId));
+    }
+
+    private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {
+        if (!feedback.getGuest().getId().equals(guest.getId())) {
+            throw new UnauthorizedAccessException("Feedback does not belong to the given guest");
+        }
     }
 
 }

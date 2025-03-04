@@ -1,5 +1,6 @@
 package gr.balasis.hotel.context.web.advice;
 
+import gr.balasis.hotel.context.base.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

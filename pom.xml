@@ -18,10 +18,7 @@
 
     <modules>
         <module>hotel-context</module>
-        <module>hotel-modules</module>
-        <module>hotel-data</module>
         <module>hotel-engine</module>
-
     </modules>
 
     <properties>
