@@ -1,10 +1,10 @@
 package gr.balasis.hotel.modules.feedback.service;
 
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.web.exception.EntityNotFoundException;
-import gr.balasis.hotel.context.web.exception.UnauthorizedAccessException;
-import gr.balasis.hotel.data.entity.GuestEntity;
-import gr.balasis.hotel.data.entity.ReservationEntity;
+import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
+import gr.balasis.hotel.context.base.exception.UnauthorizedAccessException;
+import gr.balasis.hotel.context.base.entity.GuestEntity;
+import gr.balasis.hotel.context.base.entity.ReservationEntity;
 import gr.balasis.hotel.data.repository.GuestRepository;
 import gr.balasis.hotel.data.repository.ReservationRepository;
 import gr.balasis.hotel.modules.feedback.domain.Feedback;

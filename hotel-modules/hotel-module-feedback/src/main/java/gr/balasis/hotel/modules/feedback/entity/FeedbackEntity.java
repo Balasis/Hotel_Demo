@@ -1,7 +1,7 @@
 package gr.balasis.hotel.modules.feedback.entity;
 
-import gr.balasis.hotel.data.entity.BaseEntity;
-import gr.balasis.hotel.data.entity.GuestEntity;
+import gr.balasis.hotel.context.base.entity.BaseEntity;
+import gr.balasis.hotel.context.base.entity.GuestEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

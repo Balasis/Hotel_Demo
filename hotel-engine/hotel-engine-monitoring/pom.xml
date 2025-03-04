@@ -5,14 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>gr.balasis.hotel</groupId>
-        <artifactId>hotel-context</artifactId>
+        <artifactId>hotel-engine</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hotel-context-base</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>hotel-context-base-domain</module>
-        <module>hotel-context-base-core</module>
-    </modules>
+    <artifactId>hotel-engine-monitoring</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>

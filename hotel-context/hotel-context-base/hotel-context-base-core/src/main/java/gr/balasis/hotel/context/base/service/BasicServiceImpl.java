@@ -1,11 +1,10 @@
-package gr.balasis.hotel.modules.feedback.service;
+package gr.balasis.hotel.context.base.service;
 
 import gr.balasis.hotel.context.base.domain.BaseDomain;
-import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
+import gr.balasis.hotel.context.web.exception.EntityNotFoundException;
 import gr.balasis.hotel.context.web.resource.BaseResource;
-import gr.balasis.hotel.context.base.entity.BaseEntity;
-import gr.balasis.hotel.modules.feedback.base.BaseComponent;
+import gr.balasis.hotel.context.base.component.BaseComponent;
+import gr.balasis.hotel.data.entity.BaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

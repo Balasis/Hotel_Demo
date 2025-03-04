@@ -1,6 +1,6 @@
 package gr.balasis.hotel.modules.feedback.resource;
 
-import gr.balasis.hotel.context.base.domain.domains.Guest;
+import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import lombok.*;
 

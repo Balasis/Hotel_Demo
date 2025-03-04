@@ -1,7 +1,7 @@
 package gr.balasis.hotel.modules.feedback.domain;
 
-import gr.balasis.hotel.context.base.domain.domains.BaseDomain;
-import gr.balasis.hotel.context.base.domain.domains.Guest;
+import gr.balasis.hotel.context.base.domain.BaseDomain;
+import gr.balasis.hotel.context.base.domain.Guest;
 import lombok.*;
 
 import java.time.LocalDateTime;

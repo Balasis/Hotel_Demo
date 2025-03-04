@@ -1,11 +1,11 @@
-package gr.balasis.hotel.modules.feedback.controller;
+package gr.balasis.hotel.engine.core.controller;
 
 import gr.balasis.hotel.context.base.domain.BaseDomain;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import gr.balasis.hotel.context.web.resource.BaseResource;
+import gr.balasis.hotel.context.base.component.BaseComponent;
+import gr.balasis.hotel.core.app.service.BaseService;
 import gr.balasis.hotel.context.base.entity.BaseEntity;
-import gr.balasis.hotel.modules.feedback.base.BaseComponent;
-import gr.balasis.hotel.modules.feedback.service.BaseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
