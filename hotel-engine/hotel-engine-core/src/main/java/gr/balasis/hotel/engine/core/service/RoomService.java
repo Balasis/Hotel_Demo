@@ -4,5 +4,4 @@ import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.context.base.service.BaseService;
 
 public interface RoomService extends BaseService<Room> {
-    boolean existsById(Long guestId);
 }

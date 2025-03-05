@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Payment {
     private Long id;
+    private Reservation reservation;
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private PaymentStatus paymentStatus;

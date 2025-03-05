@@ -24,9 +24,3 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: true
-
-logging:
-  level:
-    root: info
-    gr.balasis.hotel.core: trace
-    gr.balasis.hotel.core.monitoring: trace

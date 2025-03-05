@@ -9,4 +9,6 @@ server:
 logging:
   level:
     root: info
-    gr.balasis.hotel.core: debug
+    gr.balasis.hotel.engine.core: trace
+    gr.balasis.hotel.engine.monitoring: trace
+

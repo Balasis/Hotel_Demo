@@ -26,15 +26,6 @@ public class RoomController extends BaseController<Room, RoomResource> {
     private final RoomService roomService;
     private final RoomWebMapper roomMapper;
 
-    @GetMapping
-    public ResponseEntity<List<RoomResource>> findAll() {
-        List<RoomResource> resources = roomService.findAll()
-                .stream()
-                .map(roomMapper::toResource)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resources);
-    }
-
     @Override
     protected BaseService<Room> getBaseService() {
         return roomService;

@@ -1,7 +1,5 @@
 package gr.balasis.hotel.context.web.resource;
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.web.resource.BaseResource;
 import lombok.*;
 
 @Getter
@@ -10,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class FeedbackResource extends BaseResource {
-    private Guest guest;
-    private Long reservationId;
+    private ReservationResource reservation;
     private String message;
 }

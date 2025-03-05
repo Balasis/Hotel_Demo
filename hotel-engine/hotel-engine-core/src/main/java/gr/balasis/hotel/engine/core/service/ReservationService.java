@@ -8,21 +8,16 @@ import gr.balasis.hotel.context.base.service.BaseService;
 import java.util.List;
 
 public interface ReservationService extends BaseService<Reservation> {
-    List<Reservation> findReservationsByGuestId(Long id);
-
-    Reservation createReservationForGuest(Long id, Reservation reservation);
-
+    List<Reservation> findReservations(Long id);
+    Reservation createReservation(Long id, Reservation reservation);
+    Reservation getReservation(Long guestsId, Long reservationId);
     void cancelReservation(Long id, Long reservationId);
 
     Payment finalizePaymentForReservation(Long guestId, Long reservationId, Payment domainFromResource);
-
-    Payment getPaymentForReservation(Long id, Long reservationId);
-
-    Reservation getReservation(Long guestsId, Long reservationId);
-
+    Payment getPayment(Long id, Long reservationId);
 
     Feedback createFeedback(Long guestsId, Long reservationId, Feedback domain);
-    Feedback getFeedbackById(Long guestsId, Long reservationId);
+    Feedback getFeedback(Long guestsId, Long reservationId);
     void updateFeedback(Long guestsId, Long reservationId, Feedback domain);
     void deleteFeedback(Long guestsId, Long reservationId);
 

@@ -23,10 +23,8 @@ public class ReservationEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private RoomEntity room;
+
     private LocalDateTime createdAt;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(nullable = false)
-    private PaymentEntity payment;
 }

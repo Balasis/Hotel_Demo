@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Feedback extends BaseDomain {
-    private Guest guest;
-    private Long reservationId;
+    private Reservation reservation;
     private String message;
     private LocalDateTime createdAt;
 }

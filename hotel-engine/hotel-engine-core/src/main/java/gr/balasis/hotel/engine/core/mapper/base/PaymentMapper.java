@@ -7,6 +7,6 @@ import gr.balasis.hotel.context.base.mapper.BaseMapper;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
+@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true),uses = {ReservationMapper.class})
 public interface PaymentMapper extends BaseMapper<Payment, PaymentEntity> {
 }

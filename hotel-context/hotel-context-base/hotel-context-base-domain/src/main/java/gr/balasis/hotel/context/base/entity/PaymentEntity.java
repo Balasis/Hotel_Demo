@@ -2,9 +2,7 @@ package gr.balasis.hotel.context.base.entity;
 
 
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,7 +17,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "payments")
 public class PaymentEntity extends BaseEntity {
-
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private ReservationEntity reservation;
     @Column(nullable = false)
     private BigDecimal amount;
     private LocalDateTime paymentDate;

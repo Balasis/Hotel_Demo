@@ -4,7 +4,6 @@ import gr.balasis.hotel.context.base.domain.Feedback;
 import gr.balasis.hotel.context.base.domain.Payment;
 import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.base.entity.FeedbackEntity;
-import gr.balasis.hotel.context.base.entity.GuestEntity;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.exception.*;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
@@ -31,7 +30,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +46,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     @Override
     @Transactional
     public Reservation create(final Reservation reservation) {
-        validateGuestExists(reservation.getGuest().getId());
         return buildReservationWithPayment(reservation);
+
     }
 
     public Reservation getReservation(Long guestId, Long reservationId) {
@@ -61,14 +59,13 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
 
     @Override
     @Transactional
-    public Reservation createReservationForGuest(Long guestId, Reservation reservation) {
+    public Reservation createReservation(Long guestId, Reservation reservation) {
         validateGuestIdMatch(guestId, reservation);
-        validateGuestExists(reservation.getGuest().getId());
         return buildReservationWithPayment(reservation);
     }
 
     @Override
-    public List<Reservation> findReservationsByGuestId(Long guestId) {
+    public List<Reservation> findReservations(Long guestId) {
         validateGuestExists(guestId);
         return reservationMapper.toDomains(reservationRepository.findByGuestId(guestId));
     }
@@ -90,10 +87,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
         return paymentMapper.toDomain(paymentEntity);
     }
 
-    public Payment getPaymentForReservation(Long guestId, Long reservationId) {
+    @Override
+    public Payment getPayment(Long guestId, Long reservationId) {
         return paymentMapper.toDomain(validatePaymentExists(validateReservationOwnership(guestId, reservationId)));
     }
 
+    @Override
     public Feedback createFeedback(Long guestId, Long reservationId, Feedback feedback) {
         ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
         validateNoExistingFeedback(reservation);
@@ -101,23 +100,23 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
         return feedbackMapper.toDomain(savedFeedback);
     }
 
-    public Feedback getFeedbackByReservation(Long guestId, Long reservationId) {
-        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
-        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
-        return feedbackMapper.toDomain(feedback);
+
+    public Feedback getFeedback(Long guestId, Long reservationId) {
+        return feedbackMapper.toDomain(fetchFeedbackForReservation(guestId, reservationId));
     }
 
+    @Override
     public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
-        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
-        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
+        FeedbackEntity feedback = fetchFeedbackForReservation(guestId, reservationId);
         feedback.setMessage(updatedFeedback.getMessage());
         feedbackRepository.save(feedback);
     }
 
+    @Override
     public void deleteFeedback(Long guestId, Long reservationId) {
-        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
-        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
-        feedbackRepository.delete(feedback);
+        feedbackRepository.delete(
+                fetchFeedbackForReservation(guestId,reservationId)
+        );
     }
 
     @Override
@@ -130,12 +129,24 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
         return reservationMapper;
     }
 
+
+    private FeedbackEntity fetchFeedbackForReservation(Long guestId, Long reservationId) {
+        return validateFeedbackExists(
+                validateReservationOwnership(guestId, reservationId).getId());
+    }
+
     private ReservationEntity validateReservationOwnership(Long guestId, Long reservationId) {
         ReservationEntity reservation = validateReservationExists(reservationId);
         if (!reservation.getGuest().getId().equals(guestId)) {
             throw new UnauthorizedAccessException("Reservation does not belong to the guest");
         }
         return reservation;
+    }
+
+    private void validateGuestIdMatch(Long guestId, Reservation reservation) {
+        if (!reservation.getGuest().getId().equals(guestId)) {
+            throw new GuestIdMismatchException("Guest ID does not match the given reservation's guest ID.");
+        }
     }
 
     private ReservationEntity validateReservationExists(Long reservationId) {
@@ -150,7 +161,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     private PaymentEntity validatePaymentExists(ReservationEntity reservation) {
-        PaymentEntity payment = reservation.getPayment();
+        PaymentEntity payment = paymentRepository.getByReservation(reservation);
         if (payment == null) {
             throw new PaymentNotFoundException("No payment associated with this reservation");
         }
@@ -169,28 +180,28 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
         }
     }
 
-    private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {
-        if (!feedback.getGuest().getId().equals(guest.getId())) {
-            throw new UnauthorizedAccessException("Feedback does not belong to this guest");
-        }
-    }
 
-
-    private Reservation buildReservationWithPayment(Reservation reservation) {
-        Payment payment = initializePayment(reservation);
-        reservation.setPayment(payment);
+    public Reservation buildReservationWithPayment(Reservation reservation){
+        validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
-        return reservationMapper.toDomain(reservationRepository.save(reservationMapper.toEntity(reservation)));
+        Reservation savedReservation =reservationMapper.toDomain(
+                reservationRepository.save(
+                        reservationMapper.toEntity(reservation)));
+
+        initializePayment(savedReservation);
+
+        return savedReservation;
     }
 
-    private Payment initializePayment(Reservation reservation) {
+    private void initializePayment(Reservation reservation) {
         Payment payment = new Payment();
         if (reservation.getCheckOutDate() != null) {
             long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
             payment.setAmount(reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(days)));
         }
         payment.setPaymentStatus(PaymentStatus.PENDING);
-        return payment;
+        payment.setReservation(reservation);
+        paymentRepository.save(paymentMapper.toEntity(payment));
     }
 
 }

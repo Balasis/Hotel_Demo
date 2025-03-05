@@ -16,5 +16,4 @@ public class ReservationResource extends BaseResource {
     private LocalDateTime createdAt;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private PaymentResource payment;
 }

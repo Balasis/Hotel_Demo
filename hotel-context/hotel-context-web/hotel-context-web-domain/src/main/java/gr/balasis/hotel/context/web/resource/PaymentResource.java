@@ -10,9 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentResource {
+public class PaymentResource extends BaseResource{
 
-    private Long id;
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String paymentStatus;

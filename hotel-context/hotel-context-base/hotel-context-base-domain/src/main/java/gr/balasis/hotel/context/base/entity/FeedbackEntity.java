@@ -1,7 +1,5 @@
 package gr.balasis.hotel.context.base.entity;
 
-import gr.balasis.hotel.context.base.entity.BaseEntity;
-import gr.balasis.hotel.context.base.entity.GuestEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,12 +14,9 @@ import java.time.LocalDateTime;
 @Table(name = "feedback")
 public class FeedbackEntity extends BaseEntity {
 
-
-    @ManyToOne
+    @OneToOne
     @JoinColumn(nullable = false)
-    private GuestEntity guest;
-
-    private Long reservationId;
+    private ReservationEntity reservation;
 
     @Column(nullable = false)
     private String message;

@@ -16,11 +16,6 @@ public class RoomServiceImpl extends BasicServiceImpl<Room,RoomEntity> implement
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
 
-
-    public boolean existsById(Long roomId) {
-        return roomRepository.existsById(roomId);
-    }
-
     @Override
     public JpaRepository<RoomEntity, Long> getRepository() {
         return roomRepository;

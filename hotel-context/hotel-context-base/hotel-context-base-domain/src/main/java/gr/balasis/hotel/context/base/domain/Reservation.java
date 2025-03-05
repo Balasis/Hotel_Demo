@@ -18,5 +18,4 @@ public class Reservation extends BaseDomain {
     private LocalDateTime createdAt;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private Payment payment;
 }

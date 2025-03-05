@@ -3,6 +3,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 import gr.balasis.hotel.context.base.domain.Guest;
+import gr.balasis.hotel.context.base.domain.Payment;
 import gr.balasis.hotel.context.base.domain.Reservation;
 import gr.balasis.hotel.context.base.domain.Room;
 import gr.balasis.hotel.engine.core.service.GuestService;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Component
-@Profile("dev")
+@Profile("dev-includeloader")
 @AllArgsConstructor
 public class DataLoader implements ApplicationRunner {
     private final GuestService guestService;
@@ -43,10 +44,11 @@ public class DataLoader implements ApplicationRunner {
         loadGuests();
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
-        logger.info("Default dev DataLoader started");
+        logger.trace("Profile: dev-includeloader on.");
     }
 
     private void loadRooms() {
+        logger.trace("Loading rooms...");
         for (int i = 0; i < 10; i++) {
             roomService.create(
                     Room.builder()
@@ -56,9 +58,11 @@ public class DataLoader implements ApplicationRunner {
                             .build()
             );
         }
+        logger.trace("Finished loading rooms");
     }
 
     private void loadGuests() {
+        logger.trace("Loading guests...");
         for (int i = 0; i < 5; i++) {
             guestService.create(
                     Guest.builder()
@@ -69,16 +73,18 @@ public class DataLoader implements ApplicationRunner {
                             .build()
             );
         }
+        logger.trace("Finished loading guests");
     }
 
     private void loadReservations() {
+        logger.trace("Loading reservations...");
         List<Guest> guests = guestService.findAll();
         List<Room> availableRooms = roomService.findAll().stream()
                 .filter(room -> !room.isReserved())
                 .collect(Collectors.toList());
 
         if (guests.isEmpty() || availableRooms.isEmpty()) {
-            System.out.println("Skipping reservations: No guests or available rooms.");
+            logger.trace("Skipping reservations: No guests or available rooms.");
             return;
         }
 
@@ -89,19 +95,23 @@ public class DataLoader implements ApplicationRunner {
             room.setReserved(true);
             roomService.update(room);
         }
+        logger.trace("Finished loading guests");
     }
 
     private void loadPayments() {
+        logger.trace("Loading payments...");
         List<Reservation> reservations = reservationService.findAll();
         for (Reservation reservation : reservations) {
-            if (random.nextBoolean()) {
-                reservationService.finalizePaymentForReservation(
-                        reservation.getGuest().getId(),
-                        reservation.getId(),
-                        reservation.getPayment()
-                );
-            }
+           Payment payment = reservationService.getPayment(reservation.getGuest().getId(),reservation.getId());
+                if (random.nextBoolean()) {
+                    reservationService.finalizePaymentForReservation(
+                            reservation.getGuest().getId(),
+                            reservation.getId(),
+                            payment
+                    );
+                }
         }
+        logger.trace("Finished loading payments");
     }
 
     private Guest pickRandomGuest(List<Guest> guests) {

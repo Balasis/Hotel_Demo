@@ -2,8 +2,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:devDB
     driver-class-name: org.h2.Driver
-    username: feedbackUser
-    password: feedbackPass
+    username: includeLoaderUser
+    password: includeLoaderPass
     hikari:
       maximum-pool-size: 4
       minimum-idle: 2
@@ -24,10 +24,3 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: true
-
-logging:
-  level:
-    root: info
-    gr.balasis.hotel.core.app: trace
-    gr.balasis.hotel.modules.feedback: trace
-    gr.balasis.hotel.core.monitoring: trace
