@@ -13,6 +13,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>hotel-context-base-domain</module>
-        <module>hotel-context-base-mapper</module>
+        <module>hotel-context-base-core</module>
     </modules>
 </project>

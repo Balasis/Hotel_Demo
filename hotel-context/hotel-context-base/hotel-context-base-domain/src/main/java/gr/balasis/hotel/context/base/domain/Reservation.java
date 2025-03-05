@@ -1,18 +1,20 @@
-package gr.balasis.hotel.context.web.resource;
+package gr.balasis.hotel.context.base.domain;
 
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
-public class ReservationResource extends BaseResource {
-    private GuestResource guest;
-    private RoomResource room;
+@NoArgsConstructor
+public class Reservation extends BaseDomain {
+    private Guest guest;
+    private Room room;
     private LocalDateTime createdAt;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;

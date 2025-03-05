@@ -18,10 +18,7 @@
 
     <modules>
         <module>hotel-context</module>
-        <module>hotel-modules</module>
-        <module>hotel-data</module>
-        <module>hotel-core</module>
-
+        <module>hotel-engine</module>
     </modules>
 
     <properties>
@@ -32,7 +29,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <spring.profile.from.maven>dev-feedback</spring.profile.from.maven>
+        <spring.profile.from.maven>dev</spring.profile.from.maven>
     </properties>
 
     <dependencyManagement>
@@ -156,12 +153,12 @@
         </profile>
 
         <profile>
-            <id>dev-feedback</id>
+            <id>dev-includeloader</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profile.from.maven>dev-feedback</spring.profile.from.maven>
+                <spring.profile.from.maven>dev-includeloader</spring.profile.from.maven>
             </properties>
         </profile>
     </profiles>

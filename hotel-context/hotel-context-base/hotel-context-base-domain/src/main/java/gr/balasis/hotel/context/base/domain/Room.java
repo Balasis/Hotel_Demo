@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.web.resource;
+package gr.balasis.hotel.context.base.domain;
 
 import lombok.*;
 
@@ -6,10 +6,11 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @Builder
 @AllArgsConstructor
-public class RoomResource extends BaseResource {
+@NoArgsConstructor
+public class Room extends BaseDomain {
     private String roomNumber;
     private boolean reserved;
     private BigDecimal pricePerNight;
