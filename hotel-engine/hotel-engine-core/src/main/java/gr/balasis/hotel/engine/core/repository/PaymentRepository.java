@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     PaymentEntity getByReservation(ReservationEntity reservation);
+    void deleteByReservation(ReservationEntity reservation);
 }

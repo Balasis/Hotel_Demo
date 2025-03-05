@@ -71,9 +71,13 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     @Override
+    @Transactional
     public void cancelReservation(Long guestId, Long reservationId) {
         ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
-        reservationRepository.delete(reservation);
+        paymentRepository.deleteByReservation(reservation);
+        feedbackRepository.deleteByReservation(reservation);
+        reservationRepository.deleteById(reservationId);
+
     }
 
     @Override

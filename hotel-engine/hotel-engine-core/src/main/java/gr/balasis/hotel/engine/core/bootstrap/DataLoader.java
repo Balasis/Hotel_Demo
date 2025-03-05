@@ -2,10 +2,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Payment;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.domain.Room;
+import gr.balasis.hotel.context.base.domain.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
@@ -15,9 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +35,7 @@ public class DataLoader implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
+    private final MessageSource messageSource;
 
     @Override
     @Transactional
@@ -44,6 +44,7 @@ public class DataLoader implements ApplicationRunner {
         loadGuests();
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
+//        loadFeedback();
         logger.trace("Profile: dev-includeloader on.");
     }
 
@@ -113,6 +114,30 @@ public class DataLoader implements ApplicationRunner {
         }
         logger.trace("Finished loading payments");
     }
+
+    private void loadFeedback() {
+        logger.trace("Loading feedback...");
+        List<Reservation> reservations = reservationService.findAll();
+        for (Reservation reservation : reservations) {
+            int messageNumber = random.nextInt(10) + 1;
+            String theMessage = "feedback.message" + messageNumber;
+            reservationService.createFeedback(
+                    reservation.getGuest().getId(),
+                    reservation.getId(),
+                    Feedback.builder()
+                            .createdAt(LocalDateTime.now())
+                            .reservation(reservation)
+                            .message(messageSource.getMessage(theMessage,
+                                    new Object[]{reservation.getGuest().getFirstName()},
+                                    Locale.getDefault()))
+                            .build()
+                    );
+
+        }
+        logger.trace("Finished loading feedback");
+    }
+
+
 
     private Guest pickRandomGuest(List<Guest> guests) {
         return guests.removeFirst();
