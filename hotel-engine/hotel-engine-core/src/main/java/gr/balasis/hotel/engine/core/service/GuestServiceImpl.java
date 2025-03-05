@@ -1,10 +1,12 @@
 package gr.balasis.hotel.engine.core.service;
 
+import gr.balasis.hotel.context.base.exception.DuplicateEmailException;
+import gr.balasis.hotel.context.base.exception.GuestIdMismatchException;
+import gr.balasis.hotel.context.base.exception.GuestNotFoundException;
 import gr.balasis.hotel.engine.core.mapper.base.GuestMapper;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.context.base.domain.Guest;
 import gr.balasis.hotel.context.base.mapper.BaseMapper;
-import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
 import gr.balasis.hotel.context.base.entity.GuestEntity;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,32 +22,35 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implem
     @Override
     public Guest create(Guest guest) {
         if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists"); // Handle accordingly
+            throw new DuplicateEmailException("Email already exists"); // Handle accordingly
         }
         return guestMapper.toDomain(guestRepository.save(guestMapper.toEntity(guest)));
     }
 
     @Override
-    public Guest findGuestById(Long guestId) {
+    public Guest getGuest(Long guestId) {
        GuestEntity guest= guestRepository.findById(guestId)
-               .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
-
+               .orElseThrow(() -> new GuestNotFoundException("Guest not found"));
         return  guestMapper.toDomain(guest);
     }
 
+    @Override
     public void updateGuest(Long guestId, Guest updatedGuest) {
-        validateGuestId(guestId, updatedGuest);
-        GuestEntity existingGuest = findExistingGuest(guestId);
-        validateEmailUniqueness(existingGuest, updatedGuest.getEmail());
-
+        if (!guestId.equals(updatedGuest.getId())) {
+            throw new GuestIdMismatchException("Guest ID mismatch");
+        }
+//        ensureGuestIdMatches(guestId, updatedGuest); privates or not for readability?
+        GuestEntity existingGuest = guestRepository.findById(guestId).orElseThrow(
+                () -> new GuestNotFoundException("Guest with ID " + guestId + " not found for update"));
+        validateEmailUniqueness(updatedGuest.getEmail());
         existingGuest.setEmail(updatedGuest.getEmail());
         guestRepository.save(existingGuest);
     }
 
     @Override
-    public void deleteGuestById(Long guestId) {
+    public void deleteGuest(Long guestId) {
         if (!guestRepository.existsById(guestId)) {
-            throw new EntityNotFoundException("Guest not found");
+            throw new GuestNotFoundException("Guest with ID " + guestId + " not found for deletion");
         }
         guestRepository.deleteById(guestId);
     }
@@ -53,12 +58,12 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implem
     @Override
     public void updateEmail(Long guestId, String email) {
         GuestEntity guestEntity = guestRepository.findById(guestId)
-                .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
+                .orElseThrow(() -> new GuestNotFoundException("Guest with ID " + guestId
+                        + " not found for email update"));
+        validateEmailUniqueness(email);
         guestEntity.setEmail(email);
         guestMapper.toDomain(guestRepository.save(guestEntity));
     }
-
-
 
     @Override
     public JpaRepository<GuestEntity, Long> getRepository() {
@@ -70,21 +75,15 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implem
         return guestMapper;
     }
 
-    private void validateGuestId(Long guestId, Guest updatedGuest) {
-        if (!guestId.equals(updatedGuest.getId())) {
-            throw new IllegalArgumentException("Guest ID mismatch");
-        }
-    }
+//    private void ensureGuestIdMatches(Long guestId, Guest updatedGuest) {
+//        if (!guestId.equals(updatedGuest.getId())) {
+//            throw new GuestIdMismatchException("Guest ID mismatch");
+//        }
+//    }
 
-    private GuestEntity findExistingGuest(Long guestId) {
-        return guestRepository.findById(guestId)
-                .orElseThrow(() -> new IllegalArgumentException("Guest not found"));
-    }
-
-    private void validateEmailUniqueness(GuestEntity existingGuest, String newEmail) {
-        if (!existingGuest.getEmail().equals(newEmail) &&
-                guestRepository.findByEmail(newEmail).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+    private void validateEmailUniqueness(String newEmail) {
+        if (guestRepository.findByEmail(newEmail).isPresent()) {
+            throw new DuplicateEmailException("Email " + newEmail + " is already in use by another guest");
         }
     }
 

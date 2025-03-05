@@ -52,8 +52,10 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
         return buildReservationWithPayment(reservation);
     }
 
-    public Reservation findReservationById(Long guestId, Long reservationId) {
-        ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
+    public Reservation getReservation(Long guestId, Long reservationId) {
+
+        ReservationEntity reservationEntity = validateReservationExists(reservationId);
+        validateReservationOwnership(guestId, reservationId);
         return reservationMapper.toDomain(reservationEntity);
     }
 
@@ -68,95 +70,54 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     @Override
     public List<Reservation> findReservationsByGuestId(Long guestId) {
         validateGuestExists(guestId);
-        return reservationRepository.findByGuestId(guestId).stream()
-                .map(reservationMapper::toDomain)
-                .collect(Collectors.toList());
+        return reservationMapper.toDomains(reservationRepository.findByGuestId(guestId));
     }
 
     @Override
     public void cancelReservation(Long guestId, Long reservationId) {
-        ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
-
-        if (!reservationEntity.getGuest().getId().equals(guestId)) {
-            throw new IllegalArgumentException("Reservation does not belong to the guest");
-        }
-        reservationRepository.delete(reservationEntity);
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        reservationRepository.delete(reservation);
     }
 
     @Override
     @Transactional
     public Payment finalizePaymentForReservation(Long guestId, Long reservationId, Payment payment) {
-        ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
-        PaymentEntity paymentEntity = getValidPayment(reservationEntity);
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        PaymentEntity paymentEntity = validatePaymentExists(reservation);
         paymentEntity.setPaymentDate(LocalDateTime.now());
         paymentEntity.setPaymentStatus(PaymentStatus.PAID);
         paymentRepository.save(paymentEntity);
-
         return paymentMapper.toDomain(paymentEntity);
     }
 
     public Payment getPaymentForReservation(Long guestId, Long reservationId) {
-        ReservationEntity reservationEntity = getValidReservation(guestId, reservationId);
-        PaymentEntity paymentEntity = getValidPayment(reservationEntity);
-
-        return paymentMapper.toDomain(paymentEntity);
+        return paymentMapper.toDomain(validatePaymentExists(validateReservationOwnership(guestId, reservationId)));
     }
 
     public Feedback createFeedback(Long guestId, Long reservationId, Feedback feedback) {
-        GuestEntity guest = validateGuestExists(guestId);
-        ReservationEntity reservation = validateReservationExists(reservationId);
-
-        validateReservationBelongsToGuest(guest, reservation);
-        validateFeedbackBelongsToReservation(feedback, reservation);
-        validateNoDuplicateFeedback(reservation);
-
-        FeedbackEntity feedbackEntity = feedbackMapper.toEntity(feedback);
-        FeedbackEntity savedEntity = feedbackRepository.save(feedbackEntity);
-        return feedbackMapper.toDomain(savedEntity);
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        validateNoExistingFeedback(reservation);
+        FeedbackEntity savedFeedback = feedbackRepository.save(feedbackMapper.toEntity(feedback));
+        return feedbackMapper.toDomain(savedFeedback);
     }
 
-    public Feedback getFeedbackById(Long guestId, Long reservationId) {
-        GuestEntity guest = validateGuestExists(guestId);
-        ReservationEntity reservation = validateReservationExists(reservationId);
-
-        FeedbackEntity feedback = validateFeedbackExists(reservationId);
-
-        validateReservationBelongsToGuest(guest, reservation);
-        validateFeedbackBelongsToReservation(feedback, reservation);
-        validateFeedbackBelongsToGuest(feedback, guest);
-
+    public Feedback getFeedbackByReservation(Long guestId, Long reservationId) {
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
         return feedbackMapper.toDomain(feedback);
     }
 
     public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
-        GuestEntity guest = validateGuestExists(guestId);
-        ReservationEntity reservation = validateReservationExists(reservationId);
-        FeedbackEntity existingFeedback = validateFeedbackExists(reservationId);
-
-        validateReservationBelongsToGuest(guest, reservation);
-        validateFeedbackBelongsToReservation(existingFeedback, reservation);
-        validateFeedbackBelongsToGuest(existingFeedback, guest);
-
-        existingFeedback.setMessage(updatedFeedback.getMessage());
-
-        feedbackRepository.save(existingFeedback);
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
+        feedback.setMessage(updatedFeedback.getMessage());
+        feedbackRepository.save(feedback);
     }
 
     public void deleteFeedback(Long guestId, Long reservationId) {
-        GuestEntity guest = validateGuestExists(guestId);
-        ReservationEntity reservation = validateReservationExists(reservationId);
-
-        FeedbackEntity feedback = validateFeedbackExists(reservationId);
-
-        validateReservationBelongsToGuest(guest, reservation);
-        validateFeedbackBelongsToReservation(feedback, reservation);
-        validateFeedbackBelongsToGuest(feedback, guest);
-
+        ReservationEntity reservation = validateReservationOwnership(guestId, reservationId);
+        FeedbackEntity feedback = validateFeedbackExists(reservation.getId());
         feedbackRepository.delete(feedback);
-    }
-
-    public boolean feedbackExistsForReservationId(Long reservationId) {
-        return feedbackRepository.existsByReservationId(reservationId);
     }
 
     @Override
@@ -165,98 +126,71 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     @Override
-    public BaseMapper<Reservation,ReservationEntity> getMapper() {
+    public BaseMapper<Reservation, ReservationEntity> getMapper() {
         return reservationMapper;
     }
 
-    private GuestEntity validateGuestExists(Long guestId) {
-        return guestRepository.findById(guestId)
-                .orElseThrow(() -> new EntityNotFoundException("Guest not found with ID: " + guestId));
+    private ReservationEntity validateReservationOwnership(Long guestId, Long reservationId) {
+        ReservationEntity reservation = validateReservationExists(reservationId);
+        if (!reservation.getGuest().getId().equals(guestId)) {
+            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
+        }
+        return reservation;
     }
 
-    private void validateGuestIdMatch(Long guestId, Reservation reservation) {
-        if (!guestId.equals(reservation.getGuest().getId())) {
-            throw new IllegalArgumentException("Provided guest ID does not match the reservation guest ID");
+    private ReservationEntity validateReservationExists(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found: "
+                        + reservationId));
+    }
+
+    private void validateGuestExists(Long guestId) {
+        guestRepository.findById(guestId)
+                .orElseThrow(() -> new GuestNotFoundException("Guest not found: " + guestId));
+    }
+
+    private PaymentEntity validatePaymentExists(ReservationEntity reservation) {
+        PaymentEntity payment = reservation.getPayment();
+        if (payment == null) {
+            throw new PaymentNotFoundException("No payment associated with this reservation");
+        }
+        return payment;
+    }
+
+    private FeedbackEntity validateFeedbackExists(Long reservationId) {
+        return feedbackRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new FeedbackNotFoundException("Feedback not found for reservation: "
+                        + reservationId));
+    }
+
+    private void validateNoExistingFeedback(ReservationEntity reservation) {
+        if (feedbackRepository.existsByReservationId(reservation.getId())) {
+            throw new DuplicateFeedbackException("Feedback already exists for this reservation");
         }
     }
 
-    private void validateReservationOwnership(Long guestId, ReservationEntity reservationEntity) {
-        if (!reservationEntity.getGuest().getId().equals(guestId)) {
-            throw new UnauthorizedAccessException("This reservation does not belong to the guest");
+    private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {
+        if (!feedback.getGuest().getId().equals(guest.getId())) {
+            throw new UnauthorizedAccessException("Feedback does not belong to this guest");
         }
     }
+
 
     private Reservation buildReservationWithPayment(Reservation reservation) {
-        Payment payment = new Payment();
-        if (reservation.getCheckOutDate() != null) {
-            long daysStayed = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
-            payment.setAmount(
-                    reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(daysStayed))
-            );
-        }
-        payment.setPaymentStatus(PaymentStatus.PENDING);
+        Payment payment = initializePayment(reservation);
         reservation.setPayment(payment);
         reservation.setCreatedAt(LocalDateTime.now());
         return reservationMapper.toDomain(reservationRepository.save(reservationMapper.toEntity(reservation)));
     }
 
-    private ReservationEntity getValidReservation(Long guestId, Long reservationId) {
-        ReservationEntity reservationEntity = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-
-        validateReservationOwnership(guestId, reservationEntity);
-
-        return reservationEntity;
-    }
-
-    private PaymentEntity getValidPayment(ReservationEntity reservationEntity) {
-        PaymentEntity paymentEntity = reservationEntity.getPayment();
-        if (paymentEntity == null) {
-            throw new PaymentNotFoundException("No payment associated with this reservation");
+    private Payment initializePayment(Reservation reservation) {
+        Payment payment = new Payment();
+        if (reservation.getCheckOutDate() != null) {
+            long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
+            payment.setAmount(reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(days)));
         }
-        return paymentEntity;
-    }
-
-    private ReservationEntity validateReservationExists(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new EntityNotFoundException("Reservation not found with ID: " + reservationId));
-    }
-
-    private void validateReservationBelongsToGuest(GuestEntity guest, ReservationEntity reservation) {
-        if (!reservation.getGuest().getId().equals(guest.getId())) {
-            throw new UnauthorizedAccessException("Reservation does not belong to the given guest");
-        }
-    }
-
-    private void validateFeedbackBelongsToReservation(FeedbackEntity feedback, ReservationEntity reservation) {
-        if (!feedback.getReservationId().equals(reservation.getId())) {
-            throw new FeedBackMismatchException("Feedback does not belong to the provided reservation");
-        }
-    }
-
-    private void validateFeedbackBelongsToReservation(Feedback feedback, ReservationEntity reservation) {
-        if (!feedback.getReservationId().equals(reservation.getId())) {
-            throw new FeedBackMismatchException("Feedback does not belong to the provided reservation");
-        }
-    }
-
-    private void validateNoDuplicateFeedback(ReservationEntity reservation) {
-        boolean feedbackExists = feedbackRepository.existsByReservationId(reservation.getId());
-        if (feedbackExists) {
-            throw new DuplicateFeedbackException("Feedback already exists for this reservation");
-        }
-    }
-
-    private FeedbackEntity validateFeedbackExists(Long reservationId) {
-        return feedbackRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new EntityNotFoundException("Feedback not found with reservationID: "
-                        + reservationId));
-    }
-
-    private void validateFeedbackBelongsToGuest(FeedbackEntity feedback, GuestEntity guest) {
-        if (!feedback.getGuest().getId().equals(guest.getId())) {
-            throw new UnauthorizedAccessException("Feedback does not belong to the given guest");
-        }
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+        return payment;
     }
 
 }

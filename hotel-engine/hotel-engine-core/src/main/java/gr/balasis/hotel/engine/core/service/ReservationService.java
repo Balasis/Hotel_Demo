@@ -18,7 +18,7 @@ public interface ReservationService extends BaseService<Reservation> {
 
     Payment getPaymentForReservation(Long id, Long reservationId);
 
-    Reservation findReservationById(Long guestsId, Long reservationId);
+    Reservation getReservation(Long guestsId, Long reservationId);
 
 
     Feedback createFeedback(Long guestsId, Long reservationId, Feedback domain);

@@ -9,7 +9,7 @@ public interface GuestService extends BaseService<Guest> {
 
     void updateEmail(Long id, String email);
 
-    Guest findGuestById(Long guestId);
+    Guest getGuest(Long guestId);
 
-    void deleteGuestById(Long guestId);
+    void deleteGuest(Long guestId);
 }
