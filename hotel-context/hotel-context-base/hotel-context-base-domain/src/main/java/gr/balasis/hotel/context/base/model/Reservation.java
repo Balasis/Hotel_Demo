@@ -33,6 +33,7 @@ public class Reservation extends BaseModel {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 
-    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
     private Payment payment;
 }

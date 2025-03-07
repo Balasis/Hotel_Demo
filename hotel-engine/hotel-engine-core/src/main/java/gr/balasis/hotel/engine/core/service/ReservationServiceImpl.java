@@ -93,6 +93,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
     @Override
+    @Transactional
     public Payment getPayment(Long guestId, Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
         if (reservation.getPayment() == null) {
