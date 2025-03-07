@@ -1,5 +1,6 @@
 package gr.balasis.hotel.engine.core.service;
 
+import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
@@ -10,7 +11,6 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 
 import gr.balasis.hotel.engine.core.repository.FeedbackRepository;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
-import gr.balasis.hotel.engine.core.repository.PaymentRepository;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,13 +29,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     private final ReservationRepository reservationRepository;
     private final FeedbackRepository feedbackRepository;
     private final GuestRepository guestRepository;
-    private final PaymentRepository paymentRepository;
 
 
     @Override
     @Transactional
     public Reservation create(final Reservation reservation) {
-        return buildReservationWithPayment(reservation);
+        return buildAndSaveReservation(reservation);
     }
 
     public Reservation getReservation(Long guestId, Long reservationId) {
@@ -47,7 +46,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     @Override
     @Transactional
     public Reservation createReservation(Long guestId, Reservation reservation) {
-        return buildReservationWithPayment(reservation);
+        return buildAndSaveReservation(reservation);
     }
 
     @Override
@@ -60,26 +59,46 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     @Transactional
     public void cancelReservation(Long guestId, Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
-        paymentRepository.deleteByReservation(reservation);
-        feedbackRepository.deleteByReservation(reservation);
-        reservationRepository.deleteById(reservationId);
 
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
+            throw new DataConflictException("Reservation is already canceled");
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELED);
+
+        if (reservation.getPayment() != null) {
+            if (reservation.getPayment().getPaymentStatus() == PaymentStatus.PENDING) {
+                reservation.getPayment().setPaymentStatus(PaymentStatus.CANCELLED);
+            } else if (reservation.getPayment().getPaymentStatus() == PaymentStatus.PAID) {
+                reservation.getPayment().setPaymentStatus(PaymentStatus.REFUNDED);
+            }
+        }
+
+        reservationRepository.save(reservation);
     }
 
     @Override
     @Transactional
-    public Payment finalizePaymentForReservation(Long guestId, Long reservationId, Payment payment) {
+    public Payment finalizePayment(Long guestId, Long reservationId, Payment payment) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
-        Payment paymentEntity = validatePaymentExists(reservation);
-        paymentEntity.setPaymentDate(LocalDateTime.now());
-        paymentEntity.setPaymentStatus(PaymentStatus.PAID);
-        paymentRepository.save(paymentEntity);
-        return paymentEntity;
+        if (reservation.getPayment() == null) {
+            throw new PaymentNotFoundException("No payment associated with this reservation");
+        }
+
+        Payment existingPayment = reservation.getPayment();
+        existingPayment.setPaymentDate(payment.getPaymentDate() != null ? payment.getPaymentDate() : LocalDateTime.now());
+        existingPayment.setPaymentStatus(payment.getPaymentStatus());
+
+        return existingPayment;
     }
 
     @Override
     public Payment getPayment(Long guestId, Long reservationId) {
-        return validatePaymentExists(validateReservationOwnership(guestId, reservationId));
+        Reservation reservation = validateReservationOwnership(guestId, reservationId);
+        if (reservation.getPayment() == null) {
+            throw new PaymentNotFoundException("No payment associated with this reservation");
+        }
+        return reservation.getPayment();
     }
 
     @Override
@@ -138,14 +157,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
                 .orElseThrow(() -> new GuestNotFoundException("Guest not found: " + guestId));
     }
 
-    private Payment validatePaymentExists(Reservation reservation) {
-        Payment payment = paymentRepository.getByReservation(reservation);
-        if (payment == null) {
-            throw new PaymentNotFoundException("No payment associated with this reservation");
-        }
-        return payment;
-    }
-
     private Feedback validateFeedbackExists(Long reservationId) {
         return feedbackRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new FeedbackNotFoundException("Feedback not found for reservation: "
@@ -159,16 +170,10 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
 
-    public Reservation buildReservationWithPayment(Reservation reservation){
+    public Reservation buildAndSaveReservation(Reservation reservation){
         validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
-        Reservation savedReservation = reservationRepository.save(reservation);
-        initializePayment(savedReservation);
 
-        return savedReservation;
-    }
-
-    private void initializePayment(Reservation reservation) {
         Payment payment = new Payment();
         if (reservation.getCheckOutDate() != null) {
             long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
@@ -176,7 +181,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         }
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setReservation(reservation);
-        paymentRepository.save(payment);
+
+        reservation.setPayment(payment);
+        return reservationRepository.save(reservation);
     }
 
 }

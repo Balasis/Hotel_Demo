@@ -2,6 +2,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
+import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
@@ -93,7 +94,7 @@ public class DataLoader implements ApplicationRunner {
         for (int i = 0; i < 5; i++) {
             if (guests.isEmpty() || availableRooms.isEmpty()) return;
             Room room = pickRandomRoom(availableRooms);
-            reservationService.create(createReservationDomain(pickRandomGuest(guests), room));
+            reservationService.create(createReservation(pickRandomGuest(guests), room));
             room.setReserved(true);
             roomService.update(room);
         }
@@ -106,7 +107,7 @@ public class DataLoader implements ApplicationRunner {
         for (Reservation reservation : reservations) {
            Payment payment = reservationService.getPayment(reservation.getGuest().getId(),reservation.getId());
                 if (random.nextBoolean()) {
-                    reservationService.finalizePaymentForReservation(
+                    reservationService.finalizePayment(
                             reservation.getGuest().getId(),
                             reservation.getId(),
                             payment
@@ -148,11 +149,12 @@ public class DataLoader implements ApplicationRunner {
         return rooms.removeFirst();
     }
 
-    private Reservation createReservationDomain(Guest guest, Room room) {
+    private Reservation createReservation(Guest guest, Room room) {
         LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
         return Reservation.builder()
                 .guest(guest)
                 .room(room)
+                .status(ReservationStatus.ACTIVE)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
                 .build();

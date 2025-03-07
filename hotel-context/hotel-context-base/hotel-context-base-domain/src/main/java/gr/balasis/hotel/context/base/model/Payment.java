@@ -23,6 +23,8 @@ public class Payment extends BaseModel {
     @Column(nullable = false)
     private BigDecimal amount;
     private LocalDateTime paymentDate;
-    private PaymentStatus paymentStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 }
 

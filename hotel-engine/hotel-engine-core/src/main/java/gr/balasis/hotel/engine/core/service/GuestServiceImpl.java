@@ -17,14 +17,14 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest> implements GuestSe
     @Override
     public Guest create(Guest guest) {
         if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {
-            throw new DuplicateEmailException("Email already exists"); // Handle accordingly
+            throw new DuplicateEmailException("Email already exists");
         }
         return guestRepository.save(guest);
     }
 
     @Override
     public Guest getGuest(Long guestId) {
-        return  guestRepository.findById(guestId)
+        return guestRepository.findById(guestId)
                 .orElseThrow(() -> new GuestNotFoundException("Guest not found"));
     }
 

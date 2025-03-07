@@ -46,36 +46,35 @@ public class GuestController extends BaseController<Guest,GuestResource> {
                 guestMapper.toResource( guestService.getGuest(guestId))  );
     }
 
-    @GetMapping("/{guestsId}/reservations")
+    @GetMapping("/{guestId}/reservations")
     public ResponseEntity<List<ReservationResource>> findGuestReservations(
-            @PathVariable Long guestsId) {
+            @PathVariable Long guestId) {
         return ResponseEntity.ok(
-                reservationMapper.toResources(reservationService.findReservations(guestsId))
+                reservationMapper.toResources(reservationService.findReservations(guestId))
         );
     }
 
-    @GetMapping("/{guestsId}/reservations/{reservationId}")
+    @GetMapping("/{guestId}/reservations/{reservationId}")
     public ResponseEntity<ReservationResource> getReservation(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @PathVariable Long reservationId) {
         return ResponseEntity.ok(reservationMapper.toResource(
-                reservationService.getReservation(guestsId, reservationId)));
+                reservationService.getReservation(guestId, reservationId)));
     }
 
-    @GetMapping("/{guestsId}/reservations/{reservationId}/feedback")
+    @GetMapping("/{guestId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> getFeedback(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @PathVariable Long reservationId) {
-        Feedback feedback = reservationService.getFeedback(guestsId, reservationId);
+        Feedback feedback = reservationService.getFeedback(guestId, reservationId);
         return ResponseEntity.ok(feedbackMapper.toResource(feedback));
     }
 
-    @GetMapping("/{guestsId}/reservations/{reservationId}/payment")
-    public ResponseEntity<Payment> getPaymentForReservation(
-            @PathVariable Long reservationId,
-            @PathVariable Long guestsId) {
-
-        Payment payment = reservationService.getPayment(guestsId, reservationId);
+    @GetMapping("/{guestId}/reservations/{reservationId}/payment")
+    public ResponseEntity<Payment> getPayment(
+            @PathVariable Long guestId,
+            @PathVariable Long reservationId) {
+        Payment payment = reservationService.getPayment(guestId, reservationId);
         return ResponseEntity.ok(payment);
     }
 
@@ -103,36 +102,36 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     }
 
 
-
-    @PostMapping("/{guestsId}/reservations")
+    @PostMapping("/{guestId}/reservations")
     public ResponseEntity<ReservationResource> createReservation(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @RequestBody ReservationResource reservation) {
-        Reservation newReservation =
-                reservationService.createReservation(guestsId, reservationMapper.toDomain(reservation));
-        return ResponseEntity.ok(reservationMapper.toResource(newReservation));
+        return ResponseEntity.ok(reservationMapper.toResource(
+                reservationService.createReservation(
+                        guestId, reservationMapper.toDomain(reservation))
+        ));
     }
 
 
-    @DeleteMapping("/{guestsId}/reservations/{reservationId}")
+    @PutMapping("/{guestId}/reservations/{reservationId}/cancel")
     public ResponseEntity<Void> cancelReservation(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @PathVariable Long reservationId) {
-        reservationService.cancelReservation(guestsId, reservationId);
+        reservationService.cancelReservation(guestId, reservationId);
         return ResponseEntity.noContent().build();
     }
 
 
 
-    @PostMapping("/{guestsId}/reservations/{reservationId}/payment")
-    public ResponseEntity<PaymentResource> payForReservation(
-            @PathVariable Long guestsId,
+    @PostMapping("/{guestId}/reservations/{reservationId}/payment")
+    public ResponseEntity<PaymentResource> payReservation(
+            @PathVariable Long guestId,
             @PathVariable Long reservationId,
             @RequestBody @Valid PaymentResource paymentResource) {
 
-        Payment newPayment = reservationService.finalizePaymentForReservation(
-                guestsId, reservationId, paymentMapper.toDomain(paymentResource));
-        return ResponseEntity.ok(paymentMapper.toResource(newPayment));
+        return ResponseEntity.ok(paymentMapper.toResource(
+                reservationService.finalizePayment(guestId, reservationId, paymentMapper.toDomain(paymentResource))
+        ));
     }
 
 
