@@ -48,25 +48,25 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @GetMapping("/{guestId}/reservations")
     public ResponseEntity<List<ReservationResource>> findGuestReservations(
-            @PathVariable Long guestsId) {
+            @PathVariable Long guestId) {
         return ResponseEntity.ok(
-                reservationMapper.toResources(reservationService.findReservations(guestsId))
+                reservationMapper.toResources(reservationService.findReservations(guestId))
         );
     }
 
     @GetMapping("/{guestId}/reservations/{reservationId}")
     public ResponseEntity<ReservationResource> getReservation(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @PathVariable Long reservationId) {
         return ResponseEntity.ok(reservationMapper.toResource(
-                reservationService.getReservation(guestsId, reservationId)));
+                reservationService.getReservation(guestId, reservationId)));
     }
 
     @GetMapping("/{guestId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> getFeedback(
-            @PathVariable Long guestsId,
+            @PathVariable Long guestId,
             @PathVariable Long reservationId) {
-        Feedback feedback = reservationService.getFeedback(guestsId, reservationId);
+        Feedback feedback = reservationService.getFeedback(guestId, reservationId);
         return ResponseEntity.ok(feedbackMapper.toResource(feedback));
     }
 
