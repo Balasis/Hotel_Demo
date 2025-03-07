@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "payments")
 public class Payment extends BaseModel {
     @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne
     private Reservation reservation;
     @Column(nullable = false)
     private BigDecimal amount;
