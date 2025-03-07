@@ -6,7 +6,7 @@ import gr.balasis.hotel.context.base.domain.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
-import jakarta.transaction.Transactional;
+
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.math.BigDecimal;
