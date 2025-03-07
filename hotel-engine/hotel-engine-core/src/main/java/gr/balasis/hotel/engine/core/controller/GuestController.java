@@ -3,7 +3,6 @@ package gr.balasis.hotel.engine.core.controller;
 
 import gr.balasis.hotel.context.base.model.Guest;
 import gr.balasis.hotel.context.base.model.Payment;
-import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.model.Feedback;
 
 import gr.balasis.hotel.context.base.service.BaseService;
@@ -66,16 +65,18 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     public ResponseEntity<FeedbackResource> getFeedback(
             @PathVariable Long guestId,
             @PathVariable Long reservationId) {
-        Feedback feedback = reservationService.getFeedback(guestId, reservationId);
-        return ResponseEntity.ok(feedbackMapper.toResource(feedback));
+        return ResponseEntity.ok(feedbackMapper.toResource(
+                reservationService.getFeedback(guestId, reservationId))
+        );
     }
 
     @GetMapping("/{guestId}/reservations/{reservationId}/payment")
-    public ResponseEntity<Payment> getPayment(
+    public ResponseEntity<PaymentResource> getPayment(
             @PathVariable Long guestId,
             @PathVariable Long reservationId) {
-        Payment payment = reservationService.getPayment(guestId, reservationId);
-        return ResponseEntity.ok(payment);
+
+        return ResponseEntity.ok(paymentMapper.toResource(
+                reservationService.getPayment(guestId, reservationId)) );
     }
 
     @DeleteMapping("/{guestId}")
@@ -101,7 +102,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         return ResponseEntity.noContent().build();
     }
 
-
     @PostMapping("/{guestId}/reservations")
     public ResponseEntity<ReservationResource> createReservation(
             @PathVariable Long guestId,
@@ -112,7 +112,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         ));
     }
 
-
     @PutMapping("/{guestId}/reservations/{reservationId}/cancel")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable Long guestId,
@@ -120,8 +119,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         reservationService.cancelReservation(guestId, reservationId);
         return ResponseEntity.noContent().build();
     }
-
-
 
     @PostMapping("/{guestId}/reservations/{reservationId}/payment")
     public ResponseEntity<PaymentResource> payReservation(
@@ -134,15 +131,14 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         ));
     }
 
-
-
     @PostMapping("/{guestsId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> submitFeedback(
             @PathVariable Long guestsId,
             @PathVariable Long reservationId,
             @RequestBody @Valid FeedbackResource resource) {
-        Feedback feedback = reservationService.createFeedback(guestsId, reservationId, feedbackMapper.toDomain(resource));
-        return ResponseEntity.ok(feedbackMapper.toResource(feedback));
+        return ResponseEntity.ok(feedbackMapper.toResource(
+                reservationService.createFeedback(guestsId, reservationId, feedbackMapper.toDomain(resource))
+        ));
     }
 
     @PutMapping("/{guestsId}/reservations/{reservationId}/feedback")
