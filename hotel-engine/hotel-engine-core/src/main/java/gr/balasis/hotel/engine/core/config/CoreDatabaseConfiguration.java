@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan(basePackages = "gr.balasis.hotel.context.base.entity")
+@EntityScan(basePackages = "gr.balasis.hotel.context.base.model")
 @EnableJpaRepositories(basePackages = "gr.balasis.hotel.engine.core.repository")
 public class CoreDatabaseConfiguration {
 }

@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.entity;
+package gr.balasis.hotel.context.base.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "feedback")
-public class FeedbackEntity extends BaseEntity {
+public class Feedback extends BaseModel {
 
     @OneToOne
     @JoinColumn(nullable = false)
-    private ReservationEntity reservation;
+    private Reservation reservation;
 
     @Column(nullable = false)
     private String message;

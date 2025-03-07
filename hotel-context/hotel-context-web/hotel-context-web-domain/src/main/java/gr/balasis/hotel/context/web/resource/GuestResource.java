@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 public class GuestResource extends BaseResource {
     private String firstName;
