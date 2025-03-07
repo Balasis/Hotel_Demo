@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 public class ReservationResource extends BaseResource {
     private GuestResource guest;

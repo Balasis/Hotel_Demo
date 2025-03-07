@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 public class RoomResource extends BaseResource {
     private String roomNumber;

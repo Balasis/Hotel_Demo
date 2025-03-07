@@ -2,7 +2,7 @@ package gr.balasis.hotel.context.web.mapper;
 
 import java.util.List;
 
-public interface BaseWebMapper<D,R> {
+public interface BaseMapper<D,R> {
 
     D toDomain(R resource);
     List<D> toDomains(List<R> resources);

@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.entity;
+package gr.balasis.hotel.context.base.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "guests")
-public class GuestEntity extends BaseEntity {
+public class Guest extends BaseModel {
 
     @Column(nullable = false)
     private String firstName;
