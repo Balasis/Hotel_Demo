@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.entity;
+package gr.balasis.hotel.context.base.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Entity
 @Table(name = "rooms")
-public class RoomEntity extends BaseEntity {
+public class Room extends BaseModel {
 
     @Column(nullable = false)
     private String roomNumber;

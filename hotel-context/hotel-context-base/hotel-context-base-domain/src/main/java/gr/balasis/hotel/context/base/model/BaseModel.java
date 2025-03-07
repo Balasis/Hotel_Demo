@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.entity;
+package gr.balasis.hotel.context.base.model;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @MappedSuperclass
-public class BaseEntity implements Serializable {
+public class BaseModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

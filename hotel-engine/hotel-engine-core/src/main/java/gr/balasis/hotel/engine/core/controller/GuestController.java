@@ -1,10 +1,10 @@
 package gr.balasis.hotel.engine.core.controller;
 
 
-import gr.balasis.hotel.context.base.domain.Guest;
-import gr.balasis.hotel.context.base.domain.Payment;
-import gr.balasis.hotel.context.base.domain.Reservation;
-import gr.balasis.hotel.context.base.domain.Feedback;
+import gr.balasis.hotel.context.base.model.Guest;
+import gr.balasis.hotel.context.base.model.Payment;
+import gr.balasis.hotel.context.base.model.Reservation;
+import gr.balasis.hotel.context.base.model.Feedback;
 
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.controller.BaseController;
@@ -14,10 +14,10 @@ import gr.balasis.hotel.context.web.resource.PaymentResource;
 import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.context.web.resource.FeedbackResource;
 
-import gr.balasis.hotel.engine.core.mapper.web.FeedbackWebMapper;
-import gr.balasis.hotel.engine.core.mapper.web.GuestWebMapper;
-import gr.balasis.hotel.engine.core.mapper.web.PaymentWebMapper;
-import gr.balasis.hotel.engine.core.mapper.web.ReservationWebMapper;
+import gr.balasis.hotel.engine.core.mapper.FeedbackMapper;
+import gr.balasis.hotel.engine.core.mapper.GuestMapper;
+import gr.balasis.hotel.engine.core.mapper.PaymentMapper;
+import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
@@ -34,18 +34,16 @@ import java.util.List;
 public class GuestController extends BaseController<Guest,GuestResource> {
     private final GuestService guestService;
     private final ReservationService reservationService;
-    private final GuestWebMapper guestMapper;
-    private final ReservationWebMapper reservationMapper;
-    private final PaymentWebMapper paymentMapper;
-    private final FeedbackWebMapper feedbackMapper;
+    private final GuestMapper guestMapper;
+    private final ReservationMapper reservationMapper;
+    private final PaymentMapper paymentMapper;
+    private final FeedbackMapper feedbackMapper;
 
     @GetMapping("/{guestId}")
     public ResponseEntity<GuestResource> getGuest(
             @PathVariable Long guestId) {
         return ResponseEntity.ok(
-                guestMapper.toResource(
-                        guestService.getGuest(guestId))
-        );
+                guestMapper.toResource( guestService.getGuest(guestId))  );
     }
 
     @GetMapping("/{guestsId}/reservations")
@@ -171,7 +169,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     }
 
     @Override
-    protected BaseWebMapper<Guest, GuestResource> getMapper() {
+    protected BaseMapper<Guest, GuestResource> getMapper() {
         return guestMapper;
     }
 

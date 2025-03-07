@@ -2,7 +2,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import gr.balasis.hotel.context.base.domain.*;
+import gr.balasis.hotel.context.base.model.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
@@ -71,7 +71,7 @@ public class DataLoader implements ApplicationRunner {
                             .firstName(lorem.getFirstName())
                             .lastName(lorem.getLastName())
                             .email(lorem.getEmail())
-                            .createdAt(LocalDateTime.now())
+                            .createdAt(LocalDate.now())
                             .build()
             );
         }

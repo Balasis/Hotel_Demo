@@ -1,42 +1,34 @@
 package gr.balasis.hotel.context.base.service;
 
-import gr.balasis.hotel.context.base.domain.BaseDomain;
+
 import gr.balasis.hotel.context.base.component.BaseComponent;
-import gr.balasis.hotel.context.base.entity.BaseEntity;
-import gr.balasis.hotel.context.base.mapper.BaseMapper;
+import gr.balasis.hotel.context.base.model.BaseModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public abstract class BasicServiceImpl<T extends BaseDomain, E extends BaseEntity> extends BaseComponent implements BaseService<T> {
-    public abstract JpaRepository<E, Long> getRepository();
-    public abstract BaseMapper<T,E> getMapper();
+public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponent implements BaseService<T> {
+    public abstract JpaRepository<T, Long> getRepository();
 
     @Override
     public T create(final T item) {
-        return getMapper().toDomain(
-                getRepository().save(
-                        getMapper().toEntity(item))
-        );
+        return getRepository().save(item);
     }
 
     @Override
     public void update(T item) {
-        getRepository().save(
-                getMapper().toEntity(item));
+        getRepository().save(item);
     }
 
     @Override
     public void delete(T item) {
-        getRepository().delete(
-                getMapper().toEntity(item));
+        getRepository().delete(item);
     }
 
     @Override
     public List<T> findAll() {
-        return getMapper().toDomains(
-                getRepository().findAll()) ;
+        return getRepository().findAll();
     }
 
     @Override
