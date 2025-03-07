@@ -1,7 +1,6 @@
 package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.exception.DuplicateEmailException;
-import gr.balasis.hotel.context.base.exception.GuestIdMismatchException;
 import gr.balasis.hotel.context.base.exception.GuestNotFoundException;
 import gr.balasis.hotel.engine.core.mapper.base.GuestMapper;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
@@ -36,10 +35,6 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implem
 
     @Override
     public void updateGuest(Long guestId, Guest updatedGuest) {
-        if (!guestId.equals(updatedGuest.getId())) {
-            throw new GuestIdMismatchException("Guest ID mismatch");
-        }
-//        ensureGuestIdMatches(guestId, updatedGuest); privates or not for readability?
         GuestEntity existingGuest = guestRepository.findById(guestId).orElseThrow(
                 () -> new GuestNotFoundException("Guest with ID " + guestId + " not found for update"));
         validateEmailUniqueness(updatedGuest.getEmail());
@@ -74,12 +69,6 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestEntity> implem
     public BaseMapper<Guest,GuestEntity> getMapper() {
         return guestMapper;
     }
-
-//    private void ensureGuestIdMatches(Long guestId, Guest updatedGuest) {
-//        if (!guestId.equals(updatedGuest.getId())) {
-//            throw new GuestIdMismatchException("Guest ID mismatch");
-//        }
-//    }
 
     private void validateEmailUniqueness(String newEmail) {
         if (guestRepository.findByEmail(newEmail).isPresent()) {
