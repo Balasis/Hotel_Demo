@@ -19,21 +19,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(IdMismatchException.class)
-    public ResponseEntity<String> handleIdMismatchException(IdMismatchException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-
-    @ExceptionHandler(DataConflictException.class)
-    public ResponseEntity<String> handleDataConflictException(DataConflictException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-
-    @ExceptionHandler(UnauthorizedAccessException.class)
-    public ResponseEntity<String> handleDataConflictException(UnauthorizedAccessException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-    }
-
     @ExceptionHandler(GuestNotFoundException.class)
     public ResponseEntity<String> handleGuestNotFoundException(GuestNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -59,11 +44,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(GuestIdMismatchException.class)
-    public ResponseEntity<String> handleGuestIdMismatchException(GuestIdMismatchException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<String> handleDuplicateEmailException(DuplicateEmailException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -72,6 +52,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateFeedbackException.class)
     public ResponseEntity<String> handleDuplicateFeedbackException(DuplicateFeedbackException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(DataConflictException.class)
+    public ResponseEntity<String> handleDataConflictException(DataConflictException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<String> handleUnauthorizedAccessException(UnauthorizedAccessException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentResource extends BaseResource{
-
+    private ReservationResource reservationResource;
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String paymentStatus;

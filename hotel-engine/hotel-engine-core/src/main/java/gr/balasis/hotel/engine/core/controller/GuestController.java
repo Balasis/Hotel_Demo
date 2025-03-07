@@ -27,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -82,9 +81,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         return ResponseEntity.ok(payment);
     }
 
-
-
-
     @DeleteMapping("/{guestId}")
     public ResponseEntity<Void> deleteGuest(
             @PathVariable Long guestId) {
@@ -118,8 +114,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
                 reservationService.createReservation(guestsId, reservationMapper.toDomain(reservation));
         return ResponseEntity.ok(reservationMapper.toResource(newReservation));
     }
-
-
 
 
     @DeleteMapping("/{guestsId}/reservations/{reservationId}")
@@ -171,8 +165,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         return ResponseEntity.noContent().build();
     }
 
-
-
     @Override
     protected BaseService<Guest> getBaseService() {
         return guestService;
@@ -182,4 +174,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     protected BaseWebMapper<Guest, GuestResource> getMapper() {
         return guestMapper;
     }
+
+
+
+
+
 }

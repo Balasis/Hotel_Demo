@@ -48,11 +48,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     @Transactional
     public Reservation create(final Reservation reservation) {
         return buildReservationWithPayment(reservation);
-
     }
 
     public Reservation getReservation(Long guestId, Long reservationId) {
-
         ReservationEntity reservationEntity = validateReservationExists(reservationId);
         validateReservationOwnership(guestId, reservationId);
         return reservationMapper.toDomain(reservationEntity);
@@ -61,7 +59,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     @Override
     @Transactional
     public Reservation createReservation(Long guestId, Reservation reservation) {
-        validateGuestIdMatch(guestId, reservation);
         return buildReservationWithPayment(reservation);
     }
 
@@ -146,12 +143,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
             throw new UnauthorizedAccessException("Reservation does not belong to the guest");
         }
         return reservation;
-    }
-
-    private void validateGuestIdMatch(Long guestId, Reservation reservation) {
-        if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new GuestIdMismatchException("Guest ID does not match the given reservation's guest ID.");
-        }
     }
 
     private ReservationEntity validateReservationExists(Long reservationId) {
