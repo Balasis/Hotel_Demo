@@ -35,6 +35,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         return buildAndSaveReservation(reservation);
     }
 
+    @Override
     public Reservation getReservation(Long guestId, Long reservationId) {
         Reservation reservationEntity = validateReservationExists(reservationId);
         validateReservationOwnership(guestId, reservationId);
@@ -110,7 +111,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         associateFeedbackWithReservation(guestId, reservationId, updatedFeedback);
     }
 
-
+    @Override
     public Feedback getFeedback(Long guestId, Long reservationId) {
         return fetchFeedbackForReservation(guestId, reservationId);
     }
@@ -166,7 +167,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
                         () -> new GuestNotFoundException("Guest not found: " + guestId));
     }
 
-    public Reservation buildAndSaveReservation(Reservation reservation){
+    private Reservation buildAndSaveReservation(Reservation reservation){
         validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
 
