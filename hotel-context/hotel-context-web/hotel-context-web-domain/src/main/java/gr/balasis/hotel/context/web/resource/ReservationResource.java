@@ -14,6 +14,7 @@ public class ReservationResource extends BaseResource {
     private GuestResource guest;
     private RoomResource room;
     private String status;
+    private FeedbackResource feedbackResource;
     private PaymentResource payment;
     private LocalDateTime createdAt;
     private LocalDate checkInDate;

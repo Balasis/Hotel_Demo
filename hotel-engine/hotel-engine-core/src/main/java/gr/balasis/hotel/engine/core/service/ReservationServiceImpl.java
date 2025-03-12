@@ -8,8 +8,6 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.exception.*;
 
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
-
-import gr.balasis.hotel.engine.core.repository.FeedbackRepository;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
@@ -22,12 +20,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implements ReservationService {
     private final ReservationRepository reservationRepository;
-    private final FeedbackRepository feedbackRepository;
     private final GuestRepository guestRepository;
 
 
@@ -104,9 +102,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
 
     @Override
     public Feedback createFeedback(Long guestId, Long reservationId, Feedback feedback) {
-        Reservation reservation = validateReservationOwnership(guestId, reservationId);
-        validateNoExistingFeedback(reservation);
-        return feedbackRepository.save(feedback);
+        return associateFeedbackWithReservation(guestId, reservationId, feedback).getFeedback();
+    }
+
+    @Override
+    public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
+        associateFeedbackWithReservation(guestId, reservationId, updatedFeedback);
     }
 
 
@@ -115,17 +116,13 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
     @Override
-    public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
-        Feedback feedback = fetchFeedbackForReservation(guestId, reservationId);
-        feedback.setMessage(updatedFeedback.getMessage());
-        feedbackRepository.save(feedback);
-    }
-
-    @Override
     public void deleteFeedback(Long guestId, Long reservationId) {
-        feedbackRepository.delete(
-                fetchFeedbackForReservation(guestId,reservationId)
-        );
+        var reservation= validateReservationOwnership(guestId, reservationId);
+        if (reservation.getFeedback() == null){
+            throw new FeedbackNotFoundException("Feedback doesn't exist to be deleted");
+        }
+        reservation.setFeedback(null);
+        reservationRepository.save(reservation);
     }
 
     @Override
@@ -134,42 +131,40 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
 
+
+    private Reservation associateFeedbackWithReservation(Long guestId, Long reservationId, Feedback feedback) {
+        Reservation reservation = validateReservationOwnership(guestId, reservationId);
+        reservation.setFeedback(feedback);
+        return reservationRepository.save(reservation);
+    }
+
     private Feedback fetchFeedbackForReservation(Long guestId, Long reservationId) {
-        return validateFeedbackExists(
-                validateReservationOwnership(guestId, reservationId).getId());
+        return Optional.ofNullable(
+                validateReservationOwnership(guestId, reservationId).getFeedback())
+                .orElseThrow(
+                        ()-> new FeedbackNotFoundException("Feedback not found")
+        );
     }
 
     private Reservation validateReservationOwnership(Long guestId, Long reservationId) {
-        Reservation reservation = validateReservationExists(reservationId);
-        if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
-        }
-        return reservation;
+        return Optional.of(validateReservationExists(reservationId))
+                .filter(r -> r.getGuest().getId().equals(guestId))
+                .orElseThrow(
+                        () -> new UnauthorizedAccessException("Reservation does not belong to the guest"));
     }
 
     private Reservation validateReservationExists(Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found: "
+                .orElseThrow(
+                        () -> new ReservationNotFoundException("Reservation not found: "
                         + reservationId));
     }
 
     private void validateGuestExists(Long guestId) {
         guestRepository.findById(guestId)
-                .orElseThrow(() -> new GuestNotFoundException("Guest not found: " + guestId));
+                .orElseThrow(
+                        () -> new GuestNotFoundException("Guest not found: " + guestId));
     }
-
-    private Feedback validateFeedbackExists(Long reservationId) {
-        return feedbackRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new FeedbackNotFoundException("Feedback not found for reservation: "
-                        + reservationId));
-    }
-
-    private void validateNoExistingFeedback(Reservation reservation) {
-        if (feedbackRepository.existsByReservationId(reservation.getId())) {
-            throw new DuplicateFeedbackException("Feedback already exists for this reservation");
-        }
-    }
-
 
     public Reservation buildAndSaveReservation(Reservation reservation){
         validateGuestExists(reservation.getGuest().getId());
