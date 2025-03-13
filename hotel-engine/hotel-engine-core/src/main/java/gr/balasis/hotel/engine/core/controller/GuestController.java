@@ -2,8 +2,6 @@ package gr.balasis.hotel.engine.core.controller;
 
 
 import gr.balasis.hotel.context.base.model.Guest;
-
-import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.controller.BaseController;
 import gr.balasis.hotel.context.web.mapper.*;
@@ -22,8 +20,6 @@ import gr.balasis.hotel.engine.core.service.ReservationService;
 
 import gr.balasis.hotel.engine.core.validation.GuestValidator;
 import gr.balasis.hotel.engine.core.validation.ReservationValidator;
-import gr.balasis.hotel.engine.core.validation.ownership.OwnershipValidator;
-import gr.balasis.hotel.engine.core.validation.ownership.OwnershipValidatorImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/guests")
 public class GuestController extends BaseController<Guest,GuestResource> {
-    private final OwnershipValidator ownershipValidator;
     private final ResourceDataValidator resourceDataValidator;
     private final GuestValidator guestValidator;
     private final GuestService guestService;
@@ -106,7 +101,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
 
-        ownershipValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
         return ResponseEntity.ok(
                 reservationMapper.toResource(
                         reservationService.get(reservationId))
@@ -119,6 +114,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final ReservationResource reservationResource) {
 
         resourceDataValidator.validateResourceData(reservationResource);
+        reservationResource.getGuest().setId(guestId);
         var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
         return ResponseEntity.ok(
                 reservationMapper.toResource(
@@ -134,8 +130,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
         resourceDataValidator.validateResourceData(reservationResource);
         reservationResource.getGuest().setId(guestId);
-        ownershipValidator.validateReservationBelongsToGuest(reservationId,guestId);
-        var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
+        reservationResource.setId(reservationId);
+
+        var reservation = reservationValidator.validateForUpdate(reservationMapper.toDomain(reservationResource));
         reservationService.update(reservation);
         return ResponseEntity.noContent().build();
     }
@@ -146,72 +143,66 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long reservationId,
             @RequestHeader(value = "a") final String action) {
 
-        reservationService.manageReservationAction(guestId,reservationId,action);
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationService.manageReservationAction(reservationId,action);
         return ResponseEntity.noContent().build();
     }
-
-
-
 
     @GetMapping("/{guestId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> getFeedback(
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
+
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
         return ResponseEntity.ok(feedbackMapper.toResource(
-                reservationService.getFeedback(guestId, reservationId))
+                reservationService.getFeedback(reservationId))
         );
     }
+
+    @PostMapping("/{guestId}/reservations/{reservationId}/feedback")
+    public ResponseEntity<FeedbackResource> submitFeedback(
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId,
+            @RequestBody final FeedbackResource feedbackResource) {
+
+        resourceDataValidator.validateResourceData(feedbackResource);
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        return ResponseEntity.ok(feedbackMapper.toResource(
+                reservationService.createFeedback(reservationId, feedbackMapper.toDomain(feedbackResource))
+        ));
+    }
+
+    @PutMapping("/{guestId}/reservations/{reservationId}/feedback")
+    public ResponseEntity<Void> updateFeedback(
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId,
+            @RequestBody final FeedbackResource feedbackResource) {
+
+        resourceDataValidator.validateResourceData(feedbackResource);
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationService.updateFeedback(reservationId, feedbackMapper.toDomain(feedbackResource));
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{guestId}/reservations/{reservationId}/feedback")
+    public ResponseEntity<Void> deleteFeedback(
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId) {
+
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationService.deleteFeedback(reservationId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @GetMapping("/{guestId}/reservations/{reservationId}/payment")
     public ResponseEntity<PaymentResource> getPayment(
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
 
+        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
         return ResponseEntity.ok(paymentMapper.toResource(
-                reservationService.getPayment(guestId, reservationId)) );
-    }
-
-    @PostMapping("/{guestId}/reservations/{reservationId}/payment")
-    public ResponseEntity<PaymentResource> payReservation(
-            @PathVariable final Long guestId,
-            @PathVariable final Long reservationId,
-            @RequestBody final PaymentResource paymentResource) {
-
-        resourceDataValidator.validateResourceData(paymentResource);
-        return ResponseEntity.ok(paymentMapper.toResource(
-                reservationService.finalizePayment(guestId, reservationId, paymentMapper.toDomain(paymentResource))
-        ));
-    }
-
-    @PostMapping("/{guestsId}/reservations/{reservationId}/feedback")
-    public ResponseEntity<FeedbackResource> submitFeedback(
-            @PathVariable final Long guestsId,
-            @PathVariable final Long reservationId,
-            @RequestBody final FeedbackResource feedbackResource) {
-
-        resourceDataValidator.validateResourceData(feedbackResource);
-        return ResponseEntity.ok(feedbackMapper.toResource(
-                reservationService.createFeedback(guestsId, reservationId, feedbackMapper.toDomain(feedbackResource))
-        ));
-    }
-
-    @PutMapping("/{guestsId}/reservations/{reservationId}/feedback")
-    public ResponseEntity<Void> updateFeedback(
-            @PathVariable final Long guestsId,
-            @PathVariable final Long reservationId,
-            @RequestBody final FeedbackResource feedbackResource) {
-
-        resourceDataValidator.validateResourceData(feedbackResource);
-        reservationService.updateFeedback(guestsId, reservationId, feedbackMapper.toDomain(feedbackResource));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{guestsId}/reservations/{reservationId}/feedback")
-    public ResponseEntity<Void> deleteFeedback(
-            @PathVariable final Long guestsId,
-            @PathVariable final Long reservationId) {
-        reservationService.deleteFeedback(guestsId, reservationId);
-        return ResponseEntity.noContent().build();
+                reservationService.getPayment(reservationId)) );
     }
 
     @Override
