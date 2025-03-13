@@ -52,7 +52,7 @@ public class DataLoader implements ApplicationRunner {
 
     private void loadRooms() {
         logger.trace("Loading rooms...");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             roomService.create(
                     Room.builder()
                             .roomNumber("10" + (i + 1))
@@ -105,13 +105,8 @@ public class DataLoader implements ApplicationRunner {
         logger.trace("Loading payments...");
         List<Reservation> reservations = reservationService.findAll();
         for (Reservation reservation : reservations) {
-           Payment payment = reservationService.getPayment(reservation.getGuest().getId(),reservation.getId());
                 if (random.nextBoolean()) {
-                    reservationService.finalizePayment(
-                            reservation.getGuest().getId(),
-                            reservation.getId(),
-                            payment
-                    );
+                    reservationService.manageReservationAction(reservation.getId(),"Pay");
                 }
         }
         logger.trace("Finished loading payments");
@@ -124,7 +119,6 @@ public class DataLoader implements ApplicationRunner {
             int messageNumber = random.nextInt(10) + 1;
             String theMessage = "feedback.message" + messageNumber;
             reservationService.createFeedback(
-                    reservation.getGuest().getId(),
                     reservation.getId(),
                     Feedback.builder()
                             .createdAt(LocalDateTime.now())
@@ -134,12 +128,9 @@ public class DataLoader implements ApplicationRunner {
                                     Locale.getDefault()))
                             .build()
                     );
-
         }
         logger.trace("Finished loading feedback");
     }
-
-
 
     private Guest pickRandomGuest(List<Guest> guests) {
         return guests.removeFirst();
@@ -154,7 +145,6 @@ public class DataLoader implements ApplicationRunner {
         return Reservation.builder()
                 .guest(guest)
                 .room(room)
-                .status(ReservationStatus.ACTIVE)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
                 .build();

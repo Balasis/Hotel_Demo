@@ -59,12 +59,10 @@ public class ResourceDataValidatorImpl implements ResourceDataValidator {
         if (reservationResource.getGuest() == null) {
             throw new InvalidReservationResourceException("Guest information is mandatory");
         }
-        validateResourceData(reservationResource.getGuest());
 
-        if (reservationResource.getRoom() == null) {
+        if (reservationResource.getRoom() == null || reservationResource.getRoom().getId() == null) {
             throw new InvalidReservationResourceException("Room information is mandatory");
         }
-        validateResourceData(reservationResource.getRoom());
 
         if (reservationResource.getFeedback() != null){
             validateResourceData(reservationResource.getFeedback());
@@ -78,8 +76,11 @@ public class ResourceDataValidatorImpl implements ResourceDataValidator {
             throw new InvalidReservationResourceException("Check-in date is mandatory");
         }
 
-        if (reservationResource.getCheckOutDate() != null
-                && reservationResource.getCheckOutDate().isBefore(reservationResource.getCheckInDate())) {
+        if (reservationResource.getCheckOutDate() == null) {
+            throw new InvalidReservationResourceException("Check-out date is mandatory");
+        }
+
+        if (reservationResource.getCheckOutDate().isBefore(reservationResource.getCheckInDate())) {
             throw new InvalidReservationResourceException("Check-out date cannot be earlier than check-in date");
         }
     }
