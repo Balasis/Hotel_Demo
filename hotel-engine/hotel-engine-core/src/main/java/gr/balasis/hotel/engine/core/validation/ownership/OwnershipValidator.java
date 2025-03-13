@@ -5,15 +5,16 @@ import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 
 public interface OwnershipValidator {
-    void validateGuestReservation(Long guestId, Reservation reservation);
 
-    void validateGuestReservation(Long guestId, Long reservationId);
+    void validateReservationBelongsToGuest(Long guestId, Reservation reservation);
 
-    void validateReservationFeedback(Long reservationId, Feedback feedback);
+    void validateReservationBelongsToGuest(Long reservationId, Long guestId);
 
-    void validateReservationFeedback(Long reservationId, Long feedbackId);
+    void validateFeedbackBelongsToReservation(Long reservationId, Feedback feedback);
 
-    void validateReservationPayment(Long reservationId, Payment payment);
+    void validateFeedbackBelongsToReservation(Long reservationId, Long feedbackId);
 
-    void validateReservationPayment(Long reservationId, Long paymentId);
+    void validatePaymentBelongsToReservation(Long reservationId, Payment payment);
+
+    void validatePaymentBelongsToReservation(Long reservationId, Long paymentId);
 }

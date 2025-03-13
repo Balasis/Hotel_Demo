@@ -24,30 +24,6 @@ public class ReservationValidatorImpl implements ReservationValidator {
     }
 
     @Override
-    public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
-
-        if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new IllegalArgumentException("Reservation does not belong to the guest");
-        }
-    }
-
-    @Override
-    public void validateFeedbackBelongsToReservation(Long reservationId, Long feedbackId) {
-        if (!reservationRepository.existsByIdAndFeedbackId(reservationId, feedbackId)) {
-            throw new IllegalArgumentException("Feedback does not belong to the reservation");
-        }
-    }
-
-    @Override
-    public void validatePaymentBelongsToReservation(Long reservationId, Long paymentId) {
-        if (!reservationRepository.existsByIdAndPaymentId(reservationId, paymentId)) {
-            throw new IllegalArgumentException("Payment does not belong to the reservation");
-        }
-    }
-
-    @Override
     public void validateRoomAvailability(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
         boolean isRoomReserved = reservationRepository.existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(
                 roomId, checkOutDate, checkInDate);

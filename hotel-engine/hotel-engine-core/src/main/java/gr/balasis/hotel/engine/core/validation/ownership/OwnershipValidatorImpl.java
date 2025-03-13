@@ -13,37 +13,40 @@ public class OwnershipValidatorImpl implements OwnershipValidator{
     private final ReservationRepository reservationRepository;
 
     @Override
-    public void validateGuestReservation(Long guestId, Reservation reservation) {
-        validateGuestReservation(guestId, reservation.getId());
+    public void validateReservationBelongsToGuest(Long guestId, Reservation reservation) {
+        validateReservationBelongsToGuest(guestId, reservation.getId());
     }
 
     @Override
-    public void validateGuestReservation(Long guestId, Long reservationId) {
-        if (reservationRepository.existsByIdAndGuestId(reservationId, guestId)) {
+    public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        if (!reservation.getGuest().getId().equals(guestId)) {
             throw new IllegalArgumentException("Reservation does not belong to the guest");
         }
     }
 
     @Override
-    public void validateReservationFeedback(Long reservationId, Feedback feedback) {
-        validateReservationFeedback(reservationId, feedback.getId());
+    public void validateFeedbackBelongsToReservation(Long reservationId, Feedback feedback) {
+        validateFeedbackBelongsToReservation(reservationId, feedback.getId());
     }
 
     @Override
-    public void validateReservationFeedback(Long reservationId, Long feedbackId) {
-        if (!reservationRepository.existsByFeedbackIdAndId(reservationId ,feedbackId)) {
+    public void validateFeedbackBelongsToReservation(Long reservationId, Long feedbackId) {
+        if (!reservationRepository.existsByIdAndFeedbackId(reservationId, feedbackId)) {
             throw new IllegalArgumentException("Feedback does not belong to the reservation");
         }
     }
 
     @Override
-    public void validateReservationPayment(Long reservationId, Payment payment) {
-        validateReservationPayment(reservationId, payment.getId());
+    public void validatePaymentBelongsToReservation(Long reservationId, Payment payment) {
+        validatePaymentBelongsToReservation(reservationId, payment.getId());
     }
 
     @Override
-    public void validateReservationPayment(Long reservationId, Long paymentId) {
-        if (!reservationRepository.existsByPaymentIdAndId(reservationId,paymentId)) {
+    public void validatePaymentBelongsToReservation(Long reservationId, Long paymentId) {
+        if (!reservationRepository.existsByIdAndPaymentId(reservationId, paymentId)) {
             throw new IllegalArgumentException("Payment does not belong to the reservation");
         }
     }
