@@ -2,6 +2,7 @@ package gr.balasis.hotel.context.base.service;
 
 
 import gr.balasis.hotel.context.base.component.BaseComponent;
+import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
 import gr.balasis.hotel.context.base.model.BaseModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +19,25 @@ public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponen
 
     @Override
     public T get(final Long id){
-        return getRepository().findById(id).orElseThrow();
+        return getRepository().findById(id).orElseThrow(
+                () ->  new EntityNotFoundException("Entity with ID " + id + " not found.")
+        );
     }
 
     @Override
     public void update(T item) {
+        if (!getRepository().existsById(item.getId())) {
+            throw new EntityNotFoundException("Entity with ID " + item.getId() + " not found.");
+        }
         getRepository().save(item);
     }
 
     @Override
-    public void delete(T item) {
-        getRepository().delete(item);
+    public void delete(final Long id) {
+        if (!getRepository().existsById(id)) {
+            throw new EntityNotFoundException("Entity with ID " + id + " not found.");
+        }
+        getRepository().deleteById(id);
     }
 
     @Override
@@ -37,7 +46,6 @@ public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponen
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean exists(final T item) {
         return getRepository().existsById(item.getId());
     }

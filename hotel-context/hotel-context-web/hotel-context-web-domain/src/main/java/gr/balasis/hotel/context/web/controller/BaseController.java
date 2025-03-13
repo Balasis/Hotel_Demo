@@ -45,22 +45,22 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
         );
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<Void> update(
-            @RequestBody @Valid final R resource) {
-
-        getBaseService().update(getMapper().toDomain(resource));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
             @RequestBody @Valid final R resource) {
 
         T domainObject = getMapper().toDomain(resource);
-        if (getBaseService().exists(domainObject)) {
-            getBaseService().delete(domainObject);
-        }
+        domainObject.setId(id);
+        getBaseService().update(domainObject);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id) {
+
+        getBaseService().delete(id);
         return ResponseEntity.noContent().build();
     }
 

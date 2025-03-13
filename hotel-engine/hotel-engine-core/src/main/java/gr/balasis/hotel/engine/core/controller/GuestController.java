@@ -43,24 +43,27 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
         return ResponseEntity.ok(
                 guestMapper.toResource(
-                        guestService.getGuest(guestId))
+                        guestService.get(guestId))
         );
     }
 
+    @Override
     @PutMapping("/{guestId}")
-    public ResponseEntity<Void> updateGuest(
+    public ResponseEntity<Void> update(
             @PathVariable Long guestId,
             @RequestBody @Valid GuestResource guestResource) {
 
-        guestService.updateGuest(guestId, guestMapper.toDomain(guestResource));
+        guestResource.setId(guestId);
+        guestService.update(guestMapper.toDomain(guestResource));
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @DeleteMapping("/{guestId}")
-    public ResponseEntity<Void> deleteGuest(
+    public ResponseEntity<Void> delete(
             @PathVariable Long guestId) {
 
-        guestService.deleteGuest(guestId);
+        guestService.delete(guestId);
         return ResponseEntity.noContent().build();
     }
 

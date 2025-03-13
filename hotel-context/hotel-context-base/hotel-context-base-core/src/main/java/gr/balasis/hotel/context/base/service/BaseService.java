@@ -7,7 +7,7 @@ public interface BaseService<T,K> {
 
     void update(T item);
 
-    void delete(T item);
+    void delete(K id);
 
     T get(K id);
 
