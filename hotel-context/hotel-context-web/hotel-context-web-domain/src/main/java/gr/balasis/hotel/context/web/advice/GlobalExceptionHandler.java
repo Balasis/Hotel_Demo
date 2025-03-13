@@ -1,6 +1,7 @@
 package gr.balasis.hotel.context.web.advice;
 
 import gr.balasis.hotel.context.base.exception.*;
+import gr.balasis.hotel.context.web.validation.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,6 +63,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<String> handleUnauthorizedAccessException(UnauthorizedAccessException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+
+    @ExceptionHandler(InvalidResourceException.class)
+    public ResponseEntity<String> handleInvalidResourceException(InvalidResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidGuestResourceException.class)
+    public ResponseEntity<String> handleInvalidGuestResourceException(InvalidGuestResourceException e) {
+        System.out.println("got in here");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidRoomResourceException.class)
+    public ResponseEntity<String> handleInvalidRoomResourceException(InvalidRoomResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidReservationResourceException.class)
+    public ResponseEntity<String> handleInvalidReservationResourceException(InvalidReservationResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPaymentResourceException.class)
+    public ResponseEntity<String> handleInvalidPaymentResourceException(InvalidPaymentResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidFeedbackResourceException.class)
+    public ResponseEntity<String> handleInvalidFeedbackResourceException(InvalidFeedbackResourceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
 }

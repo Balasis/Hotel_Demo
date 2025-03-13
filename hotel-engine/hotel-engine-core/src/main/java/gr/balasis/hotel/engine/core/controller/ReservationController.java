@@ -29,7 +29,7 @@ public class ReservationController extends BaseController<Reservation, Reservati
     }
 
     @Override
-    protected BaseService<Reservation> getBaseService() {
+    protected BaseService<Reservation,Long> getBaseService() {
         return reservationService;
     }
 

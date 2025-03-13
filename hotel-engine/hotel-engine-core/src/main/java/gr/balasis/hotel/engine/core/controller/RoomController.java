@@ -20,7 +20,7 @@ public class RoomController extends BaseController<Room, RoomResource> {
     private final RoomMapper roomMapper;
 
     @Override
-    protected BaseService<Room> getBaseService() {
+    protected BaseService<Room,Long> getBaseService() {
         return roomService;
     }
 

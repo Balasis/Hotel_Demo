@@ -23,36 +23,26 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest> implements GuestSe
     }
 
     @Override
-    public Guest getGuest(Long guestId) {
+    public Guest get(Long guestId) {
         return guestRepository.findById(guestId)
                 .orElseThrow(() -> new GuestNotFoundException("Guest not found"));
     }
 
     @Override
-    public void updateGuest(Long guestId, Guest updatedGuest) {
-        Guest existingGuest = guestRepository.findById(guestId).orElseThrow(
-                () -> new GuestNotFoundException("Guest with ID " + guestId + " not found for update"));
+    public void update(Guest updatedGuest) {
+        Guest existingGuest = guestRepository.findById(updatedGuest.getId()).orElseThrow(
+                () -> new GuestNotFoundException("Guest with ID " + updatedGuest.getId() + " not found for update"));
         validateEmailUniqueness(updatedGuest.getEmail());
         existingGuest.setEmail(updatedGuest.getEmail());
         guestRepository.save(existingGuest);
     }
 
     @Override
-    public void deleteGuest(Long guestId) {
+    public void delete(Long guestId) {
         if (!guestRepository.existsById(guestId)) {
             throw new GuestNotFoundException("Guest with ID " + guestId + " not found for deletion");
         }
         guestRepository.deleteById(guestId);
-    }
-
-    @Override
-    public void updateEmail(Long guestId, String email) {
-        Guest guestEntity = guestRepository.findById(guestId)
-                .orElseThrow(() -> new GuestNotFoundException("Guest with ID " + guestId
-                        + " not found for email update"));
-        validateEmailUniqueness(email);
-        guestEntity.setEmail(email);
-        guestRepository.save(guestEntity);
     }
 
     @Override

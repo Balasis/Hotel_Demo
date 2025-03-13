@@ -8,6 +8,7 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.exception.*;
 
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
+import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
@@ -35,10 +36,21 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         return buildAndSaveReservation(reservation);
     }
 
+    @Override
     public Reservation getReservation(Long guestId, Long reservationId) {
         Reservation reservationEntity = validateReservationExists(reservationId);
         validateReservationOwnership(guestId, reservationId);
         return reservationEntity;
+    }
+
+    @Override
+    public void updateReservation(Long guestId, Long reservationId, ReservationResource reservationResource) {
+
+    }
+
+    @Override
+    public void manageReservationAction(Long guestId, Long reservationId, String action) {
+
     }
 
     @Override
@@ -53,9 +65,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         return reservationRepository.findByGuestId(guestId);
     }
 
-    @Override
-    @Transactional
-    public void cancelReservation(Long guestId, Long reservationId) {
+
+
+    private void cancelReservation(Long guestId, Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -110,7 +122,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         associateFeedbackWithReservation(guestId, reservationId, updatedFeedback);
     }
 
-
+    @Override
     public Feedback getFeedback(Long guestId, Long reservationId) {
         return fetchFeedbackForReservation(guestId, reservationId);
     }
@@ -166,7 +178,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
                         () -> new GuestNotFoundException("Guest not found: " + guestId));
     }
 
-    public Reservation buildAndSaveReservation(Reservation reservation){
+    private Reservation buildAndSaveReservation(Reservation reservation){
         validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
 
