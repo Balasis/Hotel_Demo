@@ -1,6 +1,5 @@
 package gr.balasis.hotel.engine.core.service;
 
-import gr.balasis.hotel.context.base.exception.DuplicateEmailException;
 import gr.balasis.hotel.context.base.exception.GuestNotFoundException;
 import gr.balasis.hotel.context.base.model.Guest;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
@@ -11,49 +10,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GuestServiceImpl extends BasicServiceImpl<Guest> implements GuestService {
+public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestNotFoundException> implements GuestService {
     private final GuestRepository guestRepository;
-
-    @Override
-    public Guest create(Guest guest) {
-        if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {
-            throw new DuplicateEmailException("Email already exists");
-        }
-        return guestRepository.save(guest);
-    }
-
-    @Override
-    public Guest get(Long guestId) {
-        return guestRepository.findById(guestId)
-                .orElseThrow(() -> new GuestNotFoundException("Guest not found"));
-    }
-
-    @Override
-    public void update(Guest updatedGuest) {
-        Guest existingGuest = guestRepository.findById(updatedGuest.getId()).orElseThrow(
-                () -> new GuestNotFoundException("Guest with ID " + updatedGuest.getId() + " not found for update"));
-        validateEmailUniqueness(updatedGuest.getEmail());
-        existingGuest.setEmail(updatedGuest.getEmail());
-        guestRepository.save(existingGuest);
-    }
-
-    @Override
-    public void delete(Long guestId) {
-        if (!guestRepository.existsById(guestId)) {
-            throw new GuestNotFoundException("Guest with ID " + guestId + " not found for deletion");
-        }
-        guestRepository.deleteById(guestId);
-    }
 
     @Override
     public JpaRepository<Guest, Long> getRepository() {
         return guestRepository;
     }
 
-    private void validateEmailUniqueness(String newEmail) {
-        if (guestRepository.findByEmail(newEmail).isPresent()) {
-            throw new DuplicateEmailException("Email " + newEmail + " is already in use by another guest");
-        }
+    @Override
+    public Class<GuestNotFoundException> getNotFoundExceptionClass() {
+        return GuestNotFoundException.class;
     }
 
+    @Override
+    public String getModelName() {
+        return "Guest";
+    }
 }

@@ -19,6 +19,8 @@ import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
+import gr.balasis.hotel.engine.core.validation.GuestValidator;
+import gr.balasis.hotel.engine.core.validation.ReservationValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +33,11 @@ import java.util.List;
 @RequestMapping("/guests")
 public class GuestController extends BaseController<Guest,GuestResource> {
     private final ResourceDataValidator resourceDataValidator;
+    private final GuestValidator guestValidator;
     private final GuestService guestService;
-    private final ReservationService reservationService;
     private final GuestMapper guestMapper;
+    private final ReservationValidator reservationValidator;
+    private final ReservationService reservationService;
     private final ReservationMapper reservationMapper;
     private final PaymentMapper paymentMapper;
     private final FeedbackMapper feedbackMapper;
@@ -41,7 +45,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     @Override
     @GetMapping("/{guestId}")
     public ResponseEntity<GuestResource> get(
-            @PathVariable Long guestId) {
+            @PathVariable final Long guestId) {
 
         return ResponseEntity.ok(
                 guestMapper.toResource(
@@ -52,31 +56,33 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     @Override
     @PostMapping
     public ResponseEntity<GuestResource> create(
-            @RequestBody @Valid final GuestResource guestResource) {
+            @RequestBody final GuestResource guestResource) {
 
         resourceDataValidator.validateResourceData(guestResource);
+        Guest guest = guestValidator.validate(getMapper().toDomain(guestResource));
         return ResponseEntity.ok(
                 getMapper().toResource(
-                        getBaseService().create(getMapper().toDomain(guestResource)))
+                        getBaseService().create(guest))
         );
     }
 
     @Override
     @PutMapping("/{guestId}")
     public ResponseEntity<Void> update(
-            @PathVariable Long guestId,
-            @RequestBody GuestResource guestResource) {
+            @PathVariable final Long guestId,
+            @RequestBody final GuestResource guestResource) {
 
         resourceDataValidator.validateResourceData(guestResource);
         guestResource.setId(guestId);
-        guestService.update(guestMapper.toDomain(guestResource));
+        Guest guest = guestValidator.validate(getMapper().toDomain(guestResource));
+        guestService.update(guest);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @DeleteMapping("/{guestId}")
     public ResponseEntity<Void> delete(
-            @PathVariable Long guestId) {
+            @PathVariable final Long guestId) {
 
         guestService.delete(guestId);
         return ResponseEntity.noContent().build();
@@ -84,7 +90,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @GetMapping("/{guestId}/reservations")
     public ResponseEntity<List<ReservationResource>> findReservations(
-            @PathVariable Long guestId) {
+            @PathVariable final Long guestId) {
 
         return ResponseEntity.ok(
                 reservationMapper.toResources(
@@ -94,8 +100,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @GetMapping("/{guestId}/reservations/{reservationId}")
     public ResponseEntity<ReservationResource> getReservation(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId) {
 
         return ResponseEntity.ok(
                 reservationMapper.toResource(
@@ -105,8 +111,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PostMapping("/{guestId}/reservations")
     public ResponseEntity<ReservationResource> createReservation(
-            @PathVariable Long guestId,
-            @RequestBody ReservationResource reservationResource) {
+            @PathVariable final Long guestId,
+            @RequestBody final ReservationResource reservationResource) {
 
         resourceDataValidator.validateResourceData(reservationResource);
         return ResponseEntity.ok(
@@ -117,9 +123,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PutMapping("/{guestId}/reservations/{reservationId}")
     public ResponseEntity<Void> updateReservation(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId,
-            @RequestBody ReservationResource reservationResource) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId,
+            @RequestBody final ReservationResource reservationResource) {
 
         resourceDataValidator.validateResourceData(reservationResource);
         reservationService.updateReservation(guestId,reservationId, reservationResource);
@@ -128,9 +134,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PatchMapping("/{guestId}/reservations/{reservationId}")
     public ResponseEntity<Void> manageReservationAction(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId,
-            @RequestHeader(value = "a") String action) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId,
+            @RequestHeader(value = "a") final String action) {
 
         reservationService.manageReservationAction(guestId,reservationId,action);
         return ResponseEntity.noContent().build();
@@ -141,8 +147,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @GetMapping("/{guestId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> getFeedback(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId) {
         return ResponseEntity.ok(feedbackMapper.toResource(
                 reservationService.getFeedback(guestId, reservationId))
         );
@@ -150,8 +156,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @GetMapping("/{guestId}/reservations/{reservationId}/payment")
     public ResponseEntity<PaymentResource> getPayment(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId) {
 
         return ResponseEntity.ok(paymentMapper.toResource(
                 reservationService.getPayment(guestId, reservationId)) );
@@ -159,9 +165,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PostMapping("/{guestId}/reservations/{reservationId}/payment")
     public ResponseEntity<PaymentResource> payReservation(
-            @PathVariable Long guestId,
-            @PathVariable Long reservationId,
-            @RequestBody PaymentResource paymentResource) {
+            @PathVariable final Long guestId,
+            @PathVariable final Long reservationId,
+            @RequestBody final PaymentResource paymentResource) {
 
         resourceDataValidator.validateResourceData(paymentResource);
         return ResponseEntity.ok(paymentMapper.toResource(
@@ -171,9 +177,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PostMapping("/{guestsId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> submitFeedback(
-            @PathVariable Long guestsId,
-            @PathVariable Long reservationId,
-            @RequestBody @Valid FeedbackResource feedbackResource) {
+            @PathVariable final Long guestsId,
+            @PathVariable final Long reservationId,
+            @RequestBody final FeedbackResource feedbackResource) {
 
         resourceDataValidator.validateResourceData(feedbackResource);
         return ResponseEntity.ok(feedbackMapper.toResource(
@@ -183,9 +189,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @PutMapping("/{guestsId}/reservations/{reservationId}/feedback")
     public ResponseEntity<Void> updateFeedback(
-            @PathVariable Long guestsId,
-            @PathVariable Long reservationId,
-            @RequestBody FeedbackResource feedbackResource) {
+            @PathVariable final Long guestsId,
+            @PathVariable final Long reservationId,
+            @RequestBody final FeedbackResource feedbackResource) {
 
         resourceDataValidator.validateResourceData(feedbackResource);
         reservationService.updateFeedback(guestsId, reservationId, feedbackMapper.toDomain(feedbackResource));
@@ -194,8 +200,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
     @DeleteMapping("/{guestsId}/reservations/{reservationId}/feedback")
     public ResponseEntity<Void> deleteFeedback(
-            @PathVariable Long guestsId,
-            @PathVariable Long reservationId) {
+            @PathVariable final Long guestsId,
+            @PathVariable final Long reservationId) {
         reservationService.deleteFeedback(guestsId, reservationId);
         return ResponseEntity.noContent().build();
     }

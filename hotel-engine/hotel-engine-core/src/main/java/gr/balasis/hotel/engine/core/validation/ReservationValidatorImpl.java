@@ -1,6 +1,9 @@
 package gr.balasis.hotel.engine.core.validation;
 
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.DataConflictException;
+import gr.balasis.hotel.context.base.exception.ReservationNotFoundException;
+import gr.balasis.hotel.context.base.exception.RoomNotAvailableException;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 import lombok.AllArgsConstructor;
@@ -17,9 +20,9 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void validateReservationNotCanceled(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
-            throw new IllegalArgumentException("Reservation is already canceled");
+            throw new DataConflictException("Reservation is already canceled");
         }
     }
 
@@ -28,9 +31,8 @@ public class ReservationValidatorImpl implements ReservationValidator {
         boolean isRoomReserved = reservationRepository.existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(
                 roomId, checkOutDate, checkInDate);
         if (isRoomReserved) {
-            throw new IllegalArgumentException("Room is already reserved during the specified dates");
+            throw new RoomNotAvailableException("Room is already reserved during the specified dates");
         }
     }
-
 
 }

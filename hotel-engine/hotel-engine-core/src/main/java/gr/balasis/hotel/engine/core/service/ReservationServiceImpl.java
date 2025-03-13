@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implements ReservationService {
+public class ReservationServiceImpl extends BasicServiceImpl<Reservation,ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final GuestRepository guestRepository;
 
@@ -37,37 +37,37 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
     @Override
-    public Reservation getReservation(Long guestId, Long reservationId) {
+    public Reservation getReservation(final Long guestId, final Long reservationId) {
         Reservation reservationEntity = validateReservationExists(reservationId);
         validateReservationOwnership(guestId, reservationId);
         return reservationEntity;
     }
 
     @Override
-    public void updateReservation(Long guestId, Long reservationId, ReservationResource reservationResource) {
+    public void updateReservation( final Long guestId, final Long reservationId, ReservationResource reservationResource) {
 
     }
 
     @Override
-    public void manageReservationAction(Long guestId, Long reservationId, String action) {
+    public void manageReservationAction(final Long guestId, final Long reservationId, String action) {
 
     }
 
     @Override
     @Transactional
-    public Reservation createReservation(Long guestId, Reservation reservation) {
+    public Reservation createReservation( final Long guestId, final Reservation reservation) {
         return buildAndSaveReservation(reservation);
     }
 
     @Override
-    public List<Reservation> findReservations(Long guestId) {
+    public List<Reservation> findReservations( final Long guestId) {
         validateGuestExists(guestId);
         return reservationRepository.findByGuestId(guestId);
     }
 
 
 
-    private void cancelReservation(Long guestId, Long reservationId) {
+    private void cancelReservation(final Long guestId, final Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -89,7 +89,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
 
     @Override
     @Transactional
-    public Payment finalizePayment(Long guestId, Long reservationId, Payment payment) {
+    public Payment finalizePayment( final Long guestId, final Long reservationId, Payment payment) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
         if (reservation.getPayment() == null) {
             throw new PaymentNotFoundException("No payment associated with this reservation");
@@ -104,7 +104,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
 
     @Override
     @Transactional
-    public Payment getPayment(Long guestId, Long reservationId) {
+    public Payment getPayment(final Long guestId,final  Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
         if (reservation.getPayment() == null) {
             throw new PaymentNotFoundException("No payment associated with this reservation");
@@ -113,22 +113,22 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
     @Override
-    public Feedback createFeedback(Long guestId, Long reservationId, Feedback feedback) {
+    public Feedback createFeedback(final Long guestId, final Long reservationId, Feedback feedback) {
         return associateFeedbackWithReservation(guestId, reservationId, feedback).getFeedback();
     }
 
     @Override
-    public void updateFeedback(Long guestId, Long reservationId, Feedback updatedFeedback) {
+    public void updateFeedback(final Long guestId, final Long reservationId, Feedback updatedFeedback) {
         associateFeedbackWithReservation(guestId, reservationId, updatedFeedback);
     }
 
     @Override
-    public Feedback getFeedback(Long guestId, Long reservationId) {
+    public Feedback getFeedback(final Long guestId,final Long reservationId) {
         return fetchFeedbackForReservation(guestId, reservationId);
     }
 
     @Override
-    public void deleteFeedback(Long guestId, Long reservationId) {
+    public void deleteFeedback(final Long guestId,final Long reservationId) {
         var reservation= validateReservationOwnership(guestId, reservationId);
         if (reservation.getFeedback() == null){
             throw new FeedbackNotFoundException("Feedback doesn't exist to be deleted");
@@ -142,15 +142,23 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         return reservationRepository;
     }
 
+    @Override
+    public Class<ReservationNotFoundException> getNotFoundExceptionClass() {
+        return ReservationNotFoundException.class;
+    }
 
+    @Override
+    public String getModelName() {
+        return "Reservation";
+    }
 
-    private Reservation associateFeedbackWithReservation(Long guestId, Long reservationId, Feedback feedback) {
+    private Reservation associateFeedbackWithReservation(final Long guestId,final Long reservationId,final Feedback feedback) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
         reservation.setFeedback(feedback);
         return reservationRepository.save(reservation);
     }
 
-    private Feedback fetchFeedbackForReservation(Long guestId, Long reservationId) {
+    private Feedback fetchFeedbackForReservation(final Long guestId,final Long reservationId) {
         return Optional.ofNullable(
                 validateReservationOwnership(guestId, reservationId).getFeedback())
                 .orElseThrow(
@@ -158,14 +166,14 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         );
     }
 
-    private Reservation validateReservationOwnership(Long guestId, Long reservationId) {
+    private Reservation validateReservationOwnership(final Long guestId,final Long reservationId) {
         return Optional.of(validateReservationExists(reservationId))
                 .filter(r -> r.getGuest().getId().equals(guestId))
                 .orElseThrow(
                         () -> new UnauthorizedAccessException("Reservation does not belong to the guest"));
     }
 
-    private Reservation validateReservationExists(Long reservationId) {
+    private Reservation validateReservationExists(final Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(
                         () -> new ReservationNotFoundException("Reservation not found: "
@@ -178,7 +186,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
                         () -> new GuestNotFoundException("Guest not found: " + guestId));
     }
 
-    private Reservation buildAndSaveReservation(Reservation reservation){
+    private Reservation buildAndSaveReservation(final Reservation reservation){
         validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
 

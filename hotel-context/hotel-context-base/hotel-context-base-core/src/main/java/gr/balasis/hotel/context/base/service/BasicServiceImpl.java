@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponent implements BaseService<T,Long> {
+public abstract class BasicServiceImpl<T extends BaseModel,E extends EntityNotFoundException> extends BaseComponent implements BaseService<T,Long> {
     public abstract JpaRepository<T, Long> getRepository();
+    public abstract Class<E> getNotFoundExceptionClass();
+    public abstract String getModelName();
 
     @Override
     public T create(final T item) {
@@ -17,16 +19,17 @@ public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponen
     }
 
     @Override
-    public T get(final Long id){
-        return getRepository().findById(id).orElseThrow(
-                () ->  new EntityNotFoundException("Entity with ID " + id + " not found.")
-        );
+    public T get(final Long id) {
+        return getRepository().findById(id)
+                .orElseThrow(() -> createNotFoundException(
+                        getModelName() +" with ID " + id + " not found."));
     }
 
     @Override
     public void update(T item) {
         if (!getRepository().existsById(item.getId())) {
-            throw new EntityNotFoundException("Entity with ID " + item.getId() + " not found.");
+            throw createNotFoundException(
+                    getModelName() + " with ID " + item.getId() + " not found.");
         }
         getRepository().save(item);
     }
@@ -34,7 +37,8 @@ public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponen
     @Override
     public void delete(final Long id) {
         if (!getRepository().existsById(id)) {
-            throw new EntityNotFoundException("Entity with ID " + id + " not found.");
+            throw createNotFoundException(
+                    getModelName() + " with ID " + id + " not found.");
         }
         getRepository().deleteById(id);
     }
@@ -47,6 +51,16 @@ public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponen
     @Override
     public boolean exists(final T item) {
         return getRepository().existsById(item.getId());
+    }
+
+    private E createNotFoundException(String message) {
+        try {
+            return getNotFoundExceptionClass()
+                    .getConstructor(String.class)
+                    .newInstance(message);
+        } catch (Exception e) {
+            throw new EntityNotFoundException(message);
+        }
     }
 
 }

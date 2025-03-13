@@ -1,5 +1,7 @@
 package gr.balasis.hotel.engine.core.validation.ownership;
 
+import gr.balasis.hotel.context.base.exception.ReservationNotFoundException;
+import gr.balasis.hotel.context.base.exception.UnauthorizedAccessException;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
@@ -20,10 +22,10 @@ public class OwnershipValidatorImpl implements OwnershipValidator{
     @Override
     public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new IllegalArgumentException("Reservation does not belong to the guest");
+            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
         }
     }
 
@@ -35,7 +37,7 @@ public class OwnershipValidatorImpl implements OwnershipValidator{
     @Override
     public void validateFeedbackBelongsToReservation(Long reservationId, Long feedbackId) {
         if (!reservationRepository.existsByIdAndFeedbackId(reservationId, feedbackId)) {
-            throw new IllegalArgumentException("Feedback does not belong to the reservation");
+            throw new UnauthorizedAccessException("Feedback does not belong to the reservation");
         }
     }
 
@@ -47,7 +49,7 @@ public class OwnershipValidatorImpl implements OwnershipValidator{
     @Override
     public void validatePaymentBelongsToReservation(Long reservationId, Long paymentId) {
         if (!reservationRepository.existsByIdAndPaymentId(reservationId, paymentId)) {
-            throw new IllegalArgumentException("Payment does not belong to the reservation");
+            throw new UnauthorizedAccessException("Payment does not belong to the reservation");
         }
     }
 
