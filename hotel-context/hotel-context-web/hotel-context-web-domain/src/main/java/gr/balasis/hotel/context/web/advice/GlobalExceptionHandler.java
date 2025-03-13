@@ -57,14 +57,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataConflictException.class)
     public ResponseEntity<String> handleDataConflictException(DataConflictException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ReservationConflictException.class)
+    public ResponseEntity<String> handleReservationConflictException(ReservationConflictException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(RoomNotAvailableException.class)
+    public ResponseEntity<String> handleRoomNotAvailableException(RoomNotAvailableException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<String> handleUnauthorizedAccessException(UnauthorizedAccessException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
-
 
     @ExceptionHandler(InvalidResourceException.class)
     public ResponseEntity<String> handleInvalidResourceException(InvalidResourceException e) {
