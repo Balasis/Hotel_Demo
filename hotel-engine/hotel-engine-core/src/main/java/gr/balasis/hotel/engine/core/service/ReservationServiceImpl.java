@@ -37,15 +37,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     @Override
-    public Reservation getReservation(final Long guestId, final Long reservationId) {
-        Reservation reservationEntity = validateReservationExists(reservationId);
-        validateReservationOwnership(guestId, reservationId);
-        return reservationEntity;
-    }
-
-    @Override
-    public void updateReservation( final Long guestId, final Long reservationId, ReservationResource reservationResource) {
-
+    public void update(final Reservation reservation) {
+        buildAndUpdateReservation(reservation);
     }
 
     @Override
@@ -54,14 +47,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     @Override
-    @Transactional
-    public Reservation createReservation( final Long guestId, final Reservation reservation) {
-        return buildAndSaveReservation(reservation);
-    }
-
-    @Override
-    public List<Reservation> findReservations( final Long guestId) {
-        validateGuestExists(guestId);
+    public List<Reservation> findByGuestId(final Long guestId) {
         return reservationRepository.findByGuestId(guestId);
     }
 
@@ -187,19 +173,24 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
     }
 
     private Reservation buildAndSaveReservation(final Reservation reservation){
-        validateGuestExists(reservation.getGuest().getId());
         reservation.setCreatedAt(LocalDateTime.now());
 
         Payment payment = new Payment();
-        if (reservation.getCheckOutDate() != null) {
-            long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
-            payment.setAmount(reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(days)));
-        }
+        long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
+        payment.setAmount(reservation.getRoom().getPricePerNight().multiply(BigDecimal.valueOf(days)));
+
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setReservation(reservation);
 
         reservation.setPayment(payment);
         return reservationRepository.save(reservation);
     }
+
+    private Reservation buildAndUpdateReservation(final Reservation reservation){
+
+        return reservationRepository.save(reservation);
+    }
+
+
 
 }

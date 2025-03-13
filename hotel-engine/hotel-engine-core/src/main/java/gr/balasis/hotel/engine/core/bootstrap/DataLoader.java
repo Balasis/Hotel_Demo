@@ -139,8 +139,6 @@ public class DataLoader implements ApplicationRunner {
         logger.trace("Finished loading feedback");
     }
 
-
-
     private Guest pickRandomGuest(List<Guest> guests) {
         return guests.removeFirst();
     }
@@ -154,7 +152,6 @@ public class DataLoader implements ApplicationRunner {
         return Reservation.builder()
                 .guest(guest)
                 .room(room)
-                .status(ReservationStatus.ACTIVE)
                 .checkInDate(checkInDate)
                 .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
                 .build();

@@ -3,6 +3,7 @@ package gr.balasis.hotel.engine.core.controller;
 
 import gr.balasis.hotel.context.base.model.Guest;
 
+import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.controller.BaseController;
 import gr.balasis.hotel.context.web.mapper.*;
@@ -21,7 +22,8 @@ import gr.balasis.hotel.engine.core.service.ReservationService;
 
 import gr.balasis.hotel.engine.core.validation.GuestValidator;
 import gr.balasis.hotel.engine.core.validation.ReservationValidator;
-import jakarta.validation.Valid;
+import gr.balasis.hotel.engine.core.validation.ownership.OwnershipValidator;
+import gr.balasis.hotel.engine.core.validation.ownership.OwnershipValidatorImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/guests")
 public class GuestController extends BaseController<Guest,GuestResource> {
+    private final OwnershipValidator ownershipValidator;
     private final ResourceDataValidator resourceDataValidator;
     private final GuestValidator guestValidator;
     private final GuestService guestService;
@@ -59,7 +62,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final GuestResource guestResource) {
 
         resourceDataValidator.validateResourceData(guestResource);
-        Guest guest = guestValidator.validate(getMapper().toDomain(guestResource));
+        var guest = guestValidator.validate(getMapper().toDomain(guestResource));
         return ResponseEntity.ok(
                 getMapper().toResource(
                         getBaseService().create(guest))
@@ -74,7 +77,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
         resourceDataValidator.validateResourceData(guestResource);
         guestResource.setId(guestId);
-        Guest guest = guestValidator.validate(getMapper().toDomain(guestResource));
+        var guest = guestValidator.validate(getMapper().toDomain(guestResource));
         guestService.update(guest);
         return ResponseEntity.noContent().build();
     }
@@ -94,7 +97,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
 
         return ResponseEntity.ok(
                 reservationMapper.toResources(
-                        reservationService.findReservations(guestId))
+                        reservationService.findByGuestId(guestId))
         );
     }
 
@@ -103,9 +106,10 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
 
+        ownershipValidator.validateReservationBelongsToGuest(reservationId,guestId);
         return ResponseEntity.ok(
                 reservationMapper.toResource(
-                        reservationService.getReservation(guestId, reservationId))
+                        reservationService.get(reservationId))
         );
     }
 
@@ -115,9 +119,10 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final ReservationResource reservationResource) {
 
         resourceDataValidator.validateResourceData(reservationResource);
+        var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
         return ResponseEntity.ok(
                 reservationMapper.toResource(
-                        reservationService.createReservation(guestId, reservationMapper.toDomain(reservationResource)))
+                        reservationService.create(reservation))
         );
     }
 
@@ -128,7 +133,10 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final ReservationResource reservationResource) {
 
         resourceDataValidator.validateResourceData(reservationResource);
-        reservationService.updateReservation(guestId,reservationId, reservationResource);
+        reservationResource.getGuest().setId(guestId);
+        ownershipValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
+        reservationService.update(reservation);
         return ResponseEntity.noContent().build();
     }
 

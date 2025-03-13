@@ -26,7 +26,7 @@ public abstract class BasicServiceImpl<T extends BaseModel,E extends EntityNotFo
     }
 
     @Override
-    public void update(T item) {
+    public void update(final T item) {
         if (!getRepository().existsById(item.getId())) {
             throw createNotFoundException(
                     getModelName() + " with ID " + item.getId() + " not found.");

@@ -30,7 +30,11 @@ public class Reservation extends BaseModel {
     private ReservationStatus status = ReservationStatus.ACTIVE;
 
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDate checkInDate;
+
+    @Column(nullable = false)
     private LocalDate checkOutDate;
 
     @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
