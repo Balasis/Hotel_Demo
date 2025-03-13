@@ -59,7 +59,7 @@ public abstract class BasicServiceImpl<T extends BaseModel,E extends EntityNotFo
                     .getConstructor(String.class)
                     .newInstance(message);
         } catch (Exception e) {
-            throw new EntityNotFoundException(message);
+            throw new EntityNotFoundException("Entity " + message);
         }
     }
 
