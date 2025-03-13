@@ -8,12 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponent implements BaseService<T> {
+public abstract class BasicServiceImpl<T extends BaseModel> extends BaseComponent implements BaseService<T,Long> {
     public abstract JpaRepository<T, Long> getRepository();
 
     @Override
     public T create(final T item) {
         return getRepository().save(item);
+    }
+
+    @Override
+    public T get(final Long id){
+        return getRepository().findById(id).orElseThrow();
     }
 
     @Override

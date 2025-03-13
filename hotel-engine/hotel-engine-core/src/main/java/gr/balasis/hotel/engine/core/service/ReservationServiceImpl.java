@@ -8,6 +8,7 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.exception.*;
 
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
+import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
@@ -43,6 +44,16 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
     }
 
     @Override
+    public void updateReservation(Long guestId, Long reservationId, ReservationResource reservationResource) {
+
+    }
+
+    @Override
+    public void manageReservationAction(Long guestId, Long reservationId, String action) {
+
+    }
+
+    @Override
     @Transactional
     public Reservation createReservation(Long guestId, Reservation reservation) {
         return buildAndSaveReservation(reservation);
@@ -54,9 +65,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation> implem
         return reservationRepository.findByGuestId(guestId);
     }
 
-    @Override
-    @Transactional
-    public void cancelReservation(Long guestId, Long reservationId) {
+
+
+    private void cancelReservation(Long guestId, Long reservationId) {
         Reservation reservation = validateReservationOwnership(guestId, reservationId);
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {

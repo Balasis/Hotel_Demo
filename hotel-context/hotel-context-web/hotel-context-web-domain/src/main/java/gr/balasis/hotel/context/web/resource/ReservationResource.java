@@ -1,6 +1,7 @@
 package gr.balasis.hotel.context.web.resource;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReservationResource extends BaseResource {
     private GuestResource guest;
     private RoomResource room;
