@@ -18,4 +18,5 @@ public interface GuestRepository extends JpaRepository<Guest, Long> {
 
     List<Guest> findByLastName(String lastName);
 
+    boolean existsByEmail(String email);
 }

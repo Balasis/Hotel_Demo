@@ -5,7 +5,6 @@ import gr.balasis.hotel.context.base.component.BaseComponent;
 import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
 import gr.balasis.hotel.context.base.model.BaseModel;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
