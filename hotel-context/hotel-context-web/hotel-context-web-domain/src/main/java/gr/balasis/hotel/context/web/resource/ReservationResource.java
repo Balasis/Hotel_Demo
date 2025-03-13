@@ -11,12 +11,11 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReservationResource extends BaseResource {
     private GuestResource guest;
     private RoomResource room;
     private String status;
-    private FeedbackResource feedbackResource;
+    private FeedbackResource feedback;
     private PaymentResource payment;
     private LocalDateTime createdAt;
     private LocalDate checkInDate;

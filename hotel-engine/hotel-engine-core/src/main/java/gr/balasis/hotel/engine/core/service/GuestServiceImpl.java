@@ -46,16 +46,6 @@ public class GuestServiceImpl extends BasicServiceImpl<Guest> implements GuestSe
     }
 
     @Override
-    public void updateEmail(Long guestId, String email) {
-        Guest guestEntity = guestRepository.findById(guestId)
-                .orElseThrow(() -> new GuestNotFoundException("Guest with ID " + guestId
-                        + " not found for email update"));
-        validateEmailUniqueness(email);
-        guestEntity.setEmail(email);
-        guestRepository.save(guestEntity);
-    }
-
-    @Override
     public JpaRepository<Guest, Long> getRepository() {
         return guestRepository;
     }
