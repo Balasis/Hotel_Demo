@@ -1,4 +1,4 @@
 package gr.balasis.hotel.engine.core.validation;
 
-public class RoomValidatorImpl {
+public class RoomValidatorImpl implements RoomValidator{
 }
