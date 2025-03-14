@@ -1,5 +1,7 @@
 package gr.balasis.hotel.engine.core.repository;
 
+import gr.balasis.hotel.context.base.model.Feedback;
+import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,10 +14,36 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.guest JOIN FETCH r.room where r.id= :reservationId")
-    Optional<Reservation> findByIdWithGuestAndRoom(Long reservationId);
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest join fetch r.room LEFT join fetch r.feedback join fetch r.payment
+    where r.id = :reservationId
+    """)
+    Optional<Reservation> findReservationByIdCompleteFetch(Long reservationId);
 
-    List<Reservation> findByGuestId(Long guestId);
+    @Query("""
+    select f
+    from Feedback f
+    where f.reservation.id = :reservationId
+    """)
+    Optional<Feedback> getFeedbackByReservationId(Long reservationId);
+
+    @Query("""
+    select p
+    from Payment p
+    where p.reservation.id= :reservationId
+    """)
+    Optional<Payment> getPaymentByReservationId(Long reservationId);
+
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest g join fetch r.room
+    where g.id= :guestId
+    """)
+    List<Reservation> findReservationByGuestIdCompleteFetch(Long guestId);
+
 
     boolean existsByIdAndFeedbackId(Long reservationId, Long feedbackId);
     boolean existsByIdAndPaymentId(Long reservationId, Long paymentId);

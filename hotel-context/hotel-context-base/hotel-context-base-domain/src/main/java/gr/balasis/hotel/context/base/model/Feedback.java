@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "feedback")
 public class Feedback extends BaseModel {
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private Reservation reservation;
 
