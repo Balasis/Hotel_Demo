@@ -38,9 +38,10 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Transactional(readOnly = true)
     public Reservation get(final Long reservationId) {
 
-        return reservationRepository.findByIdCompleteFetch(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException(
-                        "Reservation with ID " + reservationId + " not found."));
+        return reservationRepository.findReservationByIdCompleteFetch(reservationId)
+                .orElseThrow(
+                        () -> new ReservationNotFoundException("No reservation found for ID: "
+                                + reservationId));
     }
 
     @Override
@@ -56,19 +57,16 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Payment getPayment(final  Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
+        return reservationRepository.getPaymentByReservationId(reservationId)
                 .orElseThrow(
-                        () -> new ReservationNotFoundException("Reservation not found for ID: " + reservationId));
-        if (reservation.getPayment() == null) {
-            throw new PaymentNotFoundException("No payment associated with this reservation");
-        }
-        return reservation.getPayment();
+                        () -> new PaymentNotFoundException("No payment found for reservation with ID: "
+                                + reservationId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
-        return reservationRepository.findByGuestId(guestId);
+        return reservationRepository.findReservationByGuestIdCompleteFetch(guestId);
     }
 
     @Override
@@ -77,7 +75,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         reservation.setStatus(ReservationStatus.ACTIVE);
         reservation.setPayment(generatePaymentForReservation(reservation));
         reservationRepository.save(reservation);
-        return  reservationRepository.findByIdCompleteFetch(reservation.getId()).orElseThrow(
+        return  reservationRepository.findReservationByIdCompleteFetch(reservation.getId()).orElseThrow(
                 () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
                         " associated guest and room details after saving.")
         );

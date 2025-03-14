@@ -28,7 +28,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
     @Override
     public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
-        Reservation reservation = reservationRepository.findByIdCompleteFetch(reservationId)
+        Reservation reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (!reservation.getGuest().getId().equals(guestId)) {
