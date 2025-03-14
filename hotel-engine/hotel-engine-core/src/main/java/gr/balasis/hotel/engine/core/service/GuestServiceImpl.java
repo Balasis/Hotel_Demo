@@ -1,6 +1,6 @@
 package gr.balasis.hotel.engine.core.service;
 
-import gr.balasis.hotel.context.base.exception.GuestNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.GuestNotFoundException;
 import gr.balasis.hotel.context.base.model.Guest;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.GuestRepository;

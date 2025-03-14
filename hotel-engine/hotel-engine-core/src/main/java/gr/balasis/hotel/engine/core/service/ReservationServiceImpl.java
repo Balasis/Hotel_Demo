@@ -2,11 +2,15 @@ package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.enumeration.ReservationAction;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.dublicate.DublicateException;
+import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.PaymentNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.ReservationNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.RoomNotFoundException;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
-import gr.balasis.hotel.context.base.exception.*;
 
 import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
@@ -16,6 +20,7 @@ import gr.balasis.hotel.engine.core.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,16 +30,20 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ReservationServiceImpl extends BasicServiceImpl<Reservation,ReservationNotFoundException> implements ReservationService {
+public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
 
     @Override
+    @Transactional
     public Reservation create(final Reservation reservation) {
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.ACTIVE);
         reservation.setPayment(generatePaymentForReservation(reservation));
-        return  reservationRepository.save(reservation);
+        reservationRepository.save(reservation);
+        return  reservationRepository.findByIdWithGuestAndRoom(reservation.getId()).orElseThrow(
+                () -> new ReservationNotFoundException("Could not find what is just being saved...props to you dev")
+        );
     }
 
     @Override
@@ -141,7 +150,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation,Reserva
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
-            throw new DataConflictException("Reservation is already canceled");
+            throw new DublicateException("Reservation is already canceled");
         }
         var payment = reservation.getPayment();
         if (payment.getPaymentStatus() == PaymentStatus.PAID){

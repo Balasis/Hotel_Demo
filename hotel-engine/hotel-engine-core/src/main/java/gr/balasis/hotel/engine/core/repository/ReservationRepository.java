@@ -1,18 +1,22 @@
 package gr.balasis.hotel.engine.core.repository;
 
-import gr.balasis.hotel.context.base.model.Guest;
 import gr.balasis.hotel.context.base.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.guest JOIN FETCH r.room where r.id= :reservationId")
+    Optional<Reservation> findByIdWithGuestAndRoom(Long reservationId);
+
     List<Reservation> findByGuestId(Long guestId);
 
-    boolean existsByIdAndGuestId(Long reservationId, Long guestId);
     boolean existsByIdAndFeedbackId(Long reservationId, Long feedbackId);
     boolean existsByIdAndPaymentId(Long reservationId, Long paymentId);
     boolean existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(Long roomId, LocalDate checkOutDate, LocalDate checkInDate);

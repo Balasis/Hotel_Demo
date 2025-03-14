@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: @spring.profile.from.maven@
+  jpa:
+    open-in-view: false
 
 server:
   port: 3000
