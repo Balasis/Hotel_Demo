@@ -21,4 +21,10 @@ logging:
     root: info
     gr.balasis.hotel.engine.core: trace
     gr.balasis.hotel.engine.monitoring: trace
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
 
