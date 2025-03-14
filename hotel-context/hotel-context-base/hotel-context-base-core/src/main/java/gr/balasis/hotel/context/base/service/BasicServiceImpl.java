@@ -2,7 +2,7 @@ package gr.balasis.hotel.context.base.service;
 
 
 import gr.balasis.hotel.context.base.component.BaseComponent;
-import gr.balasis.hotel.context.base.exception.EntityNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.EntityNotFoundException;
 import gr.balasis.hotel.context.base.model.BaseModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,6 +1,11 @@
 spring:
   profiles:
     active: @spring.profile.from.maven@
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        generate_statistics: true
 
 server:
   port: 3000

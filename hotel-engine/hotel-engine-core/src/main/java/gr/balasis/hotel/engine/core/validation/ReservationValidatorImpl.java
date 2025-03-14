@@ -1,8 +1,10 @@
 package gr.balasis.hotel.engine.core.validation;
 
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
-import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
-import gr.balasis.hotel.context.base.exception.*;
+import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
+import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
+import gr.balasis.hotel.context.base.exception.notfound.ReservationNotFoundException;
+import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
@@ -63,7 +65,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
         boolean isRoomReserved = reservationRepository.existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(
                 roomId, checkOutDate, checkInDate);
         if (isRoomReserved) {
-            throw new RoomNotAvailableException("Room is already reserved during the specified dates");
+            throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
 
@@ -74,7 +76,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
                 roomId, checkOutDate, checkInDate, reservationId);
 
         if (isRoomReserved) {
-            throw new RoomNotAvailableException("Room is already reserved during the specified dates");
+            throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
 
