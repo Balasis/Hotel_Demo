@@ -1,6 +1,13 @@
 package gr.balasis.hotel.context.web.advice;
 
 import gr.balasis.hotel.context.base.exception.*;
+import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
+import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
+import gr.balasis.hotel.context.base.exception.dublicate.DublicateException;
+import gr.balasis.hotel.context.base.exception.dublicate.DuplicateEmailException;
+import gr.balasis.hotel.context.base.exception.dublicate.DuplicateFeedbackException;
+import gr.balasis.hotel.context.base.exception.notfound.*;
+import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import gr.balasis.hotel.context.web.validation.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,8 +62,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(DataConflictException.class)
-    public ResponseEntity<String> handleDataConflictException(DataConflictException e) {
+    @ExceptionHandler(DublicateException.class)
+    public ResponseEntity<String> handleDataConflictException(DublicateException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
@@ -65,8 +72,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(RoomNotAvailableException.class)
-    public ResponseEntity<String> handleRoomNotAvailableException(RoomNotAvailableException e) {
+    @ExceptionHandler(RoomAvailabilityConflictException.class)
+    public ResponseEntity<String> handleRoomNotAvailableException(RoomAvailabilityConflictException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
