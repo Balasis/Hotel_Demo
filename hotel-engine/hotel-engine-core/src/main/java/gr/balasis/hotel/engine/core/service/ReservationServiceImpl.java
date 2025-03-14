@@ -29,20 +29,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
 
     @Override
-    @Transactional
     public Reservation create(final Reservation reservation) {
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.ACTIVE);
         reservation.setPayment(generatePaymentForReservation(reservation));
         reservationRepository.save(reservation);
         return  reservationRepository.findByIdWithGuestAndRoom(reservation.getId()).orElseThrow(
-                () -> new ReservationNotFoundException("Could not find what is just being saved...props to you dev")
+                () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
+                        " associated guest and room details after saving.")
         );
     }
 
@@ -54,12 +55,14 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
         return reservationRepository.findByGuestId(guestId);
     }
 
 
     @Override
+    @Transactional(readOnly = true)
     public Payment getPayment(final  Long reservationId) {
         var reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(
@@ -71,6 +74,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Feedback getFeedback(final Long reservationId) {
         var reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(
