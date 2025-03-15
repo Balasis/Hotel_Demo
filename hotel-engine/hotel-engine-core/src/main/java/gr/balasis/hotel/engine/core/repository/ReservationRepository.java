@@ -6,6 +6,7 @@ import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -35,6 +36,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where r.id = :reservationId
     """)
     Optional<Reservation> findReservationByIdCompleteFetch(Long reservationId);
+
+    @Query("""
+    select r
+    from Reservation r
+    left join fetch r.feedback join fetch r.payment
+    where r.id = :reservationId
+    """)
+    Optional<Reservation> findReservationByIdMinimalFetch(Long reservationId);
 
     @Query("""
     select r.status
@@ -90,15 +99,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where g.id= :guestId
     """)
     List<Reservation> findReservationByGuestIdCompleteFetch(Long guestId);
-
-
-    boolean existsByIdAndFeedbackId(Long reservationId, Long feedbackId);
-    boolean existsByIdAndPaymentId(Long reservationId, Long paymentId);
-    boolean existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(Long roomId, LocalDate checkOutDate, LocalDate checkInDate);
-
-
-    boolean existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfterAndIdNot(Long roomId, LocalDate checkOutDate,
-                                                                           LocalDate checkInDate, Long reservationId);
-
 
 }

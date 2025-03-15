@@ -3,6 +3,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.model.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
@@ -129,6 +130,7 @@ public class DataLoader implements ApplicationRunner {
                             .build()
                     );
         }
+
         logger.trace("Finished loading feedback");
     }
 

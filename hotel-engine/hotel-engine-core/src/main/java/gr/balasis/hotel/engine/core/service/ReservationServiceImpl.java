@@ -2,6 +2,7 @@ package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.enumeration.ReservationAction;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.dublicate.DublicateException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.notfound.PaymentNotFoundException;
@@ -19,6 +20,8 @@ import gr.balasis.hotel.engine.core.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -27,8 +30,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
@@ -36,7 +39,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Reservation get(final Long reservationId) {
-
         return reservationRepository.findReservationByIdCompleteFetch(reservationId)
                 .orElseThrow(
                         () -> new ReservationNotFoundException("No reservation found for ID: "
@@ -46,7 +48,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Feedback getFeedback(final Long reservationId) {
-
         return reservationRepository.getFeedbackByReservationId(reservationId)
                 .orElseThrow(
                         () -> new FeedbackNotFoundException("No feedback found for reservation with ID: "
@@ -112,13 +113,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void deleteFeedback(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        if (reservation.getFeedback() == null){
-            throw new FeedbackNotFoundException("Feedback doesn't exist to be deleted");
-        }
         reservation.setFeedback(null);
-        reservationRepository.save(reservation);
     }
 
     @Override
@@ -153,12 +150,15 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         var payment = reservationRepository.getPaymentByReservationId(reservationId).orElseThrow(
                 () -> new PaymentNotFoundException("No payment associated with this reservation")
         );
+        if (payment.getPaymentStatus().equals(PaymentStatus.PAID)){{
+            throw new HotelException("Reservation is already paid");
+        }}
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentStatus(PaymentStatus.PAID);
     }
 
     private void cancelReservation(final Long reservationId) {
-        var reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
+        var reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -174,7 +174,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     private Feedback createFeedbackProcess(final Long reservationId,final Feedback feedback){
-        var reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId).orElseThrow(
+        var reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId).orElseThrow(
                 () -> new ReservationNotFoundException("No reservation found for ID: " + reservationId)
         );
         feedback.setReservation(reservation);

@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 @Table(name = "reservations")
 public class Reservation extends BaseModel {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private Guest guest;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private Room room;
 
