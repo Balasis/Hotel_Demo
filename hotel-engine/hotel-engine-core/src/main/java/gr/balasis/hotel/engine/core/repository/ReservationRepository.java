@@ -5,6 +5,7 @@ import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
+import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,9 +18,6 @@ import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-
-
-
 
     @Query("""
     select case when exists (
@@ -68,7 +66,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
-
     @Query("""
     select r
     from Reservation r
@@ -76,6 +73,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where r.id = :reservationId
     """)
     Optional<Reservation> findReservationByIdMinimalFetch(Long reservationId);
+
+    @Query(value = """
+    SELECT
+        ro.id AS roomId,
+        COUNT(r.id) AS reservationsPerRoom
+    FROM reservations r
+    INNER JOIN rooms ro ON ro.id = r.room_id
+    GROUP BY ro.id
+    """, nativeQuery = true)
+    List<ReservationAnalyticsDTO> getReservationAnalytics();
 
     @Query("""
     select r.status

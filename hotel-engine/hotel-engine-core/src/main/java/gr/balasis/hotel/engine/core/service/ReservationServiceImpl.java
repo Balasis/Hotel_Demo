@@ -17,6 +17,7 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
+import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -118,6 +119,14 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public void deleteFeedback(final Long reservationId) {
       reservationRepository.deleteFeedbackByReservationId(reservationId);
     }
+
+
+    @Override
+    public List<ReservationAnalyticsDTO> getAnalytics(){
+        return reservationRepository.getReservationAnalytics();
+    }
+
+
 
     @Override
     public JpaRepository<Reservation, Long> getRepository() {
