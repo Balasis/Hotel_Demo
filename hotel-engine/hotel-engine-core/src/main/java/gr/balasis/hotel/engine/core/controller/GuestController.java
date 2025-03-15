@@ -156,7 +156,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         resourceDataValidator.validateResourceData(reservationResource);
         reservationResource.getGuest().setId(guestId);
         reservationResource.setId(reservationId);
-
         var reservation = reservationValidator.validateForUpdate(reservationMapper.toDomain(reservationResource));
         reservationService.update(reservation);
         return ResponseEntity.noContent().build();

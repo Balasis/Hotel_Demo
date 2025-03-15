@@ -39,7 +39,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Reservation get(final Long reservationId) {
-        return reservationRepository.findReservationByIdCompleteFetch(reservationId)
+        return reservationRepository.findByIdCompleteFetch(reservationId)
                 .orElseThrow(
                         () -> new ReservationNotFoundException("No reservation found for ID: "
                                 + reservationId));
@@ -66,7 +66,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
-        return reservationRepository.findReservationByGuestIdCompleteFetch(guestId);
+        return reservationRepository.findByGuestIdCompleteFetch(guestId);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         reservation.setStatus(ReservationStatus.ACTIVE);
         var savedReservation = reservationRepository.save(reservation);
         savedReservation.setPayment(generatePayment(savedReservation,false));
-        return reservationRepository.findReservationByIdCompleteFetch(savedReservation.getId()).orElseThrow(
+        return reservationRepository.findByIdCompleteFetch(savedReservation.getId()).orElseThrow(
                 () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
                         " associated guest and room details after saving."));
     }
@@ -92,13 +92,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void update(final Reservation reservation) {
-        reservation.setPayment(generatePayment(reservation,true));
-        reservation.setStatus(ReservationStatus.ACTIVE);
-        if (reservation.getFeedback() != null){
-            reservation.getFeedback().setReservation(reservation);
-            reservation.getFeedback().setCreatedAt(LocalDateTime.now());
-        }
-        reservationRepository.save(reservation);
+        var savedReservation = reservationRepository.findByIdCompleteFetch(reservation.getId()).orElseThrow(
+                () -> new ReservationNotFoundException("Reservation to update not found")
+        );
+        savedReservation.setRoom(reservation.getRoom());
+        savedReservation.setGuest(reservation.getGuest());
+        savedReservation.setPayment(generatePayment(reservation,true));
     }
 
     @Override

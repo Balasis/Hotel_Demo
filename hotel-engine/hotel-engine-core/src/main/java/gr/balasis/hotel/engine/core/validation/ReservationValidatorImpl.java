@@ -3,9 +3,7 @@ package gr.balasis.hotel.engine.core.validation;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
-import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
 import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
-import gr.balasis.hotel.context.base.exception.notfound.ReservationNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
@@ -29,7 +27,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
     @Override
     public void validateRoomAvailability(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        if (reservationRepository.existsReservationConflict(roomId, checkOutDate, checkInDate)) {
+        if (!reservationRepository.isRoomAvailableOn(roomId, checkOutDate, checkInDate)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
@@ -37,7 +35,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void validateRoomAvailabilityForUpdate(Long roomId, LocalDate checkInDate,
                                                   LocalDate checkOutDate, Long reservationId) {
-        if (reservationRepository.existsReservationConflictExcludeSelf(roomId, checkOutDate, checkInDate, reservationId)) {
+        if (!reservationRepository.isRoomAvailableExcludeSelfOn(roomId, checkOutDate, checkInDate, reservationId)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
