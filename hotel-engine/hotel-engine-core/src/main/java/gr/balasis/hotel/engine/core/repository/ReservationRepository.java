@@ -1,5 +1,7 @@
 package gr.balasis.hotel.engine.core.repository;
 
+import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
+import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
@@ -15,12 +17,38 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("""
+    select case when exists (
+                            select 1
+                            from Reservation r
+                            where r.id= :reservationId and r.guest.id= :guestID
+                            )
+    then true
+    else false
+    end
+    """)
+    boolean reservationBelongsToGuest(Long reservationId,Long guestID);
+
+    @Query("""
     select r
     from Reservation r
-    join fetch r.guest join fetch r.room LEFT join fetch r.feedback join fetch r.payment
+    join fetch r.guest join fetch r.room left join fetch r.feedback join fetch r.payment
     where r.id = :reservationId
     """)
     Optional<Reservation> findReservationByIdCompleteFetch(Long reservationId);
+
+    @Query("""
+    select r.status
+    from Reservation r
+    where r.id = :reservationId
+    """)
+    ReservationStatus getReservationStatus(Long reservationId);
+
+    @Query("""
+    select p.paymentStatus
+    from Payment p
+    where p.reservation.id = :reservationId
+    """)
+    PaymentStatus getReservationPaymentStatus(Long reservationId);
 
     @Query("""
     select f

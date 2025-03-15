@@ -12,7 +12,6 @@ import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 
-import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
@@ -74,7 +73,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.ACTIVE);
         var savedReservation = reservationRepository.save(reservation);
-        savedReservation.setPayment(generatePaymentForCreateReservation(savedReservation,false));
+        savedReservation.setPayment(generatePayment(savedReservation,false));
         return reservationRepository.findReservationByIdCompleteFetch(savedReservation.getId()).orElseThrow(
                 () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
                         " associated guest and room details after saving."));
@@ -92,7 +91,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void update(final Reservation reservation) {
-        reservation.setPayment(generatePaymentForCreateReservation(reservation,true));
+        reservation.setPayment(generatePayment(reservation,true));
         reservation.setStatus(ReservationStatus.ACTIVE);
         if (reservation.getFeedback() != null){
             reservation.getFeedback().setReservation(reservation);
@@ -137,7 +136,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return "Reservation";
     }
 
-    private Payment generatePaymentForCreateReservation(final Reservation reservation,final Boolean paymentExist){
+    private Payment generatePayment(final Reservation reservation, final Boolean paymentExist){
         var payment = (paymentExist)
                 ? reservationRepository.getPaymentByReservationId(reservation.getId()).orElse(new Payment())
                 : new Payment();
@@ -150,8 +149,16 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return payment;
     }
 
+    private void payReservation(final Long reservationId) {
+        var payment = reservationRepository.getPaymentByReservationId(reservationId).orElseThrow(
+                () -> new PaymentNotFoundException("No payment associated with this reservation")
+        );
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentStatus(PaymentStatus.PAID);
+    }
+
     private void cancelReservation(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
+        var reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -163,20 +170,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         }else{
             payment.setPaymentStatus(PaymentStatus.CANCELLED);
         }
-       reservation.setStatus(ReservationStatus.CANCELED);
-       reservationRepository.save(reservation);
-    }
-
-    private void payReservation(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        Payment payment = reservation.getPayment();
-        if (payment == null) {
-            throw new PaymentNotFoundException("No payment associated with this reservation");
-        }
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentStatus(PaymentStatus.PAID);
-        reservationRepository.save(reservation);
+        reservation.setStatus(ReservationStatus.CANCELED);
     }
 
     private Feedback createFeedbackProcess(final Long reservationId,final Feedback feedback){
@@ -186,6 +180,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         feedback.setReservation(reservation);
         feedback.setCreatedAt(LocalDateTime.now());
         reservation.setFeedback(feedback);
-        return reservationRepository.save(reservation).getFeedback();
+        return reservation.getFeedback();
     };
+
 }

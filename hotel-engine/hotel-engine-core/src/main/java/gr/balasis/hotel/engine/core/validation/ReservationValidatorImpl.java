@@ -22,19 +22,14 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
     @Override
     public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
-        Reservation reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-
-        if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
-        }
+      if(!reservationRepository.reservationBelongsToGuest(reservationId,guestId)){
+          throw new UnauthorizedAccessException("Reservation does not exist or doesn't belong to the guest");
+      }
     }
 
     @Override
     public void validateRoomAvailability(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        boolean isRoomReserved = reservationRepository.existsReservationConflict(
-                roomId, checkOutDate, checkInDate);
-        if (isRoomReserved) {
+        if (reservationRepository.existsReservationConflict(roomId, checkOutDate, checkInDate)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
@@ -42,11 +37,17 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void validateRoomAvailabilityForUpdate(Long roomId, LocalDate checkInDate,
                                                   LocalDate checkOutDate, Long reservationId) {
-        boolean isRoomReserved = reservationRepository.existsReservationConflictExcludeSelf(
-                roomId, checkOutDate, checkInDate, reservationId);
-
-        if (isRoomReserved) {
+        if (reservationRepository.existsReservationConflictExcludeSelf(roomId, checkOutDate, checkInDate, reservationId)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
+        }
+    }
+
+    @Override
+    public void reservationFeedbackValidations(Long reservationId, Long guestId) {
+        validateReservationBelongsToGuest(reservationId,guestId);
+        if(reservationRepository.getReservationStatus(reservationId).equals(ReservationStatus.CANCELED)){
+            //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
+            throw new HotelException("Feedback is not allowed to canceled reservations");
         }
     }
 
@@ -57,23 +58,15 @@ public class ReservationValidatorImpl implements ReservationValidator {
                 reservation.getCheckInDate(),
                 reservation.getCheckOutDate()
         );
-
         return reservation;
     }
 
     @Override
     public Reservation validateForUpdate(Reservation reservation) {
-        Reservation savedReservation = reservationRepository.findReservationByIdCompleteFetch(reservation.getId())
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-
-        if (!savedReservation.getGuest().getId().equals(reservation.getGuest().getId())){
-            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
+        validateReservationBelongsToGuest(reservation.getId(),reservation.getGuest().getId());
+        if (reservationRepository.getReservationPaymentStatus(reservation.getId()).equals(PaymentStatus.PAID)){
+            throw new HotelException("Can not update paid reservation");
         }
-
-        if (savedReservation.getPayment().getPaymentStatus() == PaymentStatus.PAID){
-            throw new ReservationConflictException("Can not update an already paid reservation");
-        }
-
         validateRoomAvailabilityForUpdate(
                 reservation.getRoom().getId(),
                 reservation.getCheckInDate(),
@@ -84,19 +77,6 @@ public class ReservationValidatorImpl implements ReservationValidator {
         return reservation;
     }
 
-    @Override
-    public void reservationFeedbackValidations(Long reservationId, Long guestId) {
-        Reservation reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        if (!reservation.getGuest().getId().equals(guestId)){
-            throw new UnauthorizedAccessException("The feedback target reservation('"+reservationId+
-                    "')does not belong to guest('"+guestId+"')");
-        }
-        if(reservation.getStatus().equals(ReservationStatus.CANCELED)){
-        //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
-            throw new HotelException("Feedback is not allowed to canceled reservations");
-        }
 
-    }
 
 }
