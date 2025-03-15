@@ -77,7 +77,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query(value = """
     SELECT
         ro.id AS roomId,
-        COUNT(r.id) AS reservationsPerRoom
+        ro.room_number AS roomNumber,
+        ROUND(AVG(TIMESTAMPDIFF(DAY,r.CHECK_IN_DATE,r.CHECK_OUT_DATE))) AS averageDaysPerReservation,
+        COALESCE(
+                    (select SUM(p1.amount)
+                     from payments p1
+                     inner join reservations r1 on r1.id = p1.reservation_id
+                     where r1.room_id = ro.id and p1.payment_status = 'PAID'
+                     group by ro.id
+                     )
+                     ,0 ) AS incomeSoFar
     FROM reservations r
     INNER JOIN rooms ro ON ro.id = r.room_id
     GROUP BY ro.id

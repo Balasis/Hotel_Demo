@@ -46,7 +46,7 @@ public class DataLoader implements ApplicationRunner {
         loadRooms();
         loadGuests();
         loadReservations();
-//        loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
+        loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedback();
         logger.trace("Profile: dev-includeloader on.");
     }

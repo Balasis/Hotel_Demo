@@ -1,11 +1,19 @@
 package gr.balasis.hotel.engine.core.transfer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
+@JsonPropertyOrder({"ri","rn","adpr","isf"})
 public interface ReservationAnalyticsDTO {
-    @JsonProperty("rpr")
-    Long getReservationsPerRoom();
+    @JsonProperty("ri")
+    Long getRoomId();
+
+    @JsonProperty("rn")
+    String getRoomNumber();
+
+    @JsonProperty("adpr")
+    Long getAverageDaysPerReservation();
+
+    @JsonProperty("isf")
+    Long getIncomeSoFar();
 }
