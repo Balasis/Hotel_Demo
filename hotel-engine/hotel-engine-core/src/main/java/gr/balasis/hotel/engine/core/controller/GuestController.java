@@ -127,7 +127,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final FeedbackResource feedbackResource) {
 
         resourceDataValidator.validateResourceData(feedbackResource);
-        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationValidator.reservationFeedbackValidations(reservationId,guestId);
         return ResponseEntity.ok(feedbackMapper.toResource(
                 reservationService.createFeedback(reservationId, feedbackMapper.toDomain(feedbackResource))
         ));

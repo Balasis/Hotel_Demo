@@ -42,7 +42,7 @@ public class Reservation extends BaseModel {
     @JoinColumn
     private Feedback feedback;
 
-    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation",optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(nullable = false)
     private Payment payment;
 }

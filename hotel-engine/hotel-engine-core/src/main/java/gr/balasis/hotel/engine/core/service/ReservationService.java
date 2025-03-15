@@ -10,10 +10,8 @@ import java.util.List;
 
 public interface ReservationService extends BaseService<Reservation,Long> {
     List<Reservation> findByGuestId(Long id);
-
     void manageReservationAction(Long reservationId, String action);
     Payment getPayment(Long reservationId);
-
     Feedback createFeedback(Long reservationId, Feedback domain);
     Feedback getFeedback(Long reservationId);
     void updateFeedback(Long reservationId, Feedback domain);

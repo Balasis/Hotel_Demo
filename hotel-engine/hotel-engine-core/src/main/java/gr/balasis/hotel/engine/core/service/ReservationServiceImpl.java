@@ -82,26 +82,25 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     @Override
-    public Feedback createFeedback(final Long reservationId, Feedback feedback) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        reservation.setFeedback(feedback);
-        return reservationRepository.save(reservation).getFeedback();
+    public Feedback createFeedback(final Long reservationId,final Feedback feedback) {
+       return createFeedbackProcess(reservationId, feedback);
     }
 
+    @Override
+    public void updateFeedback(final Long reservationId,final Feedback feedback) {
+        createFeedbackProcess(reservationId, feedback);
+    }
 
     @Override
     public void update(final Reservation reservation) {
         reservation.setPayment(generatePaymentForReservation(reservation));
-        reservation.setStatus(ReservationStatus.ACTIVE);
-        reservationRepository.save(reservation);
-    }
 
-    @Override
-    public void updateFeedback(final Long reservationId, Feedback feedback) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        reservation.setFeedback(feedback);
+        reservation.setStatus(ReservationStatus.ACTIVE);
+
+        if (reservation.getFeedback() != null){
+            reservation.getFeedback().setReservation(reservation);
+            reservation.getFeedback().setCreatedAt(LocalDateTime.now());
+        }
         reservationRepository.save(reservation);
     }
 
@@ -142,16 +141,18 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     private Payment generatePaymentForReservation(final Reservation reservation){
-        Payment payment = new Payment();
-        System.out.println("The rooms Id is : " + reservation.getRoom().getId());
-        Room room = roomRepository.findById(
-                reservation.getRoom().getId()).orElseThrow(() -> new RoomNotFoundException("Room doesn't exist"));
+        Payment payment = reservationRepository.getPaymentByReservationId(reservation.getId()).orElse(
+                new Payment()
+        );
+        Room room = roomRepository.getRoomByIdCompleteFetch(reservation.getRoom().getId()).orElseThrow(
+                () -> new RoomNotFoundException("Room doesn't exist"));
         long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
         payment.setAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(days)));
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setReservation(reservation);
         return payment;
     }
+
 
     private void cancelReservation(final Long reservationId) {
         var reservation = reservationRepository.findById(reservationId)
@@ -181,4 +182,14 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         payment.setPaymentStatus(PaymentStatus.PAID);
         reservationRepository.save(reservation);
     }
+
+    private Feedback createFeedbackProcess(final Long reservationId,final Feedback feedback){
+        var reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId).orElseThrow(
+                () -> new ReservationNotFoundException("No reservation found for ID: " + reservationId)
+        );
+        feedback.setReservation(reservation);
+        feedback.setCreatedAt(LocalDateTime.now());
+        reservation.setFeedback(feedback);
+        return reservationRepository.save(reservation).getFeedback();
+    };
 }

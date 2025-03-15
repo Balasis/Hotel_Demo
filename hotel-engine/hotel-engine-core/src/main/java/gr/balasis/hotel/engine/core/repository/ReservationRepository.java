@@ -37,9 +37,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Payment> getPaymentByReservationId(Long reservationId);
 
     @Query("""
+       select case when COUNT(r) > 0 then true else false end
+       from Reservation r
+       where r.room.id = :roomId
+       and r.checkOutDate > :checkInDate
+       and r.checkInDate < :checkOutDate
+       """)
+    boolean existsReservationConflict(Long roomId,LocalDate checkOutDate,LocalDate checkInDate);
+
+    @Query("""
+       select case when COUNT(r) > 0 then true else false end
+       from Reservation r
+       where r.room.id = :roomId
+       and r.checkOutDate > :checkInDate
+       and r.checkInDate < :checkOutDate
+       and r.id != :reservationId
+       """)
+    boolean existsReservationConflictExcludeSelf(Long roomId,LocalDate checkOutDate,LocalDate checkInDate,Long reservationId);
+
+    @Query("""
     select r
     from Reservation r
-    join fetch r.guest g join fetch r.room
+    join fetch r.guest g join fetch r.room join fetch r.feedback join fetch r.payment
     where g.id= :guestId
     """)
     List<Reservation> findReservationByGuestIdCompleteFetch(Long guestId);
@@ -52,4 +71,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfterAndIdNot(Long roomId, LocalDate checkOutDate,
                                                                            LocalDate checkInDate, Long reservationId);
+
+
 }
