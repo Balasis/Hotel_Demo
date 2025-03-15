@@ -82,12 +82,16 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public Feedback createFeedback(final Long reservationId,final Feedback feedback) {
-       return createFeedbackProcess(reservationId, feedback);
+        var savedReservation = reservationRepository.findReservationByIdMinimalFetch(reservationId).orElseThrow(
+                () -> new ReservationNotFoundException("Could not find reservation with id: " + reservationId));
+        savedReservation.setFeedback(feedback);
+        savedReservation.setCreatedAt(LocalDateTime.now());
+       return savedReservation.getFeedback();
     }
 
     @Override
     public void updateFeedback(final Long reservationId,final Feedback feedback) {
-        createFeedbackProcess(reservationId, feedback);
+        reservationRepository.updateFeedback(reservationId,feedback.getMessage(),LocalDateTime.now());
     }
 
     @Override
@@ -97,7 +101,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         );
         savedReservation.setRoom(reservation.getRoom());
         savedReservation.setGuest(reservation.getGuest());
-        savedReservation.setPayment(generatePayment(reservation,true));
+        savedReservation.setPayment(generatePayment(savedReservation,true));
     }
 
     @Override
@@ -112,9 +116,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void deleteFeedback(final Long reservationId) {
-        Reservation reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        reservation.setFeedback(null);
+      reservationRepository.deleteFeedbackByReservationId(reservationId);
     }
 
     @Override
@@ -171,15 +173,5 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         }
         reservation.setStatus(ReservationStatus.CANCELED);
     }
-
-    private Feedback createFeedbackProcess(final Long reservationId,final Feedback feedback){
-        var reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId).orElseThrow(
-                () -> new ReservationNotFoundException("No reservation found for ID: " + reservationId)
-        );
-        feedback.setReservation(reservation);
-        feedback.setCreatedAt(LocalDateTime.now());
-        reservation.setFeedback(feedback);
-        return reservation.getFeedback();
-    };
 
 }

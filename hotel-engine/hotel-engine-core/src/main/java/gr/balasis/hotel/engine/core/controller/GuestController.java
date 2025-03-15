@@ -198,7 +198,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
 
-        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationValidator.checkIfFeedbackCanBeDeleted(reservationId,guestId);
         reservationService.deleteFeedback(reservationId);
         return ResponseEntity.noContent().build();
     }

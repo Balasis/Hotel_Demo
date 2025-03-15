@@ -16,5 +16,7 @@ public interface ReservationValidator {
 
     Reservation validateForUpdate(Reservation reservation);
 
+    void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId);
+
     void reservationFeedbackValidations(Long reservationId, Long guestId);
 }

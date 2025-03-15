@@ -6,15 +6,20 @@ import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+
+
 
     @Query("""
     select case when exists (
@@ -45,7 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
        and r.checkInDate < :checkOutDate
        and r.id != :reservationId
        """)
-    boolean isRoomAvailableExcludeSelfOn(Long roomId, LocalDate checkOutDate, LocalDate checkInDate, Long reservationId);
+    boolean isRoomAvailableExcludeReservationOn(Long roomId, LocalDate checkOutDate, LocalDate checkInDate, Long reservationId);
 
     @Query("""
     select r
@@ -86,12 +91,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     PaymentStatus getReservationPaymentStatus(Long reservationId);
 
-    @Query("""
-    select f
-    from Feedback f
-    where f.reservation.id = :reservationId
-    """)
-    Optional<Feedback> getFeedbackByReservationId(Long reservationId);
 
     @Query("""
     select p
@@ -100,7 +99,37 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     Optional<Payment> getPaymentByReservationId(Long reservationId);
 
+    @Query("""
+    select f
+    from Feedback f
+    where f.reservation.id = :reservationId
+    """)
+    Optional<Feedback> getFeedbackByReservationId(Long reservationId);
 
+    @Query("""
+    select case when exists (
+                        select 1
+                        from Feedback f
+                        where f.reservation.id= :reservationId)
+                        then true
+                        else false
+                        end
+    """)
+    boolean doesFeedbackExist(Long reservationId);
 
+    @Modifying
+    @Query(""" 
+    update Feedback f
+    SET f.message = :message,
+    f.createdAt = :createdAt
+    WHERE f.reservation.id = :reservationId
+    """)
+    void updateFeedback(Long reservationId,String message,LocalDateTime createdAt);
 
+    @Modifying
+    @Query("""
+    delete from Feedback f
+    where f.reservation.id= :reservationId
+    """)
+    void deleteFeedbackByReservationId(Long reservationId);
 }

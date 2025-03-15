@@ -4,6 +4,7 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
+import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
@@ -35,8 +36,16 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void validateRoomAvailabilityForUpdate(Long roomId, LocalDate checkInDate,
                                                   LocalDate checkOutDate, Long reservationId) {
-        if (!reservationRepository.isRoomAvailableExcludeSelfOn(roomId, checkOutDate, checkInDate, reservationId)) {
+        if (!reservationRepository.isRoomAvailableExcludeReservationOn(roomId, checkOutDate, checkInDate, reservationId)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
+        }
+    }
+
+    @Override
+    public void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId){
+        validateReservationBelongsToGuest(reservationId,guestId);
+        if (!reservationRepository.doesFeedbackExist(reservationId)){
+            throw new FeedbackNotFoundException("Theres no feedback to delete for reservation: " + reservationId);
         }
     }
 
