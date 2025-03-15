@@ -39,10 +39,8 @@ public class Reservation extends BaseModel {
     private LocalDate checkOutDate;
 
     @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn
     private Feedback feedback;
 
-    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation",optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(nullable = false)
+    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 }

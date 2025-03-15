@@ -73,12 +73,11 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public Reservation create(final Reservation reservation) {
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.ACTIVE);
-        reservation.setPayment(generatePaymentForReservation(reservation));
-        reservationRepository.save(reservation);
-        return  reservationRepository.findReservationByIdCompleteFetch(reservation.getId()).orElseThrow(
+        var savedReservation = reservationRepository.save(reservation);
+        savedReservation.setPayment(generatePaymentForCreateReservation(savedReservation,false));
+        return reservationRepository.findReservationByIdCompleteFetch(savedReservation.getId()).orElseThrow(
                 () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
-                        " associated guest and room details after saving.")
-        );
+                        " associated guest and room details after saving."));
     }
 
     @Override
@@ -93,10 +92,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void update(final Reservation reservation) {
-        reservation.setPayment(generatePaymentForReservation(reservation));
-
+        reservation.setPayment(generatePaymentForCreateReservation(reservation,true));
         reservation.setStatus(ReservationStatus.ACTIVE);
-
         if (reservation.getFeedback() != null){
             reservation.getFeedback().setReservation(reservation);
             reservation.getFeedback().setCreatedAt(LocalDateTime.now());
@@ -140,11 +137,11 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return "Reservation";
     }
 
-    private Payment generatePaymentForReservation(final Reservation reservation){
-        Payment payment = reservationRepository.getPaymentByReservationId(reservation.getId()).orElse(
-                new Payment()
-        );
-        Room room = roomRepository.getRoomByIdCompleteFetch(reservation.getRoom().getId()).orElseThrow(
+    private Payment generatePaymentForCreateReservation(final Reservation reservation,final Boolean paymentExist){
+        var payment = (paymentExist)
+                ? reservationRepository.getPaymentByReservationId(reservation.getId()).orElse(new Payment())
+                : new Payment();
+        var room = roomRepository.getRoomByIdCompleteFetch(reservation.getRoom().getId()).orElseThrow(
                 () -> new RoomNotFoundException("Room doesn't exist"));
         long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
         payment.setAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(days)));
@@ -152,7 +149,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         payment.setReservation(reservation);
         return payment;
     }
-
 
     private void cancelReservation(final Long reservationId) {
         var reservation = reservationRepository.findById(reservationId)
