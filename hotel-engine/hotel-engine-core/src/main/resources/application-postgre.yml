@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hotel_db
+    driver-class-name: org.postgresql.Driver
+    username: user
+    password: pass
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 2
+      idle-timeout: 500000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

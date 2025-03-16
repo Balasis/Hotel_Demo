@@ -2,8 +2,8 @@ spring:
   datasource:
     url: jdbc:h2:mem:devDB
     driver-class-name: org.h2.Driver
-    username: includeLoaderUser
-    password: includeLoaderPass
+    username: user
+    password: pass
     hikari:
       maximum-pool-size: 4
       minimum-idle: 2

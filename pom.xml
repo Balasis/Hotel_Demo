@@ -29,7 +29,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <spring.profile.from.maven>dev</spring.profile.from.maven>
+        <activeProfile>postgre</activeProfile>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +120,20 @@
                     </configuration>
                 </plugin>
 
+                <plugin>
+                    <groupId>com.livetribe</groupId>
+                    <artifactId>dotenv-maven-plugin</artifactId>
+                    <version>1.0.2</version>
+                    <executions>
+                        <execution>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>load</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -128,6 +142,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
+
         </plugins>
 
         <resources>
@@ -146,19 +161,19 @@
 
     <profiles>
         <profile>
-            <id>dev</id>
+            <id>postgre</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
-                <spring.profile.from.maven>dev</spring.profile.from.maven>
+                <activeProfile>postgre</activeProfile>
             </properties>
         </profile>
 
         <profile>
             <id>h2</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
-                <spring.profile.from.maven>h2</spring.profile.from.maven>
+                <activeProfile>h2</activeProfile>
             </properties>
         </profile>
     </profiles>

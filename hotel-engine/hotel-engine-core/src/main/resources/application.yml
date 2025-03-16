@@ -1,11 +1,11 @@
 spring:
   profiles:
-    active: @spring.profile.from.maven@
+    active: @activeProfile@
   jpa:
     open-in-view: false
-    properties:
-      hibernate:
-        generate_statistics: true
+#    properties:
+#      hibernate:
+#        generate_statistics: true
 
 server:
   port: 3000
@@ -21,10 +21,14 @@ logging:
     root: info
     gr.balasis.hotel.engine.core: trace
     gr.balasis.hotel.engine.monitoring: trace
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql: TRACE
+#    org:
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql: TRACE
 
+
+the:
+  current:
+    profile: @activeProfile@
