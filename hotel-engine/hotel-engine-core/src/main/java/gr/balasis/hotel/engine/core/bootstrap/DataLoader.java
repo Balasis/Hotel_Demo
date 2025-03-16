@@ -97,7 +97,7 @@ public class DataLoader implements ApplicationRunner {
             room.setReserved(true);
             roomService.update(room);
         }
-        logger.trace("Finished loading guests");
+        logger.trace("Finished loading reservations");
     }
 
     private void loadPayments() {

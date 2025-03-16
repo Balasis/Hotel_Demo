@@ -17,7 +17,7 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
-import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationRoomAnalyticsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -46,6 +46,13 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
                                 + reservationId));
     }
 
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<Reservation> findAll(){
+//        System.out.println("reservation find all service");
+//        return reservationRepository.findAllCompleteFetch();
+//    }
+
     @Override
     @Transactional(readOnly = true)
     public Feedback getFeedback(final Long reservationId) {
@@ -67,6 +74,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
+        System.out.println("findByGuestId reservation service");
         return reservationRepository.findByGuestIdCompleteFetch(guestId);
     }
 
@@ -122,8 +130,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
 
     @Override
-    public List<ReservationAnalyticsDTO> getAnalytics(){
-        return reservationRepository.getReservationAnalytics();
+    public List<ReservationRoomAnalyticsDTO> getAnalytics(){
+        return reservationRepository.getReservationRoomAnalytics();
     }
 
 

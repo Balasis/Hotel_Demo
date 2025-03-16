@@ -20,7 +20,7 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
 
     @GetMapping
     public ResponseEntity <List<R>> findAll() {
-
+        System.out.println("BASE controller find all");
         return ResponseEntity.ok(
                 getMapper().toResources(
                         getBaseService().findAll())

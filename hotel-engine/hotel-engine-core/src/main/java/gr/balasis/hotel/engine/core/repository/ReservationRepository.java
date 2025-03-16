@@ -5,8 +5,7 @@ import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
-import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
-import org.springframework.context.annotation.Profile;
+import gr.balasis.hotel.engine.core.transfer.ReservationRoomAnalyticsDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -75,28 +74,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     Optional<Reservation> findReservationByIdMinimalFetch(Long reservationId);
 
-
-    //H2 native
-//    @Query(value = """
-//    SELECT
-//        ro.id AS roomId,
-//        ro.room_number AS roomNumber,
-//        ROUND(AVG(TIMESTAMPDIFF(DAY,r.CHECK_IN_DATE,r.CHECK_OUT_DATE))) AS averageDaysPerReservation,
-//        COALESCE(
-//                    (select SUM(p1.amount)
-//                     from payments p1
-//                     inner join reservations r1 on r1.id = p1.reservation_id
-//                     where r1.room_id = ro.id and p1.payment_status = 'PAID'
-//                     group by ro.id
-//                     )
-//                     ,0 ) AS incomeSoFar
-//    FROM reservations r
-//    INNER JOIN rooms ro ON ro.id = r.room_id
-//    GROUP BY ro.id
-//    """, nativeQuery = true)
-//    List<ReservationAnalyticsDTO> getReservationAnalytics();
-
-
     //postgre native
     @Query(value = """
         select
@@ -117,8 +94,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     inner join rooms ro on ro.id = r.room_id
     group by ro.id;
     """, nativeQuery = true)
-    List<ReservationAnalyticsDTO> getReservationAnalytics();
-
+    List<ReservationRoomAnalyticsDTO> getReservationRoomAnalytics();
 
     @Query("""
     select r.status
@@ -133,7 +109,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where p.reservation.id = :reservationId
     """)
     PaymentStatus getReservationPaymentStatus(Long reservationId);
-
 
     @Query("""
     select p
@@ -175,4 +150,32 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where f.reservation.id= :reservationId
     """)
     void deleteFeedbackByReservationId(Long reservationId);
+
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest join fetch r.room join fetch r.payment join fetch r.feedback
+    """)
+    List<Reservation> findAllCompleteFetch();
+
+    //H2 native
+//    @Query(value = """
+//    SELECT
+//        ro.id AS roomId,
+//        ro.room_number AS roomNumber,
+//        ROUND(AVG(TIMESTAMPDIFF(DAY,r.CHECK_IN_DATE,r.CHECK_OUT_DATE))) AS averageDaysPerReservation,
+//        COALESCE(
+//                    (select SUM(p1.amount)
+//                     from payments p1
+//                     inner join reservations r1 on r1.id = p1.reservation_id
+//                     where r1.room_id = ro.id and p1.payment_status = 'PAID'
+//                     group by ro.id
+//                     )
+//                     ,0 ) AS incomeSoFar
+//    FROM reservations r
+//    INNER JOIN rooms ro ON ro.id = r.room_id
+//    GROUP BY ro.id
+//    """, nativeQuery = true)
+//    List<ReservationAnalyticsDTO> getReservationAnalytics();
+
 }
