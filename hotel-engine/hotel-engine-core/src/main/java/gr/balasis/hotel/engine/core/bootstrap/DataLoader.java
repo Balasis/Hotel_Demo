@@ -37,18 +37,16 @@ public class DataLoader implements ApplicationRunner {
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
     private final MessageSource feedbackMessages;
-    private final MessageSource appInfoMessages;
 
     @Override
     @Transactional
+    @Profile({"h2","postgre"})
     public void run(ApplicationArguments args) {
         loadRooms();
         loadGuests();
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedback();
-        logger.trace("Current profile: " +
-                appInfoMessages.getMessage("app.currentProfile",null,Locale.getDefault()));
     }
 
     private void loadRooms() {

@@ -27,8 +27,3 @@ logging:
 #        type:
 #          descriptor:
 #            sql: TRACE
-
-
-the:
-  current:
-    profile: @activeProfile@

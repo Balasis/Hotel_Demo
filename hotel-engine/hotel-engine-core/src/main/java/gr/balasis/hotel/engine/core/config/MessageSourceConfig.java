@@ -16,11 +16,4 @@ public class MessageSourceConfig {
         return feedbackMessages;
     }
 
-    @Bean
-    public MessageSource appInfoMessages() {
-        var appInfoMessages = new ReloadableResourceBundleMessageSource();
-        appInfoMessages.setBasename("classpath:app-info-messages");
-        appInfoMessages.setDefaultEncoding("UTF-8");
-        return appInfoMessages;
-    }
 }
