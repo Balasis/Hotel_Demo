@@ -2,7 +2,6 @@ package gr.balasis.hotel.engine.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 
 
 @Component
-@Profile("dev-includeloader")
 @AllArgsConstructor
 public class DataLoader implements ApplicationRunner {
     private final GuestService guestService;
@@ -47,7 +45,7 @@ public class DataLoader implements ApplicationRunner {
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedback();
-        logger.trace("Profile: dev-includeloader on.");
+        logger.trace("Profile: h2 profile on.");
     }
 
     private void loadRooms() {
@@ -129,6 +127,7 @@ public class DataLoader implements ApplicationRunner {
                             .build()
                     );
         }
+
         logger.trace("Finished loading feedback");
     }
 

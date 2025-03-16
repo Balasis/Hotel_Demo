@@ -127,7 +127,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final FeedbackResource feedbackResource) {
 
         resourceDataValidator.validateResourceData(feedbackResource);
-        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationValidator.reservationFeedbackValidations(reservationId,guestId);
         return ResponseEntity.ok(feedbackMapper.toResource(
                 reservationService.createFeedback(reservationId, feedbackMapper.toDomain(feedbackResource))
         ));
@@ -156,7 +156,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
         resourceDataValidator.validateResourceData(reservationResource);
         reservationResource.getGuest().setId(guestId);
         reservationResource.setId(reservationId);
-
         var reservation = reservationValidator.validateForUpdate(reservationMapper.toDomain(reservationResource));
         reservationService.update(reservation);
         return ResponseEntity.noContent().build();
@@ -199,7 +198,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @PathVariable final Long reservationId) {
 
-        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
+        reservationValidator.checkIfFeedbackCanBeDeleted(reservationId,guestId);
         reservationService.deleteFeedback(reservationId);
         return ResponseEntity.noContent().build();
     }
