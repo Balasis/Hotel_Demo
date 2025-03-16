@@ -10,6 +10,7 @@ import gr.balasis.hotel.engine.core.service.RoomService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.MessageSource;
@@ -35,7 +36,8 @@ public class DataLoader implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
-    private final MessageSource messageSource;
+    private final MessageSource feedbackMessages;
+    private final MessageSource appInfoMessages;
 
     @Override
     @Transactional
@@ -45,7 +47,8 @@ public class DataLoader implements ApplicationRunner {
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedback();
-        logger.trace("Profile: h2 profile on.");
+        logger.trace("Current profile: " +
+                appInfoMessages.getMessage("app.currentProfile",null,Locale.getDefault()));
     }
 
     private void loadRooms() {
@@ -121,7 +124,7 @@ public class DataLoader implements ApplicationRunner {
                     Feedback.builder()
                             .createdAt(LocalDateTime.now())
                             .reservation(reservation)
-                            .message(messageSource.getMessage(theMessage,
+                            .message(feedbackMessages.getMessage(theMessage,
                                     new Object[]{reservation.getGuest().getFirstName()},
                                     Locale.getDefault()))
                             .build()

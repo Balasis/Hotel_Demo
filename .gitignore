@@ -19,6 +19,7 @@ target/
 *.iml
 *.ipr
 
+
 /*.log
 
 ### NetBeans ###
@@ -33,3 +34,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+*.pid
+postgres-data/
+docker-compose.override.yml
+
+### env ###
+.env
