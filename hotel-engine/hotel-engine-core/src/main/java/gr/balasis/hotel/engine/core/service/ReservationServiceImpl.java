@@ -55,7 +55,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
 
     @Transactional(readOnly = true)
-    public List<Reservation> debugMePLz(){
+    public List<Reservation> findAllHotelReservations(){
         System.out.println("reservation find all service");
         return reservationRepository.findAllCompleteFetch();
     }

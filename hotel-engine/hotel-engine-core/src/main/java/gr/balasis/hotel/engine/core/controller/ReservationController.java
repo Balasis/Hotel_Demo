@@ -28,7 +28,7 @@ public class ReservationController extends BaseController<Reservation, Reservati
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
         System.out.println("reservation controller find all");
-        return ResponseEntity.ok(reservationMapper.toResources(reservationService.debugMePLz()) );
+        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAllHotelReservations()) );
     }
 
     @GetMapping("/analytics")
