@@ -2,6 +2,7 @@ package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.enumeration.ReservationAction;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.dublicate.DublicateException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.notfound.PaymentNotFoundException;
@@ -12,14 +13,16 @@ import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 
-import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
+import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -28,8 +31,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
@@ -37,8 +40,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Reservation get(final Long reservationId) {
-
-        return reservationRepository.findReservationByIdCompleteFetch(reservationId)
+        return reservationRepository.findByIdCompleteFetch(reservationId)
                 .orElseThrow(
                         () -> new ReservationNotFoundException("No reservation found for ID: "
                                 + reservationId));
@@ -47,7 +49,6 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public Feedback getFeedback(final Long reservationId) {
-
         return reservationRepository.getFeedbackByReservationId(reservationId)
                 .orElseThrow(
                         () -> new FeedbackNotFoundException("No feedback found for reservation with ID: "
@@ -66,43 +67,42 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
-        return reservationRepository.findReservationByGuestIdCompleteFetch(guestId);
+        return reservationRepository.findByGuestIdCompleteFetch(guestId);
     }
 
     @Override
     public Reservation create(final Reservation reservation) {
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.ACTIVE);
-        reservation.setPayment(generatePaymentForReservation(reservation));
-        reservationRepository.save(reservation);
-        return  reservationRepository.findReservationByIdCompleteFetch(reservation.getId()).orElseThrow(
+        var savedReservation = reservationRepository.save(reservation);
+        savedReservation.setPayment(generatePayment(savedReservation,false));
+        return reservationRepository.findByIdCompleteFetch(savedReservation.getId()).orElseThrow(
                 () -> new ReservationNotFoundException("Failed to fetch the reservation with" +
-                        " associated guest and room details after saving.")
-        );
+                        " associated guest and room details after saving."));
     }
 
     @Override
-    public Feedback createFeedback(final Long reservationId, Feedback feedback) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        reservation.setFeedback(feedback);
-        return reservationRepository.save(reservation).getFeedback();
+    public Feedback createFeedback(final Long reservationId,final Feedback feedback) {
+        var savedReservation = reservationRepository.findReservationByIdMinimalFetch(reservationId).orElseThrow(
+                () -> new ReservationNotFoundException("Could not find reservation with id: " + reservationId));
+        savedReservation.setFeedback(feedback);
+        savedReservation.setCreatedAt(LocalDateTime.now());
+       return savedReservation.getFeedback();
     }
 
+    @Override
+    public void updateFeedback(final Long reservationId,final Feedback feedback) {
+        reservationRepository.updateFeedback(reservationId,feedback.getMessage(),LocalDateTime.now());
+    }
 
     @Override
     public void update(final Reservation reservation) {
-        reservation.setPayment(generatePaymentForReservation(reservation));
-        reservation.setStatus(ReservationStatus.ACTIVE);
-        reservationRepository.save(reservation);
-    }
-
-    @Override
-    public void updateFeedback(final Long reservationId, Feedback feedback) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        reservation.setFeedback(feedback);
-        reservationRepository.save(reservation);
+        var savedReservation = reservationRepository.findByIdCompleteFetch(reservation.getId()).orElseThrow(
+                () -> new ReservationNotFoundException("Reservation to update not found")
+        );
+        savedReservation.setRoom(reservation.getRoom());
+        savedReservation.setGuest(reservation.getGuest());
+        savedReservation.setPayment(generatePayment(savedReservation,true));
     }
 
     @Override
@@ -117,14 +117,16 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public void deleteFeedback(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        if (reservation.getFeedback() == null){
-            throw new FeedbackNotFoundException("Feedback doesn't exist to be deleted");
-        }
-        reservation.setFeedback(null);
-        reservationRepository.save(reservation);
+      reservationRepository.deleteFeedbackByReservationId(reservationId);
     }
+
+
+    @Override
+    public List<ReservationAnalyticsDTO> getAnalytics(){
+        return reservationRepository.getReservationAnalytics();
+    }
+
+
 
     @Override
     public JpaRepository<Reservation, Long> getRepository() {
@@ -141,11 +143,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return "Reservation";
     }
 
-    private Payment generatePaymentForReservation(final Reservation reservation){
-        Payment payment = new Payment();
-        System.out.println("The rooms Id is : " + reservation.getRoom().getId());
-        Room room = roomRepository.findById(
-                reservation.getRoom().getId()).orElseThrow(() -> new RoomNotFoundException("Room doesn't exist"));
+    private Payment generatePayment(final Reservation reservation, final Boolean paymentExist){
+        var payment = (paymentExist)
+                ? reservationRepository.getPaymentByReservationId(reservation.getId()).orElse(new Payment())
+                : new Payment();
+        var room = roomRepository.getRoomByIdCompleteFetch(reservation.getRoom().getId()).orElseThrow(
+                () -> new RoomNotFoundException("Room doesn't exist"));
         long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
         payment.setAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(days)));
         payment.setPaymentStatus(PaymentStatus.PENDING);
@@ -153,8 +156,19 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return payment;
     }
 
+    private void payReservation(final Long reservationId) {
+        var payment = reservationRepository.getPaymentByReservationId(reservationId).orElseThrow(
+                () -> new PaymentNotFoundException("No payment associated with this reservation")
+        );
+        if (payment.getPaymentStatus().equals(PaymentStatus.PAID)){{
+            throw new HotelException("Reservation is already paid");
+        }}
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentStatus(PaymentStatus.PAID);
+    }
+
     private void cancelReservation(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
+        var reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -166,19 +180,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         }else{
             payment.setPaymentStatus(PaymentStatus.CANCELLED);
         }
-       reservation.setStatus(ReservationStatus.CANCELED);
-       reservationRepository.save(reservation);
+        reservation.setStatus(ReservationStatus.CANCELED);
     }
 
-    private void payReservation(final Long reservationId) {
-        var reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-        Payment payment = reservation.getPayment();
-        if (payment == null) {
-            throw new PaymentNotFoundException("No payment associated with this reservation");
-        }
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentStatus(PaymentStatus.PAID);
-        reservationRepository.save(reservation);
-    }
 }

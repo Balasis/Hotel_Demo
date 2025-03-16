@@ -1,19 +1,17 @@
 package gr.balasis.hotel.engine.core.validation;
 
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
-import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
+import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
+import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
-import gr.balasis.hotel.context.base.exception.notfound.ReservationNotFoundException;
+import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
-import gr.balasis.hotel.context.base.model.Feedback;
-import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -22,49 +20,15 @@ public class ReservationValidatorImpl implements ReservationValidator {
     private final ReservationRepository reservationRepository;
 
     @Override
-    public void validateReservationBelongsToGuest(Long guestId, Reservation reservation) {
-        validateReservationBelongsToGuest(guestId, reservation.getId());
-    }
-
-    @Override
     public void validateReservationBelongsToGuest(Long reservationId, Long guestId) {
-        Reservation reservation = reservationRepository.findReservationByIdCompleteFetch(reservationId)
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-
-        if (!reservation.getGuest().getId().equals(guestId)) {
-            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
-        }
-    }
-
-    @Override
-    public void validateFeedbackBelongsToReservation(Long reservationId, Feedback feedback) {
-        validateFeedbackBelongsToReservation(reservationId, feedback.getId());
-    }
-
-    @Override
-    public void validateFeedbackBelongsToReservation(Long reservationId, Long feedbackId) {
-        if (!reservationRepository.existsByIdAndFeedbackId(reservationId, feedbackId)) {
-            throw new UnauthorizedAccessException("Feedback does not belong to the reservation");
-        }
-    }
-
-    @Override
-    public void validatePaymentBelongsToReservation(Long reservationId, Payment payment) {
-        validatePaymentBelongsToReservation(reservationId, payment.getId());
-    }
-
-    @Override
-    public void validatePaymentBelongsToReservation(Long reservationId, Long paymentId) {
-        if (!reservationRepository.existsByIdAndPaymentId(reservationId, paymentId)) {
-            throw new UnauthorizedAccessException("Payment does not belong to the reservation");
-        }
+      if(!reservationRepository.reservationBelongsToGuest(reservationId,guestId)){
+          throw new UnauthorizedAccessException("Reservation does not exist or doesn't belong to the guest");
+      }
     }
 
     @Override
     public void validateRoomAvailability(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
-        boolean isRoomReserved = reservationRepository.existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfter(
-                roomId, checkOutDate, checkInDate);
-        if (isRoomReserved) {
+        if (!reservationRepository.isRoomAvailableOn(roomId, checkOutDate, checkInDate)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
         }
     }
@@ -72,11 +36,25 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void validateRoomAvailabilityForUpdate(Long roomId, LocalDate checkInDate,
                                                   LocalDate checkOutDate, Long reservationId) {
-        boolean isRoomReserved = reservationRepository.existsByRoomIdAndCheckInDateBeforeAndCheckOutDateAfterAndIdNot(
-                roomId, checkOutDate, checkInDate, reservationId);
-
-        if (isRoomReserved) {
+        if (!reservationRepository.isRoomAvailableExcludeReservationOn(roomId, checkOutDate, checkInDate, reservationId)) {
             throw new RoomAvailabilityConflictException("Room is already reserved during the specified dates");
+        }
+    }
+
+    @Override
+    public void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId){
+        validateReservationBelongsToGuest(reservationId,guestId);
+        if (!reservationRepository.doesFeedbackExist(reservationId)){
+            throw new FeedbackNotFoundException("Theres no feedback to delete for reservation: " + reservationId);
+        }
+    }
+
+    @Override
+    public void reservationFeedbackValidations(Long reservationId, Long guestId) {
+        validateReservationBelongsToGuest(reservationId,guestId);
+        if(reservationRepository.getReservationStatus(reservationId).equals(ReservationStatus.CANCELED)){
+            //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
+            throw new HotelException("Feedback is not allowed to canceled reservations");
         }
     }
 
@@ -87,23 +65,15 @@ public class ReservationValidatorImpl implements ReservationValidator {
                 reservation.getCheckInDate(),
                 reservation.getCheckOutDate()
         );
-
         return reservation;
     }
 
     @Override
     public Reservation validateForUpdate(Reservation reservation) {
-        Reservation savedReservation = reservationRepository.findById(reservation.getId())
-                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
-
-        if (!Objects.equals(savedReservation.getGuest().getId(), reservation.getGuest().getId())){
-            throw new UnauthorizedAccessException("Reservation does not belong to the guest");
+        validateReservationBelongsToGuest(reservation.getId(),reservation.getGuest().getId());
+        if (reservationRepository.getReservationPaymentStatus(reservation.getId()).equals(PaymentStatus.PAID)){
+            throw new HotelException("Can not update paid reservation");
         }
-
-        if (savedReservation.getPayment().getPaymentStatus() == PaymentStatus.PAID){
-            throw new ReservationConflictException("Can not update an already paid reservation");
-        }
-
         validateRoomAvailabilityForUpdate(
                 reservation.getRoom().getId(),
                 reservation.getCheckInDate(),
@@ -113,5 +83,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
         return reservation;
     }
+
+
 
 }

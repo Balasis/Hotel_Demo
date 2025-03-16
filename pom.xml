@@ -153,12 +153,12 @@
         </profile>
 
         <profile>
-            <id>dev-includeloader</id>
+            <id>h2</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profile.from.maven>dev-includeloader</spring.profile.from.maven>
+                <spring.profile.from.maven>h2</spring.profile.from.maven>
             </properties>
         </profile>
     </profiles>

@@ -24,8 +24,4 @@ public class Feedback extends BaseModel {
 
     private LocalDateTime createdAt;
 
-    @PrePersist
-    private void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

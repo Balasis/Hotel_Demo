@@ -8,6 +8,7 @@ import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
+import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,11 @@ public class ReservationController extends BaseController<Reservation, Reservati
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
         return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAll()) );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<List<ReservationAnalyticsDTO>> getAnalytics(){
+        return ResponseEntity.ok(reservationService.getAnalytics());
     }
 
     @Override
