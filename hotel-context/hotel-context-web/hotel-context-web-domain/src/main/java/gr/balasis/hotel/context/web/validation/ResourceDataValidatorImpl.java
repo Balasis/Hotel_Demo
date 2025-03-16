@@ -33,6 +33,11 @@ public class ResourceDataValidatorImpl implements ResourceDataValidator {
         if (!isValidEmail(guestResource.getEmail())) {
             throw new InvalidGuestResourceException("Invalid email format");
         }
+
+        if (guestResource.getBirthDate() == null) {
+            throw new InvalidGuestResourceException("Birth date cannot be null");
+        }
+
     }
 
     @Override

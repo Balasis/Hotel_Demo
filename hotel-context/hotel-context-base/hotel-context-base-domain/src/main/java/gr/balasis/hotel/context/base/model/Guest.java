@@ -30,4 +30,5 @@ public class Guest extends BaseModel {
 
     private LocalDate createdAt;
 
+    private LocalDate birthDate;
 }

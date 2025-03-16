@@ -3,7 +3,7 @@ package gr.balasis.hotel.engine.core.service;
 import gr.balasis.hotel.context.base.enumeration.ReservationAction;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
-import gr.balasis.hotel.context.base.exception.dublicate.DublicateException;
+import gr.balasis.hotel.context.base.exception.dublicate.DuplicateException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.notfound.PaymentNotFoundException;
 import gr.balasis.hotel.context.base.exception.notfound.ReservationNotFoundException;
@@ -17,7 +17,8 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
-import gr.balasis.hotel.engine.core.transfer.ReservationRoomAnalyticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -49,14 +50,12 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> findByGuestId(final Long guestId) {
-        System.out.println("findByGuestId reservation service");
         return reservationRepository.findByGuestIdCompleteFetch(guestId);
     }
 
 
     @Transactional(readOnly = true)
     public List<Reservation> findAllHotelReservations(){
-        System.out.println("reservation find all service");
         return reservationRepository.findAllCompleteFetch();
     }
 
@@ -93,7 +92,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
 
     @Override
     public Feedback createFeedback(final Long reservationId,final Feedback feedback) {
-        var savedReservation = reservationRepository.findReservationByIdMinimalFetch(reservationId).orElseThrow(
+        var savedReservation = reservationRepository.findByIdMinimalFetch(reservationId).orElseThrow(
                 () -> new ReservationNotFoundException("Could not find reservation with id: " + reservationId));
         savedReservation.setFeedback(feedback);
         savedReservation.setCreatedAt(LocalDateTime.now());
@@ -130,13 +129,15 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
       reservationRepository.deleteFeedbackByReservationId(reservationId);
     }
 
-
     @Override
-    public List<ReservationRoomAnalyticsDTO> getAnalytics(){
-        return reservationRepository.getReservationRoomAnalytics();
+    public List<ReservationGuestStatisticsDTO> findGuestStatistics(){
+        return reservationRepository.findReservationGuestStatistics();
     }
 
-
+    @Override
+    public List<ReservationRoomStatisticsDTO> findRoomStatistics(){
+        return reservationRepository.findReservationRoomStatistics();
+    }
 
     @Override
     public JpaRepository<Reservation, Long> getRepository() {
@@ -178,11 +179,11 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     private void cancelReservation(final Long reservationId) {
-        var reservation = reservationRepository.findReservationByIdMinimalFetch(reservationId)
+        var reservation = reservationRepository.findByIdMinimalFetch(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Reservation not found"));
 
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
-            throw new DublicateException("Reservation is already canceled");
+            throw new DuplicateException("Reservation is already canceled");
         }
         var payment = reservation.getPayment();
         if (payment.getPaymentStatus() == PaymentStatus.PAID){

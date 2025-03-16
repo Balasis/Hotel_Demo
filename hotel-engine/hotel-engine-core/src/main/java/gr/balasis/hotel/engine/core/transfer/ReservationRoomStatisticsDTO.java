@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"ri","rn","adpr","isf"})
-public interface ReservationRoomAnalyticsDTO {
+public interface ReservationRoomStatisticsDTO {
     @JsonProperty("ri")
     Long getRoomId();
 

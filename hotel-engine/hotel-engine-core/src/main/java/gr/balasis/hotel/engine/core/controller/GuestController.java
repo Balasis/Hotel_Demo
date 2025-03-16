@@ -87,7 +87,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     @GetMapping("/{guestId}/reservations")
     public ResponseEntity<List<ReservationResource>> findReservations(
             @PathVariable final Long guestId) {
-        System.out.println("guest controller get reservation");
         return ResponseEntity.ok(reservationMapper.toResources(
                 reservationService.findByGuestId(guestId)
         ));

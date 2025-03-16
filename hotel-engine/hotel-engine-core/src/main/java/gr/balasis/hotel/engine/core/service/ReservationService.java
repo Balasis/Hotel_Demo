@@ -5,7 +5,8 @@ import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.service.BaseService;
-import gr.balasis.hotel.engine.core.transfer.ReservationRoomAnalyticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 
 import java.util.List;
 
@@ -19,5 +20,6 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     void updateFeedback(Long reservationId, Feedback domain);
     void deleteFeedback(Long reservationId);
 
-    List<ReservationRoomAnalyticsDTO> getAnalytics();
+    List<ReservationRoomStatisticsDTO> findRoomStatistics();
+    List<ReservationGuestStatisticsDTO> findGuestStatistics();
 }

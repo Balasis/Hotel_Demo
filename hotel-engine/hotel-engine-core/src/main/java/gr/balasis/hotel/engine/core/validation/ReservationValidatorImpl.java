@@ -4,6 +4,8 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
+import gr.balasis.hotel.context.base.exception.corrupted.CorruptedFeedbackModelException;
+import gr.balasis.hotel.context.base.exception.corrupted.CorruptedReservationModelException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import gr.balasis.hotel.context.base.model.Reservation;
@@ -52,7 +54,10 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public void reservationFeedbackValidations(Long reservationId, Long guestId) {
         validateReservationBelongsToGuest(reservationId,guestId);
-        if(reservationRepository.getReservationStatus(reservationId).equals(ReservationStatus.CANCELED)){
+        var reservationStatus = reservationRepository.getReservationStatus(reservationId).orElseThrow(
+                () -> new CorruptedReservationModelException("Reservation status could not be found (corrupted data)")
+        );
+        if(reservationStatus.equals(ReservationStatus.CANCELED)){
             //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
             throw new HotelException("Feedback is not allowed to canceled reservations");
         }
