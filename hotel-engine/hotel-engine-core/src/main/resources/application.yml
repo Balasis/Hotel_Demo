@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: @spring.profile.from.maven@
+    active: @activeProfile@
   jpa:
     open-in-view: false
 #    properties:
@@ -31,4 +31,4 @@ logging:
 
 the:
   current:
-    profile: @spring.profile.from.maven@
+    profile: @activeProfile@
