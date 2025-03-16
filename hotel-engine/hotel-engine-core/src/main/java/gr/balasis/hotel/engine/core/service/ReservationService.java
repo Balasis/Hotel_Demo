@@ -10,6 +10,7 @@ import gr.balasis.hotel.engine.core.transfer.ReservationRoomAnalyticsDTO;
 import java.util.List;
 
 public interface ReservationService extends BaseService<Reservation,Long> {
+    List<Reservation> debugMePLz();
     List<Reservation> findByGuestId(Long id);
     void manageReservationAction(Long reservationId, String action);
     Payment getPayment(Long reservationId);

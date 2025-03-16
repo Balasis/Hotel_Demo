@@ -46,12 +46,19 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
                                 + reservationId));
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<Reservation> findAll(){
-//        System.out.println("reservation find all service");
-//        return reservationRepository.findAllCompleteFetch();
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reservation> findByGuestId(final Long guestId) {
+        System.out.println("findByGuestId reservation service");
+        return reservationRepository.findByGuestIdCompleteFetch(guestId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<Reservation> debugMePLz(){
+        System.out.println("reservation find all service");
+        return reservationRepository.findAllCompleteFetch();
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -71,12 +78,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
                                 + reservationId));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Reservation> findByGuestId(final Long guestId) {
-        System.out.println("findByGuestId reservation service");
-        return reservationRepository.findByGuestIdCompleteFetch(guestId);
-    }
+
 
     @Override
     public Reservation create(final Reservation reservation) {

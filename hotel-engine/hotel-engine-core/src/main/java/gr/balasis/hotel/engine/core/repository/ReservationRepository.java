@@ -50,13 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
        """)
     boolean isRoomAvailableExcludeReservationOn(Long roomId, LocalDate checkOutDate, LocalDate checkInDate, Long reservationId);
 
-    @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest join fetch r.room left join fetch r.feedback join fetch r.payment
-    where r.id = :reservationId
-    """)
-    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
+
 
     @Query("""
     select r
@@ -157,6 +151,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     join fetch r.guest join fetch r.room join fetch r.payment join fetch r.feedback
     """)
     List<Reservation> findAllCompleteFetch();
+
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest join fetch r.room left join fetch r.feedback join fetch r.payment
+    where r.id = :reservationId
+    """)
+    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     //H2 native
 //    @Query(value = """
