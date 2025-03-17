@@ -5,6 +5,7 @@ import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
+import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,17 @@ import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+    @Query("""
+        select new gr.balasis.hotel.engine.core.transfer.KeyValue('averageFeedback', AVG(avgResult.totalCount))
+        from (
+            select count(r.id) as totalCount
+            from Reservation r
+            where r.feedback is not null
+            group by r.id
+        ) avgResult
+    """)
+    KeyValue<String, Float> getAvgPercentageRateOfFeedback();
 
     @Query("""
     select case when exists (
@@ -65,12 +77,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
     select r
     from Reservation r
-    join fetch r.guest g join fetch r.room join fetch r.feedback join fetch r.payment
+    join fetch r.guest g join fetch r.room left join fetch r.feedback left join fetch r.payment
     where g.id= :guestId
     """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
-
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
+    where r.id = :reservationId
+    """)
+    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     //postgre
     @Query(value = """
@@ -121,7 +139,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
     select r
     from Reservation r
-    join fetch r.guest join fetch r.room join fetch r.payment join fetch r.feedback
+    join fetch r.guest join fetch r.room left join fetch r.payment left join fetch r.feedback
     """)
     List<Reservation> findAllCompleteFetch();
 
@@ -161,14 +179,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     Optional<Feedback> getFeedbackByReservationId(Long reservationId);
 
-    @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest join fetch r.room left join fetch r.feedback join fetch r.payment
-    where r.id = :reservationId
-    """)
-    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
-
     @Modifying
     @Query(""" 
     update Feedback f
@@ -184,6 +194,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where f.reservation.id= :reservationId
     """)
     void deleteFeedbackByReservationId(Long reservationId);
+
+
+
 
     //H2
 //    @Query(value = """

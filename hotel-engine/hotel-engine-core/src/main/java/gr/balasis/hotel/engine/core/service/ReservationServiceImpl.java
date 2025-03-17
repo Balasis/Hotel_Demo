@@ -17,6 +17,7 @@ import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
+import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor //Isolation.READ_COMMITTED would prevent me from seeing create results;removed for now
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+@RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
@@ -53,9 +54,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         return reservationRepository.findByGuestIdCompleteFetch(guestId);
     }
 
-
     @Transactional(readOnly = true)
-    public List<Reservation> findAllHotelReservations(){
+    public List<Reservation> findAll(){
         return reservationRepository.findAllCompleteFetch();
     }
 
@@ -137,6 +137,11 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Override
     public List<ReservationRoomStatisticsDTO> findRoomStatistics(){
         return reservationRepository.findReservationRoomStatistics();
+    }
+
+    @Override
+    public KeyValue<String, Float> getAvgPercentageRateOfFeedback() {
+        return reservationRepository.getAvgPercentageRateOfFeedback();
     }
 
     @Override

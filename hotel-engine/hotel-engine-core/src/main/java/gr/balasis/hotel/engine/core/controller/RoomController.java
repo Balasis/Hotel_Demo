@@ -1,5 +1,6 @@
 package gr.balasis.hotel.engine.core.controller;
 
+import gr.balasis.hotel.context.base.enumeration.BedType;
 import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.controller.BaseController;
@@ -9,6 +10,9 @@ import gr.balasis.hotel.context.web.validation.RoomResourceValidator;
 import gr.balasis.hotel.engine.core.mapper.RoomMapper;
 import gr.balasis.hotel.engine.core.service.RoomService;
 import gr.balasis.hotel.engine.core.validation.RoomValidator;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +33,11 @@ public class RoomController extends BaseController<Room, RoomResource> {
     @GetMapping()
     public ResponseEntity<List<RoomResource>> findAll(
             @RequestParam(required = false) String roomNumber,
-            @RequestParam(required = false) BigDecimal pricePerNight) {
+            @RequestParam(required = false) BigDecimal pricePerNight,
+            @RequestParam(required = false) String bedType,
+            @RequestParam(required = false) Integer floor) {
 
-        List<Room> rooms = roomService.searchBy(roomNumber, pricePerNight);
+        List<Room> rooms = roomService.searchBy(roomNumber, pricePerNight,bedType,floor);
         return ResponseEntity.ok(roomMapper.toResources(rooms));
     }
 

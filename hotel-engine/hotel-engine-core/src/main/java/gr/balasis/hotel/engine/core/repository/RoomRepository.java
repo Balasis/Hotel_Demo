@@ -16,8 +16,10 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         SELECT r FROM Room r
         WHERE (LOWER(r.roomNumber) = LOWER(:roomNumber) OR :roomNumber IS NULL)
         AND (r.pricePerNight = :pricePerNight OR :pricePerNight IS NULL)
+        AND (LOWER(r.bedType) = LOWER(:bedType) OR :bedType IS NULL)
+        AND (r.floor = :floor OR :floor IS NULL)
     """)
-    List<Room> searchBy(String roomNumber, BigDecimal pricePerNight);
+    List<Room> searchBy(String roomNumber, BigDecimal pricePerNight,String bedType,Integer floor);
 
     @Query("""
        select case when COUNT(r) > 0 then true else false end

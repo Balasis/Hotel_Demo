@@ -16,8 +16,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.Locale;
 import java.math.BigDecimal;
@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-
 @Component
 @AllArgsConstructor
+@Profile({"h2", "postgre"})
 public class DataLoader implements ApplicationRunner {
     private final GuestService guestService;
     private final RoomService roomService;
@@ -39,13 +39,11 @@ public class DataLoader implements ApplicationRunner {
     private final MessageSource feedbackMessages;
 
     @Override
-    @Transactional
-    @Profile({"h2","postgre"})
     public void run(ApplicationArguments args) {
         loadRooms();
         loadGuests();
         loadReservations();
-        loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
+        loadPayments(); // Payments are created when reservations are made; this just marks some as paid.
         loadFeedback();
     }
 
@@ -56,8 +54,8 @@ public class DataLoader implements ApplicationRunner {
                     Room.builder()
                             .roomNumber("10" + (i + 1))
                             .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
-                            .bedType(  (random.nextBoolean()) ?  BedType.SINGLE : BedType.DOUBLE )
-                            .floor(new Random().nextInt(1,4))
+                            .bedType(random.nextBoolean() ? BedType.SINGLE : BedType.DOUBLE)
+                            .floor(random.nextInt(1, 4))
                             .build()
             );
         }
@@ -73,9 +71,7 @@ public class DataLoader implements ApplicationRunner {
                             .lastName(lorem.getLastName())
                             .email(lorem.getEmail())
                             .createdAt(LocalDate.now())
-                            .birthDate(
-                                    LocalDate.now().minusYears(20 + new Random().nextInt(41))
-                            )
+                            .birthDate(LocalDate.now().minusYears(20 + random.nextInt(41)))
                             .build()
             );
         }
@@ -84,8 +80,8 @@ public class DataLoader implements ApplicationRunner {
 
     private void loadReservations() {
         logger.trace("Loading reservations...");
-        List<Guest> guests = guestService.findAll();
-        List<Room> rooms = roomService.findAll();
+        List<Guest> guests = guestService.searchBy(null, null, null, null);
+        List<Room> rooms = roomService.searchBy(null, null, null, null);
 
         if (guests.isEmpty() || rooms.isEmpty()) {
             logger.trace("Skipping reservations: No guests or rooms.");
@@ -95,38 +91,49 @@ public class DataLoader implements ApplicationRunner {
         for (int i = 0; i < 5; i++) {
             if (guests.isEmpty() || rooms.isEmpty()) return;
 
-            try{
-            reservationService.create(createReservation(guests.removeFirst(), rooms.removeFirst()));
-                }catch (Exception e){
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            try {
+                createReservationTransactional(guests.removeFirst(), rooms.removeFirst());
+            } catch (Exception e) {
+                logger.error("Failed to create reservation: " + e.getMessage());
             }
         }
         logger.trace("Finished loading reservations");
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createReservationTransactional(Guest guest, Room room) {
+        reservationService.create(createReservation(guest, room));
+    }
+
     private void loadPayments() {
         logger.trace("Loading payments...");
         List<Reservation> reservations = reservationService.findAll();
+
         for (Reservation reservation : reservations) {
-            try{
+            try {
                 if (random.nextBoolean()) {
-                    reservationService.manageReservationAction(reservation.getId(),"Pay");
+                    markPaymentAsCompleted(reservation.getId());
                 }
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-                //caught the exception, but still rollback the transaction <- this was googled ...makes sense though
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            } catch (Exception e) {
+                logger.error("Failed to mark payment as completed: " + e.getMessage());
             }
         }
         logger.trace("Finished loading payments");
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markPaymentAsCompleted(Long reservationId) {
+        reservationService.manageReservationAction(reservationId, "Pay");
+    }
+
     private void loadFeedback() {
         logger.trace("Loading feedback...");
         List<Reservation> reservations = reservationService.findAll();
+
         for (Reservation reservation : reservations) {
             int messageNumber = random.nextInt(10) + 1;
             String theMessage = "feedback.message" + messageNumber;
+
             reservationService.createFeedback(
                     reservation.getId(),
                     Feedback.builder()
@@ -136,9 +143,8 @@ public class DataLoader implements ApplicationRunner {
                                     new Object[]{reservation.getGuest().getFirstName()},
                                     Locale.getDefault()))
                             .build()
-                    );
+            );
         }
-
         logger.trace("Finished loading feedback");
     }
 
