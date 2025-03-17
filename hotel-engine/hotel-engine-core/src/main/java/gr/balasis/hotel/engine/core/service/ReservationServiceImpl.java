@@ -166,7 +166,9 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         var room = roomRepository.getRoomByIdCompleteFetch(reservation.getRoom().getId()).orElseThrow(
                 () -> new RoomNotFoundException("Room doesn't exist"));
         long days = ChronoUnit.DAYS.between(reservation.getCheckInDate(), reservation.getCheckOutDate());
+        reservation.setRoom(room);
         payment.setAmount(room.getPricePerNight().multiply(BigDecimal.valueOf(days)));
+        payment.setAmount(BigDecimal.valueOf(100L));
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setReservation(reservation);
         return payment;
