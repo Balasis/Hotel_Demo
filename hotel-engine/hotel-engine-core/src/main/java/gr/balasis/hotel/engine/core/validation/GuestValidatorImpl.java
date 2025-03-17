@@ -34,8 +34,14 @@ public class GuestValidatorImpl implements GuestValidator {
 
     @Override
     public void validateBirthDate(LocalDate birthDate){
-        if (birthDate.isAfter(LocalDate.now())) {
+        LocalDate today = LocalDate.now();
+
+        if (birthDate.isAfter(today)) {
             throw new HotelException("Birth date cannot be in the future");
+        }
+
+        if (birthDate.isAfter(today.minusYears(18))) {
+            throw new HotelException("Guest must be at least 18 years old");
         }
     }
 

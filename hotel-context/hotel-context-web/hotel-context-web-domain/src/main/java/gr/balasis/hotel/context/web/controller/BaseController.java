@@ -38,6 +38,7 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
     public ResponseEntity<R> create(
             @RequestBody @Valid final R resource) {
 
+        resource.setId(null);
         return ResponseEntity.ok(
                 getMapper().toResource(
                         getBaseService().create(getMapper().toDomain(resource)))
@@ -49,6 +50,7 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
             @PathVariable Long id,
             @RequestBody @Valid final R resource) {
 
+        resource.setId(id);
         T domainObject = getMapper().toDomain(resource);
         domainObject.setId(id);
         getBaseService().update(domainObject);

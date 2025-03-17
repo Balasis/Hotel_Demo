@@ -97,6 +97,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     public ResponseEntity<GuestResource> create(
             @RequestBody final GuestResource guestResource) {
 
+        guestResource.setId(null);
         resourceDataValidator.validateResourceData(guestResource);
         var guest = guestValidator.validate(guestMapper.toDomain(guestResource));
         return ResponseEntity.ok(
@@ -110,8 +111,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @RequestBody final ReservationResource reservationResource) {
 
-        resourceDataValidator.validateResourceData(reservationResource);
+        reservationResource.setId(null);
         reservationResource.getGuest().setId(guestId);
+        resourceDataValidator.validateResourceData(reservationResource);
         var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
         return ResponseEntity.ok(
                 reservationMapper.toResource(
@@ -125,6 +127,7 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long reservationId,
             @RequestBody final FeedbackResource feedbackResource) {
 
+        feedbackResource.setId(null);
         resourceDataValidator.validateResourceData(feedbackResource);
         reservationValidator.reservationFeedbackValidations(reservationId,guestId);
         return ResponseEntity.ok(feedbackMapper.toResource(
@@ -139,8 +142,8 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @RequestBody final GuestResource guestResource) {
 
-        resourceDataValidator.validateResourceData(guestResource);
         guestResource.setId(guestId);
+        resourceDataValidator.validateResourceData(guestResource);
         var guest = guestValidator.validate(getMapper().toDomain(guestResource));
         guestService.update(guest);
         return ResponseEntity.noContent().build();
@@ -152,9 +155,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long reservationId,
             @RequestBody final ReservationResource reservationResource) {
 
-        resourceDataValidator.validateResourceData(reservationResource);
         reservationResource.getGuest().setId(guestId);
         reservationResource.setId(reservationId);
+        resourceDataValidator.validateResourceData(reservationResource);
         var reservation = reservationValidator.validateForUpdate(reservationMapper.toDomain(reservationResource));
         reservationService.update(reservation);
         return ResponseEntity.noContent().build();

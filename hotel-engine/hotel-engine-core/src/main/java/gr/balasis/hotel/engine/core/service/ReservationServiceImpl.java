@@ -32,8 +32,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+@RequiredArgsConstructor //Isolation.READ_COMMITTED would prevent me from seeing create results;removed for now
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ReservationServiceImpl extends BasicServiceImpl<Reservation, ReservationNotFoundException> implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;

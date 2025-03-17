@@ -65,6 +65,10 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
     @Override
     public Reservation validate(Reservation reservation) {
+        if (reservation.getPayment() != null) {
+            throw new HotelException("Payment should not be sent since its been exclusively generated server side.");
+        }
+
         validateRoomAvailability(
                 reservation.getRoom().getId(),
                 reservation.getCheckInDate(),
