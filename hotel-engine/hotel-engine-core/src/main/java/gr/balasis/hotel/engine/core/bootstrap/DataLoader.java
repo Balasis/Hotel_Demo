@@ -107,7 +107,7 @@ public class DataLoader implements ApplicationRunner {
 
     private void loadPayments() {
         logger.trace("Loading payments...");
-        List<Reservation> reservations = reservationService.findAllHotelReservations();
+        List<Reservation> reservations = reservationService.findAll();
 
         for (Reservation reservation : reservations) {
             try {
@@ -128,7 +128,7 @@ public class DataLoader implements ApplicationRunner {
 
     private void loadFeedback() {
         logger.trace("Loading feedback...");
-        List<Reservation> reservations = reservationService.findAllHotelReservations();
+        List<Reservation> reservations = reservationService.findAll();
 
         for (Reservation reservation : reservations) {
             int messageNumber = random.nextInt(10) + 1;

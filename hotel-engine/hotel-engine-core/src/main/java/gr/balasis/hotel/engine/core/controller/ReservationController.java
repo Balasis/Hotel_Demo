@@ -28,7 +28,7 @@ public class ReservationController extends BaseController<Reservation, Reservati
 
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
-        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAllHotelReservations()) );
+        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAll()) );
     }
 
     @GetMapping(headers = "action=reservationRoomStatisticsDTO")

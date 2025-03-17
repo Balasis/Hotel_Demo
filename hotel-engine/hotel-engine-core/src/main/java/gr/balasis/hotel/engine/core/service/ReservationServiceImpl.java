@@ -55,7 +55,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> findAllHotelReservations(){
+    public List<Reservation> findAll(){
         return reservationRepository.findAllCompleteFetch();
     }
 
