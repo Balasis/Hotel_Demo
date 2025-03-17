@@ -8,10 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl extends BasicServiceImpl<Room, RoomNotFoundException> implements RoomService {
     private final RoomRepository roomRepository;
+
+    @Override
+    public List<Room> searchBy(String roomNumber, BigDecimal pricePerNight) {
+        return roomRepository.searchBy(roomNumber, pricePerNight);
+    }
 
     @Override
     public JpaRepository<Room, Long> getRepository() {
