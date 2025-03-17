@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.web.validation.exception;
+package gr.balasis.hotel.context.web.exception;
 
 public class InvalidGuestResourceException extends InvalidResourceException {
     public InvalidGuestResourceException(String message) {
