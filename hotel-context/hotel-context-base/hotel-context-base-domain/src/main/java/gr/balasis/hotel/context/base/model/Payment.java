@@ -16,7 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "payments")
+@Table(name = "payments" ,indexes = {
+        @Index(name = "index_payment_reservation",columnList = "reservation_id"),
+        @Index(name = "index_payment_paymentStatus",columnList = "payment_status")
+})
 public class Payment extends BaseModel {
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, optional = false)
