@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")
@@ -23,6 +26,16 @@ public class RoomController extends BaseController<Room, RoomResource> {
     private final ResourceDataValidator resourceDataValidator;
     private final RoomMapper roomMapper;
 
+
+    @GetMapping()
+    public ResponseEntity<List<RoomResource>> findAll(
+            @RequestParam(required = false) String roomNumber,
+            @RequestParam(required = false) BigDecimal pricePerNight) {
+
+        List<Room> rooms = roomService.searchBy(roomNumber, pricePerNight);
+        return ResponseEntity.ok(roomMapper.toResources(rooms));
+    }
+
     @Override
     @PostMapping
     public ResponseEntity<RoomResource> create(
@@ -31,7 +44,6 @@ public class RoomController extends BaseController<Room, RoomResource> {
         roomResource.setId(null);
         resourceDataValidator.validateResourceData(roomResource);
         Room room = roomValidator.validate(roomMapper.toDomain(roomResource));
-        System.out.println("pass through here 2");
         return ResponseEntity.ok(
                 roomMapper.toResource(
                         roomService.create(room))

@@ -8,10 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestNotFoundException> implements GuestService {
     private final GuestRepository guestRepository;
+
+    @Override
+    public List<Guest> searchBy(String email, String firstName, String lastName, LocalDate birthDate) {
+        return guestRepository.searchBy(email, firstName, lastName, birthDate);
+    }
 
     @Override
     public JpaRepository<Guest, Long> getRepository() {

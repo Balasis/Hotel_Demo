@@ -70,15 +70,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
+
+
     //postgre
     @Query(value = """
         select
         ro.id as roomId,
         ro.room_number as roomNumber,
-        ROUND(AVG(r.CHECK_OUT_DATE - r.CHECK_IN_DATE)) AS averageDaysPerReservation,
-        COALESCE(
+        round(avg(r.CHECK_OUT_DATE - r.CHECK_IN_DATE)) AS averageDaysPerReservation,
+        coalesce(
             (
-                select SUM(p1.amount)
+                select sum(p1.amount)
                 from payments p1
                 inner join reservations r1 on r1.id = p1.reservation_id
                 where r1.room_id = ro.id and p1.payment_status = 'PAID'
@@ -98,10 +100,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         select
         g.id as guestId,
         count(r.id) as totalReservations,
-        ROUND(AVG(r.check_out_date - r.check_in_date)) as avgStayDuration,
-        COALESCE(
+        round(avg(r.check_out_date - r.check_in_date)) as avgStayDuration,
+        coalesce(
             (
-                select SUM(p.amount)
+                select sum(p.amount)
                 from payments p
                 inner join reservations r1 on r1.id = p.reservation_id
                 where r1.guest_id = g.id and p.payment_status = 'PAID'
