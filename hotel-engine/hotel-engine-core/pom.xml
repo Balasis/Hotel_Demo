@@ -82,7 +82,7 @@
             </plugin>
 
         </plugins>
-
+        <finalName>hotel-demo</finalName>
 
     </build>
 

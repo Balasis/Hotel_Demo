@@ -10,13 +10,13 @@ import gr.balasis.hotel.engine.core.service.RoomService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.Locale;
 import java.math.BigDecimal;
@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 
 @Component
@@ -37,18 +36,16 @@ public class DataLoader implements ApplicationRunner {
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
     private final MessageSource feedbackMessages;
-    private final MessageSource appInfoMessages;
 
     @Override
     @Transactional
+    @Profile({"h2","postgre"})
     public void run(ApplicationArguments args) {
         loadRooms();
         loadGuests();
         loadReservations();
         loadPayments();//payments been created when reservations do. loadPayments() only set some as paid.
         loadFeedback();
-        logger.trace("Current profile: " +
-                appInfoMessages.getMessage("app.currentProfile",null,Locale.getDefault()));
     }
 
     private void loadRooms() {
@@ -57,7 +54,6 @@ public class DataLoader implements ApplicationRunner {
             roomService.create(
                     Room.builder()
                             .roomNumber("10" + (i + 1))
-                            .reserved(false)
                             .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
                             .build()
             );
@@ -74,6 +70,9 @@ public class DataLoader implements ApplicationRunner {
                             .lastName(lorem.getLastName())
                             .email(lorem.getEmail())
                             .createdAt(LocalDate.now())
+                            .birthDate(
+                                    LocalDate.now().minusYears(20 + new Random().nextInt(41))
+                            )
                             .build()
             );
         }
@@ -83,32 +82,38 @@ public class DataLoader implements ApplicationRunner {
     private void loadReservations() {
         logger.trace("Loading reservations...");
         List<Guest> guests = guestService.findAll();
-        List<Room> availableRooms = roomService.findAll().stream()
-                .filter(room -> !room.isReserved())
-                .collect(Collectors.toList());
+        List<Room> rooms = roomService.findAll();
 
-        if (guests.isEmpty() || availableRooms.isEmpty()) {
-            logger.trace("Skipping reservations: No guests or available rooms.");
+        if (guests.isEmpty() || rooms.isEmpty()) {
+            logger.trace("Skipping reservations: No guests or rooms.");
             return;
         }
 
         for (int i = 0; i < 5; i++) {
-            if (guests.isEmpty() || availableRooms.isEmpty()) return;
-            Room room = pickRandomRoom(availableRooms);
-            reservationService.create(createReservation(pickRandomGuest(guests), room));
-            room.setReserved(true);
-            roomService.update(room);
+            if (guests.isEmpty() || rooms.isEmpty()) return;
+
+            try{
+            reservationService.create(createReservation(guests.removeFirst(), rooms.removeFirst()));
+                }catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            }
         }
-        logger.trace("Finished loading guests");
+        logger.trace("Finished loading reservations");
     }
 
     private void loadPayments() {
         logger.trace("Loading payments...");
         List<Reservation> reservations = reservationService.findAll();
         for (Reservation reservation : reservations) {
+            try{
                 if (random.nextBoolean()) {
                     reservationService.manageReservationAction(reservation.getId(),"Pay");
                 }
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+                //caught the exception, but still rollback the transaction <- this was googled ...makes sense though
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            }
         }
         logger.trace("Finished loading payments");
     }
@@ -132,14 +137,6 @@ public class DataLoader implements ApplicationRunner {
         }
 
         logger.trace("Finished loading feedback");
-    }
-
-    private Guest pickRandomGuest(List<Guest> guests) {
-        return guests.removeFirst();
-    }
-
-    private Room pickRandomRoom(List<Room> rooms) {
-        return rooms.removeFirst();
     }
 
     private Reservation createReservation(Guest guest, Room room) {

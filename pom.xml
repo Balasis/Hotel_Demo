@@ -156,7 +156,8 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
+        <finalName>custom-name</finalName>
+        <defaultGoal>package</defaultGoal>
     </build>
 
     <profiles>

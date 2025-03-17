@@ -8,9 +8,9 @@ import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
-import gr.balasis.hotel.engine.core.transfer.ReservationAnalyticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
+import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,14 +25,22 @@ public class ReservationController extends BaseController<Reservation, Reservati
     private final ReservationService reservationService;
     private final ReservationMapper reservationMapper;
 
+    @Override
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
-        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAll()) );
+        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAllHotelReservations()) );
     }
 
-    @GetMapping("/analytics")
-    public ResponseEntity<List<ReservationAnalyticsDTO>> getAnalytics(){
-        return ResponseEntity.ok(reservationService.getAnalytics());
+    //TODO: find alternative api for the statistics since they violate the domain driven api design.
+    //      Ask if a controller for statistics is allowed although its not aggregate root or stand alone;
+    @GetMapping("/statistics/room")
+    public ResponseEntity<List<ReservationRoomStatisticsDTO>> getReservationsRoomStatistics(){
+        return ResponseEntity.ok(reservationService.findRoomStatistics());
+    }
+
+    @GetMapping("/statistics/guest")
+    public ResponseEntity<List<ReservationGuestStatisticsDTO>> getReservationsGuestStatistics(){
+        return ResponseEntity.ok(reservationService.findGuestStatistics());
     }
 
     @Override

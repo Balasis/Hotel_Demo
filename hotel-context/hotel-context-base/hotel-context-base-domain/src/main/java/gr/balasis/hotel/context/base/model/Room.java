@@ -18,11 +18,8 @@ import java.math.BigDecimal;
 @Table(name = "rooms")
 public class Room extends BaseModel {
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String roomNumber;
-
-    @Column(nullable = false)
-    private boolean reserved;
 
     @Column(nullable = false)
     private BigDecimal pricePerNight;

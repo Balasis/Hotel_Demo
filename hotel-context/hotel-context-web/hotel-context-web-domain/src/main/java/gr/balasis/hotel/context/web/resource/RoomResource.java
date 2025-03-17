@@ -10,6 +10,5 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class RoomResource extends BaseResource {
     private String roomNumber;
-    private boolean reserved;
     private BigDecimal pricePerNight;
 }

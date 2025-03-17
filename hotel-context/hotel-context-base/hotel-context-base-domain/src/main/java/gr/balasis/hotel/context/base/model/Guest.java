@@ -30,4 +30,6 @@ public class Guest extends BaseModel {
 
     private LocalDate createdAt;
 
+    @Column(nullable = false)
+    private LocalDate birthDate;
 }

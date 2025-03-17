@@ -11,9 +11,17 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     @Query("""
+       select case when COUNT(r) > 0 then true else false end
+       from Room r
+       where LOWER(r.roomNumber) = LOWER(:roomNumber)
+       """)
+    boolean existsByRoomNumber(String roomNumber);
+
+    @Query("""
     select r
     from Room r
     where r.id= :roomId
     """)
     Optional<Room> getRoomByIdCompleteFetch(Long roomId);
+
 }
