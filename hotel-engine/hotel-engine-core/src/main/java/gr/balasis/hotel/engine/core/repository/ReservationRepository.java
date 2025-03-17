@@ -82,6 +82,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
+    @Query("""
+    select r
+    from Reservation r
+    join fetch r.guest join fetch r.room join fetch r.feedback join fetch r.payment
+    where r.id = :reservationId
+    """)
+    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     //postgre
     @Query(value = """
@@ -129,8 +136,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """, nativeQuery = true)
     List<ReservationGuestStatisticsDTO> findReservationGuestStatistics();
 
-
-
     @Query("""
     select r
     from Reservation r
@@ -173,14 +178,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     where f.reservation.id = :reservationId
     """)
     Optional<Feedback> getFeedbackByReservationId(Long reservationId);
-
-    @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest join fetch r.room left join fetch r.feedback join fetch r.payment
-    where r.id = :reservationId
-    """)
-    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     @Modifying
     @Query(""" 
