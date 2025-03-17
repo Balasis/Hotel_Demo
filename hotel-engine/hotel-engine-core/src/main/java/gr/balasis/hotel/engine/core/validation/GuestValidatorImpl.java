@@ -19,19 +19,13 @@ public class GuestValidatorImpl implements GuestValidator {
 
 
     @Override
-    public Guest validate(Guest guest){
-        guest.setId(null);
-        validateEmailUnique(guest.getEmail());
-        validateBirthDate(guest.getBirthDate());
-        return guest;
+    public Guest validate(Guest guest) {
+        return commonValidation(guest);
     }
 
     @Override
-    public Guest validateForUpdate(Long id, Guest guest){
-        guest.setId(id);
-        validateEmailUnique(guest.getEmail());
-        validateBirthDate(guest.getBirthDate());
-        return guest;
+    public Guest validateForUpdate(Long id, Guest guest) {
+        return commonValidation(guest);
     }
 
     @Override
@@ -42,7 +36,7 @@ public class GuestValidatorImpl implements GuestValidator {
     }
 
     @Override
-    public void validateBirthDate(LocalDate birthDate){
+    public void validateBirthDate(LocalDate birthDate) {
         LocalDate today = LocalDate.now();
 
         if (birthDate.isAfter(today)) {
@@ -59,5 +53,11 @@ public class GuestValidatorImpl implements GuestValidator {
         if (!guestRepository.existsById(guestId)) {
             throw new GuestNotFoundException("Guest not found");
         }
+    }
+
+    private Guest commonValidation(Guest guest) {
+        validateEmailUnique(guest.getEmail());
+        validateBirthDate(guest.getBirthDate());
+        return guest;
     }
 }

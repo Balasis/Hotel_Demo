@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.web.validation.exception;
+package gr.balasis.hotel.context.web.exception;
 
 import gr.balasis.hotel.context.base.exception.HotelException;
 
