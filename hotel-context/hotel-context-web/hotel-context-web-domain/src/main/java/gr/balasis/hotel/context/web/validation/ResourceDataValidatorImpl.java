@@ -1,13 +1,18 @@
 package gr.balasis.hotel.context.web.validation;
 
+import gr.balasis.hotel.context.base.enumeration.BedType;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.web.resource.*;
 import gr.balasis.hotel.context.web.validation.ResourceDataValidator;
 import gr.balasis.hotel.context.web.validation.exception.*;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class ResourceDataValidatorImpl implements ResourceDataValidator {
@@ -53,6 +58,22 @@ public class ResourceDataValidatorImpl implements ResourceDataValidator {
         if (roomResource.getPricePerNight() == null || roomResource.getPricePerNight().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidRoomResourceException("Price per night must be greater than zero");
         }
+
+        if (roomResource.getBedType() == null){
+            throw new InvalidRoomResourceException("Bed type can't be null");
+        }
+
+        boolean bedTypeIsValid = Stream.of(BedType.values())
+                .anyMatch(bedType -> bedType.name().equals(roomResource.getBedType()));
+
+        if (!bedTypeIsValid){
+            throw new InvalidRoomResourceException("Invalid bed type: " + roomResource.getBedType());
+        }
+
+        if (roomResource.getFloor() == null || roomResource.getFloor() < 0) {
+            throw new InvalidRoomResourceException("Floor must be a non-negative integer");
+        }
+
     }
 
     @Override
