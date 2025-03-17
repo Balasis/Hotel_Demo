@@ -1,9 +1,7 @@
 package gr.balasis.hotel.context.base.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
+import gr.balasis.hotel.context.base.enumeration.BedType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -26,4 +24,12 @@ public class Room extends BaseModel {
 
     @Column(nullable = false)
     private BigDecimal pricePerNight;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BedType bedType;
+
+    @Column(nullable = false)
+    private Integer floor;
+
 }
