@@ -5,13 +5,14 @@ import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Payment;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.context.base.service.BaseService;
+import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 
 import java.util.List;
 
 public interface ReservationService extends BaseService<Reservation,Long> {
-    List<Reservation> findAllHotelReservations();
+    List<Reservation> findAll();
     List<Reservation> findByGuestId(Long id);
     void manageReservationAction(Long reservationId, String action);
     Payment getPayment(Long reservationId);
@@ -20,6 +21,7 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     void updateFeedback(Long reservationId, Feedback domain);
     void deleteFeedback(Long reservationId);
 
+    KeyValue<String,Float> getAvgPercentageRateOfFeedback();
     List<ReservationRoomStatisticsDTO> findRoomStatistics();
     List<ReservationGuestStatisticsDTO> findGuestStatistics();
 }
