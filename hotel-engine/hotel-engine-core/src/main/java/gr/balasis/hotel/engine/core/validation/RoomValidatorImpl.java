@@ -14,6 +14,7 @@ public class RoomValidatorImpl implements RoomValidator{
 
     @Override
     public Room validate(Room room) {
+        room.setId(null);
         boolean exists = roomRepository.existsByRoomNumber(room.getRoomNumber());
       if (exists) {
           System.out.println("got in here");
@@ -23,7 +24,8 @@ public class RoomValidatorImpl implements RoomValidator{
     }
 
     @Override
-    public Room validateForUpdate(Room room) {
+    public Room validateForUpdate(Long id, Room room) {
+        room.setId(id);
         if(!roomRepository.existsById(room.getId())) {
             throw new RoomNotFoundException("Room with id " + room.getId() + " does not exist");
         }

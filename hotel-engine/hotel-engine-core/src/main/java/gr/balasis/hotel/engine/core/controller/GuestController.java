@@ -1,6 +1,5 @@
 package gr.balasis.hotel.engine.core.controller;
 
-
 import gr.balasis.hotel.context.base.model.Guest;
 import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.controller.BaseController;
@@ -110,7 +109,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     public ResponseEntity<GuestResource> create(
             @RequestBody final GuestResource guestResource) {
 
-        guestResource.setId(null);
         resourceDataValidator.validateResourceData(guestResource);
         var guest = guestValidator.validate(guestMapper.toDomain(guestResource));
         return ResponseEntity.ok(
@@ -124,7 +122,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @RequestBody final ReservationResource reservationResource) {
 
-        reservationResource.setId(null);
         reservationResource.getGuest().setId(guestId);
         resourceDataValidator.validateResourceData(reservationResource);
         var reservation = reservationValidator.validate(reservationMapper.toDomain(reservationResource));
@@ -140,11 +137,11 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long reservationId,
             @RequestBody final FeedbackResource feedbackResource) {
 
-        feedbackResource.setId(null);
         resourceDataValidator.validateResourceData(feedbackResource);
-        reservationValidator.reservationFeedbackValidations(reservationId,guestId);
+        var feedback = reservationValidator.validateFeedback(
+                reservationId,guestId,feedbackMapper.toDomain(feedbackResource));
         return ResponseEntity.ok(feedbackMapper.toResource(
-                reservationService.createFeedback(reservationId, feedbackMapper.toDomain(feedbackResource))
+                reservationService.createFeedback(reservationId,feedback)
         ));
     }
 
@@ -155,7 +152,6 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long guestId,
             @RequestBody final GuestResource guestResource) {
 
-        guestResource.setId(guestId);
         resourceDataValidator.validateResourceData(guestResource);
         var guest = guestValidator.validate(getMapper().toDomain(guestResource));
         guestService.update(guest);
@@ -169,9 +165,9 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @RequestBody final ReservationResource reservationResource) {
 
         reservationResource.getGuest().setId(guestId);
-        reservationResource.setId(reservationId);
         resourceDataValidator.validateResourceData(reservationResource);
-        var reservation = reservationValidator.validateForUpdate(reservationMapper.toDomain(reservationResource));
+        var reservation = reservationValidator.validateForUpdate(
+                reservationId,reservationMapper.toDomain(reservationResource));
         reservationService.update(reservation);
         return ResponseEntity.noContent().build();
     }
@@ -182,9 +178,10 @@ public class GuestController extends BaseController<Guest,GuestResource> {
             @PathVariable final Long reservationId,
             @RequestBody final FeedbackResource feedbackResource) {
 
-        resourceDataValidator.validateResourceData(feedbackResource);
-        reservationValidator.validateReservationBelongsToGuest(reservationId,guestId);
-        reservationService.updateFeedback(reservationId, feedbackMapper.toDomain(feedbackResource));
+       resourceDataValidator.validateResourceData(feedbackResource);
+       var feedback = reservationValidator.validateFeedbackForUpdate(
+                reservationId,guestId,feedbackMapper.toDomain(feedbackResource));
+        reservationService.updateFeedback(reservationId, feedback );
         return ResponseEntity.noContent().build();
     }
 

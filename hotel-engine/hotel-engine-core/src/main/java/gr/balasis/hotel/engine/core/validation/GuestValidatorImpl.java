@@ -20,6 +20,15 @@ public class GuestValidatorImpl implements GuestValidator {
 
     @Override
     public Guest validate(Guest guest){
+        guest.setId(null);
+        validateEmailUnique(guest.getEmail());
+        validateBirthDate(guest.getBirthDate());
+        return guest;
+    }
+
+    @Override
+    public Guest validateForUpdate(Long id, Guest guest){
+        guest.setId(id);
         validateEmailUnique(guest.getEmail());
         validateBirthDate(guest.getBirthDate());
         return guest;

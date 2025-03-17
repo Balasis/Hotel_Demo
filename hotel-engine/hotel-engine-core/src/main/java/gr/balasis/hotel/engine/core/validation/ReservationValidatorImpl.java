@@ -4,10 +4,10 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
-import gr.balasis.hotel.context.base.exception.corrupted.CorruptedFeedbackModelException;
 import gr.balasis.hotel.context.base.exception.corrupted.CorruptedReservationModelException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
+import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.repository.ReservationRepository;
 import lombok.AllArgsConstructor;
@@ -43,25 +43,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
         }
     }
 
-    @Override
-    public void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId){
-        validateReservationBelongsToGuest(reservationId,guestId);
-        if (!reservationRepository.doesFeedbackExist(reservationId)){
-            throw new FeedbackNotFoundException("Theres no feedback to delete for reservation: " + reservationId);
-        }
-    }
 
-    @Override
-    public void reservationFeedbackValidations(Long reservationId, Long guestId) {
-        validateReservationBelongsToGuest(reservationId,guestId);
-        var reservationStatus = reservationRepository.getReservationStatus(reservationId).orElseThrow(
-                () -> new CorruptedReservationModelException("Reservation status could not be found (corrupted data)")
-        );
-        if(reservationStatus.equals(ReservationStatus.CANCELED)){
-            //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
-            throw new HotelException("Feedback is not allowed to canceled reservations");
-        }
-    }
 
     @Override
     public Reservation validate(Reservation reservation) {
@@ -74,11 +56,12 @@ public class ReservationValidatorImpl implements ReservationValidator {
                 reservation.getCheckInDate(),
                 reservation.getCheckOutDate()
         );
+
         return reservation;
     }
 
     @Override
-    public Reservation validateForUpdate(Reservation reservation) {
+    public Reservation validateForUpdate(Long id ,Reservation reservation) {
         validateReservationBelongsToGuest(reservation.getId(),reservation.getGuest().getId());
         if (reservationRepository.getReservationPaymentStatus(reservation.getId()).equals(PaymentStatus.PAID)){
             throw new HotelException("Can not update paid reservation");
@@ -93,6 +76,35 @@ public class ReservationValidatorImpl implements ReservationValidator {
         return reservation;
     }
 
+    @Override
+    public Feedback validateFeedback(Long reservationId, Long guestId, Feedback feedback) {
+        feedback.setId(null);
+        return commonFeedbackValidationForUpdateAndCreate(reservationId,guestId,feedback);
+    }
 
+    @Override
+    public Feedback validateFeedbackForUpdate(Long reservationId, Long guestId, Feedback feedback) {
+        return commonFeedbackValidationForUpdateAndCreate(reservationId,guestId,feedback);
+    }
+
+    @Override
+    public void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId){
+        validateReservationBelongsToGuest(reservationId,guestId);
+        if (!reservationRepository.doesFeedbackExist(reservationId)){
+            throw new FeedbackNotFoundException("Theres no feedback to delete for reservation: " + reservationId);
+        }
+    }
+
+    private Feedback commonFeedbackValidationForUpdateAndCreate(Long reservationId, Long guestId,Feedback feedback){
+        validateReservationBelongsToGuest(reservationId,guestId);
+        var reservationStatus = reservationRepository.getReservationStatus(reservationId).orElseThrow(
+                () -> new CorruptedReservationModelException("Reservation status could not be found (corrupted data)")
+        );
+        if(reservationStatus.equals(ReservationStatus.CANCELED)){
+            //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
+            throw new HotelException("Feedback is not allowed to canceled reservations");
+        }
+        return feedback;
+    }
 
 }

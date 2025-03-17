@@ -2,6 +2,7 @@ package gr.balasis.hotel.engine.core.bootstrap;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
+import gr.balasis.hotel.context.base.enumeration.BedType;
 import gr.balasis.hotel.context.base.model.*;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
@@ -55,6 +56,8 @@ public class DataLoader implements ApplicationRunner {
                     Room.builder()
                             .roomNumber("10" + (i + 1))
                             .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
+                            .bedType(  (random.nextBoolean()) ?  BedType.SINGLE : BedType.DOUBLE )
+                            .floor(new Random().nextInt(1,4))
                             .build()
             );
         }

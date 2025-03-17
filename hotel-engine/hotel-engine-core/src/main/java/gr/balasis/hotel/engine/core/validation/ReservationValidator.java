@@ -1,10 +1,11 @@
 package gr.balasis.hotel.engine.core.validation;
 
+import gr.balasis.hotel.context.base.model.Feedback;
 import gr.balasis.hotel.context.base.model.Reservation;
 
 import java.time.LocalDate;
 
-public interface ReservationValidator {
+public interface ReservationValidator extends BaseValidator<Reservation>{
 
     void validateReservationBelongsToGuest(Long reservationId, Long guestId);
 
@@ -12,11 +13,10 @@ public interface ReservationValidator {
 
     void validateRoomAvailabilityForUpdate(Long roomId, LocalDate checkInDate, LocalDate checkOutDate, Long reservationId);
 
-    Reservation validate(Reservation domain);
+    Feedback validateFeedback(Long reservationId, Long guestId, Feedback feedback);
 
-    Reservation validateForUpdate(Reservation reservation);
+    Feedback validateFeedbackForUpdate(Long reservationId, Long guestId, Feedback feedback);
 
     void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId);
 
-    void reservationFeedbackValidations(Long reservationId, Long guestId);
 }
