@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "feedback")
+@Table(name = "feedback" ,indexes = {
+        @Index(name = "index_feedback_reservation",columnList = "reservation_id")
+})
 public class Feedback extends BaseModel {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)

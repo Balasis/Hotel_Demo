@@ -15,7 +15,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "reservations")
+@Table(name = "reservations" ,indexes = {
+        @Index(name = "index_reservation_guest",columnList = "guest_id"),
+        @Index(name = "index_reservation_checkInDate",columnList = "check_in_Date"),
+        @Index(name = "index_reservation_checkOutDate",columnList = "check_out_Date")
+})
 public class Reservation extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -38,9 +42,9 @@ public class Reservation extends BaseModel {
     @Column(nullable = false)
     private LocalDate checkOutDate;
 
-    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Feedback feedback;
 
-    @OneToOne(fetch = FetchType.LAZY,mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 }
