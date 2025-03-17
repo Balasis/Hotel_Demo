@@ -8,6 +8,7 @@ import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 
+import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,11 @@ public class ReservationController extends BaseController<Reservation, Reservati
     @GetMapping(headers = "action=reservationGuestStatisticsDTO")
     public ResponseEntity<List<ReservationGuestStatisticsDTO>> findReservationsGuestStatistics(){
         return ResponseEntity.ok(reservationService.findGuestStatistics());
+    }
+
+    @GetMapping(headers = "action=avgPercentageRateOfFeedback")
+    public ResponseEntity<KeyValue<String,Float>> getAvgPercentageRateOfFeedback(){
+        return ResponseEntity.ok(reservationService.getAvgPercentageRateOfFeedback() );
     }
 
     @Override

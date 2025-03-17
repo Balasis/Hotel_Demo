@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: @activeProfile@
+  cache:
+    type: none
   jpa:
     open-in-view: false
 #    properties:

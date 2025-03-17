@@ -7,18 +7,23 @@ import gr.balasis.hotel.engine.core.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class RoomServiceImpl extends BasicServiceImpl<Room, RoomNotFoundException> implements RoomService {
     private final RoomRepository roomRepository;
 
     @Override
-    public List<Room> searchBy(String roomNumber, BigDecimal pricePerNight) {
-        return roomRepository.searchBy(roomNumber, pricePerNight);
+    @Transactional(readOnly = true)
+    public List<Room> searchBy(String roomNumber, BigDecimal pricePerNight,String bedType,Integer floor) {
+        return roomRepository.searchBy(roomNumber, pricePerNight, bedType, floor);
     }
 
     @Override
