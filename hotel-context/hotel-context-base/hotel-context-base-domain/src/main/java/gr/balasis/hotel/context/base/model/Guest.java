@@ -25,7 +25,7 @@ public class Guest extends BaseModel {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true )
     private String email;
 
     private LocalDate createdAt;

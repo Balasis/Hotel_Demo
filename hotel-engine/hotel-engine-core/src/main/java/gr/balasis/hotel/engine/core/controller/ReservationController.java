@@ -25,21 +25,18 @@ public class ReservationController extends BaseController<Reservation, Reservati
     private final ReservationService reservationService;
     private final ReservationMapper reservationMapper;
 
-    @Override
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
         return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAllHotelReservations()) );
     }
 
-    //TODO: find alternative api for the statistics since they violate the domain driven api design.
-    //      Ask if a controller for statistics is allowed although its not aggregate root or stand alone;
-    @GetMapping("/statistics/room")
-    public ResponseEntity<List<ReservationRoomStatisticsDTO>> getReservationsRoomStatistics(){
+    @GetMapping(headers = "action=reservationRoomStatisticsDTO")
+    public ResponseEntity<List<ReservationRoomStatisticsDTO>> findReservationsRoomStatistics(){
         return ResponseEntity.ok(reservationService.findRoomStatistics());
     }
 
-    @GetMapping("/statistics/guest")
-    public ResponseEntity<List<ReservationGuestStatisticsDTO>> getReservationsGuestStatistics(){
+    @GetMapping(headers = "action=reservationGuestStatisticsDTO")
+    public ResponseEntity<List<ReservationGuestStatisticsDTO>> findReservationsGuestStatistics(){
         return ResponseEntity.ok(reservationService.findGuestStatistics());
     }
 

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,6 +40,18 @@ public class GuestController extends BaseController<Guest,GuestResource> {
     private final ReservationMapper reservationMapper;
     private final PaymentMapper paymentMapper;
     private final FeedbackMapper feedbackMapper;
+
+
+    @GetMapping
+    public ResponseEntity<List<GuestResource>> findAll(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) LocalDate birthDate) {
+
+        List<Guest> guests = guestService.searchBy(email, firstName, lastName, birthDate);
+        return ResponseEntity.ok(guestMapper.toResources(guests));
+    }
 
     @Override
     @GetMapping("/{guestId}")

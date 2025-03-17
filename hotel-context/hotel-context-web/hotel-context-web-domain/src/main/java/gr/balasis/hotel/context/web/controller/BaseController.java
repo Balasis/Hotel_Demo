@@ -17,15 +17,6 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
     protected abstract BaseService<T,Long> getBaseService();
     protected abstract BaseMapper<T, R> getMapper();
 
-
-    @GetMapping
-    public ResponseEntity <List<R>> findAll() {
-        return ResponseEntity.ok(
-                getMapper().toResources(
-                        getBaseService().findAll())
-        );
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<R> get(
             @PathVariable("id") final Long id) {
