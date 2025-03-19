@@ -43,9 +43,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Transactional(readOnly = true)
     public Reservation get(final Long reservationId) {
         return reservationRepository.findByIdCompleteFetch(reservationId)
-                .orElseThrow(
-                        () -> new ReservationNotFoundException("No reservation found for ID: "
-                                + reservationId));
+                .orElseThrow(() -> new ReservationNotFoundException("No reservation found for ID: " + reservationId));
     }
 
     @Override
@@ -63,18 +61,14 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     @Transactional(readOnly = true)
     public Feedback getFeedback(final Long reservationId) {
         return reservationRepository.getFeedbackByReservationId(reservationId)
-                .orElseThrow(
-                        () -> new FeedbackNotFoundException("No feedback found for reservation with ID: "
-                                + reservationId));
+                .orElseThrow(() -> new FeedbackNotFoundException("No feedback found for reservation with ID: " + reservationId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Payment getPayment(final  Long reservationId) {
         return reservationRepository.getPaymentByReservationId(reservationId)
-                .orElseThrow(
-                        () -> new PaymentNotFoundException("No payment found for reservation with ID: "
-                                + reservationId));
+                .orElseThrow(() -> new PaymentNotFoundException("No payment found for reservation with ID: " + reservationId));
     }
 
 
