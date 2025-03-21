@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @AllArgsConstructor
+@DateComparison(
+        firstField = "checkInDate",
+        secondField = "checkOutDate",
+        condition = "beforeOrEqual",
+        message = "Check-in date must be before or equal to check-out date"
+)
 public class ReservationResource extends BaseResource {
     @NotNull(message ="Guest is mandatory")
     private GuestResource guest;
@@ -29,7 +35,6 @@ public class ReservationResource extends BaseResource {
     private LocalDateTime createdAt;
 
     @NotNull(message ="CheckIn Date is mandatory")
-    @DateComparison(comparedField = "checkOutDate", condition = "beforeOrEqual", message = "Check-in date must be before or equal to the check-out date")
     private LocalDate checkInDate;
 
     @NotNull(message ="CheckOut Date is mandatory")

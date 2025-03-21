@@ -1,21 +1,21 @@
 package gr.balasis.hotel.context.web.validation.custom;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD })
-@Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DateComparisonValidator.class)
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface DateComparison {
-
-    String message() default "Invalid date comparison";
+    String message() default "Date comparison failed";
     Class<?>[] groups() default {};
-    Class<?>[] payload() default {};
-
-    String comparedField();
-    String condition() default "before";
+    Class<? extends Payload>[] payload() default {};
+    String firstField();
+    String secondField();
+    String condition();
 }

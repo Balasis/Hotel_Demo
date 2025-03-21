@@ -5,50 +5,43 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 
-public class DateComparisonValidator implements ConstraintValidator<DateComparison, LocalDate> {
+public class DateComparisonValidator implements ConstraintValidator<DateComparison, Object> {
 
-    private String comparedField;
+    private String firstFieldName;
+    private String secondFieldName;
     private String condition;
 
     @Override
     public void initialize(DateComparison annotation) {
-        this.comparedField = annotation.comparedField();
+        this.firstFieldName = annotation.firstField();
+        this.secondFieldName = annotation.secondField();
         this.condition = annotation.condition();
-
     }
 
     @Override
-    public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-        System.out.println("the value is : " + value);
-        System.out.println("the string field is " + comparedField);
-
-
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
         try {
-            if (value == null) {
-                return true;
-            }
+            Field firstField = value.getClass().getDeclaredField(firstFieldName);
+            Field secondField = value.getClass().getDeclaredField(secondFieldName);
+            firstField.setAccessible(true);
+            secondField.setAccessible(true);
 
-            Field comparedFieldObj = value.getClass().getDeclaredField(comparedField);
+            LocalDate firstDate = (LocalDate) firstField.get(value);
+            LocalDate secondDate = (LocalDate) secondField.get(value);
 
-            comparedFieldObj.setAccessible(true);
-            LocalDate comparedDate = (LocalDate) comparedFieldObj.get(value);
-            System.out.println("the value is : " + value);
-            System.out.println("the compare date is :" +comparedDate);
-
-            if (comparedDate == null) {
+            if (firstDate == null || secondDate == null) {
                 return true;
             }
 
             return switch (condition) {
-                case "before" -> value.isBefore(comparedDate);
-                case "after" -> value.isAfter(comparedDate);
-                case "equal" -> value.isEqual(comparedDate);
-                case "beforeOrEqual" -> value.isBefore(comparedDate) || value.isEqual(comparedDate);
+                case "before" -> firstDate.isBefore(secondDate);
+                case "after" -> firstDate.isAfter(secondDate);
+                case "equal" -> firstDate.isEqual(secondDate);
+                case "beforeOrEqual" -> firstDate.isBefore(secondDate) || firstDate.isEqual(secondDate);
                 default -> false;
             };
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 }
-
