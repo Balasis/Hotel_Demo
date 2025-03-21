@@ -9,6 +9,7 @@ import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
 
 import gr.balasis.hotel.engine.core.validation.GuestValidator;
+import gr.balasis.hotel.engine.core.validation.ReservationValidator;
 import gr.balasis.hotel.engine.core.validation.RoomValidator;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public class DataLoader implements ApplicationRunner {
     private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
     private final MessageSource feedbackMessages;
+    private final ReservationValidator reservationValidator;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -54,8 +56,13 @@ public class DataLoader implements ApplicationRunner {
     private void loadRooms() {
         logger.trace("Loading rooms...");
         for (int i = 0; i < 9; i++) {
-            createRoomTransactional(i);
+            try{
+                createRoomTransactional(i);
+             }catch (Exception e){
+                logger.warn(e.getMessage());
+            }
         }
+
         logger.trace("Finished loading rooms");
     }
 
@@ -76,20 +83,30 @@ public class DataLoader implements ApplicationRunner {
     private void loadGuests() {
         logger.trace("Loading guests...");
         for (int i = 0; i < 5; i++) {
-            guestService.create(
-                    Guest.builder()
-                            .firstName(lorem.getFirstName())
-                            .lastName(lorem.getLastName())
-                            .email(lorem.getEmail())
-                            .createdAt(LocalDate.now())
-                            .birthDate(LocalDate.now().minusYears(20 + random.nextInt(41)))
-                            .build()
-            );
+            try{
+                createGuestTransactional();
+            }catch (Exception e){
+                logger.warn(e.getMessage());
+            }
         }
+
         logger.trace("Finished loading guests");
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createGuestTransactional() {
+        guestService.create(
+                guestValidator.validate(
+                        Guest.builder()
+                                .firstName(lorem.getFirstName())
+                                .lastName(lorem.getLastName())
+                                .email(lorem.getEmail())
+                                .createdAt(LocalDate.now())
+                                .birthDate(LocalDate.now().minusYears(20 + random.nextInt(41)))
+                                .build()
+                )
+        );
+    }
 
     private void loadReservations() {
         logger.trace("Loading reservations...");
@@ -107,7 +124,7 @@ public class DataLoader implements ApplicationRunner {
             try {
                 createReservationTransactional(guests.removeFirst(), rooms.removeFirst());
             } catch (Exception e) {
-                logger.error("Failed to create reservation: " + e.getMessage());
+                logger.warn(e.getMessage());
             }
         }
         logger.trace("Finished loading reservations");
@@ -115,7 +132,16 @@ public class DataLoader implements ApplicationRunner {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createReservationTransactional(Guest guest, Room room) {
-        reservationService.create(createReservation(guest, room));
+        LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
+        reservationService.create(
+                reservationValidator.validate(
+                Reservation.builder()
+                .guest(guest)
+                .room(room)
+                .checkInDate(checkInDate)
+                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
+                .build())
+        );
     }
 
     private void loadPayments() {
@@ -128,7 +154,7 @@ public class DataLoader implements ApplicationRunner {
                     markPaymentAsCompleted(reservation.getId());
                 }
             } catch (Exception e) {
-                logger.error("Failed to mark payment as completed: " + e.getMessage());
+                logger.warn("Failed to mark payment as completed: " + e.getMessage());
             }
         }
         logger.trace("Finished loading payments");
@@ -144,30 +170,32 @@ public class DataLoader implements ApplicationRunner {
         List<Reservation> reservations = reservationService.findAll();
 
         for (Reservation reservation : reservations) {
-            int messageNumber = random.nextInt(10) + 1;
-            String theMessage = "feedback.message" + messageNumber;
+            try {
+                createFeedbackTransactional(reservation);
+            }catch (Exception e){
+                logger.warn(e.getMessage());
+            }
 
-            reservationService.createFeedback(
-                    reservation.getId(),
-                    Feedback.builder()
-                            .createdAt(LocalDateTime.now())
-                            .reservation(reservation)
-                            .message(feedbackMessages.getMessage(theMessage,
-                                    new Object[]{reservation.getGuest().getFirstName()},
-                                    Locale.getDefault()))
-                            .build()
-            );
         }
         logger.trace("Finished loading feedback");
     }
 
-    private Reservation createReservation(Guest guest, Room room) {
-        LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
-        return Reservation.builder()
-                .guest(guest)
-                .room(room)
-                .checkInDate(checkInDate)
-                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
-                .build();
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createFeedbackTransactional(Reservation reservation) {
+        int messageNumber = random.nextInt(10) + 1;
+        var theMessage = "feedback.message" + messageNumber;
+        var feedback = reservationValidator.validateFeedback(
+                reservation.getId(),
+                reservation.getGuest().getId(),
+                Feedback.builder()
+                    .createdAt(LocalDateTime.now())
+                    .reservation(reservation)
+                    .message(feedbackMessages.getMessage(theMessage,new Object[]{reservation.getGuest().getFirstName()},
+                                                        Locale.getDefault()))
+                    .build()
+        );
+
+        reservationService.createFeedback(reservation.getId(),feedback);
     }
+
 }
