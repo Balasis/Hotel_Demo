@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "reservations" ,indexes = {
-        @Index(name = "index_reservation_guest",columnList = "guest_id"),
-        @Index(name = "index_reservation_checkInDate",columnList = "check_in_Date"),
-        @Index(name = "index_reservation_checkOutDate",columnList = "check_out_Date")
+@Table(name = "reservations", indexes = {
+        @Index(name = "index_reservation_guest", columnList = "guest_id"),
+        @Index(name = "index_reservation_checkInDate", columnList = "check_in_Date"),
+        @Index(name = "index_reservation_checkOutDate", columnList = "check_out_Date")
 })
 public class Reservation extends BaseModel {
 

@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "rooms" ,indexes = {
-        @Index(name = "index_room_roomNumber",columnList = "room_number")
+@Table(name = "rooms", indexes = {
+        @Index(name = "index_room_roomNumber", columnList = "room_number")
 })
 public class Room extends BaseModel {
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String roomNumber;
 
     @Column(nullable = false)

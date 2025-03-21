@@ -11,17 +11,26 @@ import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
 
 import java.util.List;
 
-public interface ReservationService extends BaseService<Reservation,Long> {
+public interface ReservationService extends BaseService<Reservation, Long> {
     List<Reservation> findAll();
+
     List<Reservation> findByGuestId(Long id);
+
     void manageReservationAction(Long reservationId, String action);
+
     Payment getPayment(Long reservationId);
+
     Feedback createFeedback(Long reservationId, Feedback domain);
+
     Feedback getFeedback(Long reservationId);
+
     void updateFeedback(Long reservationId, Feedback domain);
+
     void deleteFeedback(Long feedbackId);
 
-    KeyValue<String,Float> getAvgPercentageRateOfFeedback();
+    KeyValue<String, Float> getAvgPercentageRateOfFeedback();
+
     List<ReservationRoomStatisticsDTO> findRoomStatistics();
+
     List<ReservationGuestStatisticsDTO> findGuestStatistics();
 }

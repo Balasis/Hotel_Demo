@@ -22,195 +22,195 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("""
-        select new gr.balasis.hotel.engine.core.transfer.KeyValue('averageFeedback', AVG(avgResult.totalCount))
-        from (
-            select count(r.id) as totalCount
-            from Reservation r
-            where r.feedback is not null
-            group by r.id
-        ) avgResult
-    """)
+                select new gr.balasis.hotel.engine.core.transfer.KeyValue('averageFeedback', AVG(avgResult.totalCount))
+                from (
+                    select count(r.id) as totalCount
+                    from Reservation r
+                    where r.feedback is not null
+                    group by r.id
+                ) avgResult
+            """)
     KeyValue<String, Float> getAvgPercentageRateOfFeedback();
 
     @Query("""
-    select case when exists (
-                            select 1
-                            from Reservation r
-                            where r.id= :reservationId and r.guest.id= :guestID
-                            )
-    then true
-    else false
-    end
-    """)
-    boolean reservationBelongsToGuest(Long reservationId,Long guestID);
+            select case when exists (
+                                    select 1
+                                    from Reservation r
+                                    where r.id= :reservationId and r.guest.id= :guestID
+                                    )
+            then true
+            else false
+            end
+            """)
+    boolean reservationBelongsToGuest(Long reservationId, Long guestID);
 
     @Query("""
-       select case when COUNT(r) > 0 then false else true end
-       from Reservation r
-       where r.room.id = :roomId
-       and r.checkOutDate > :checkInDate
-       and r.checkInDate < :checkOutDate
-       """)
+            select case when COUNT(r) > 0 then false else true end
+            from Reservation r
+            where r.room.id = :roomId
+            and r.checkOutDate > :checkInDate
+            and r.checkInDate < :checkOutDate
+            """)
     boolean isRoomAvailableOn(Long roomId, LocalDate checkOutDate, LocalDate checkInDate);
 
     @Query("""
-       select case when COUNT(r) > 0 then false else true end
-       from Reservation r
-       where r.room.id = :roomId
-       and r.checkOutDate > :checkInDate
-       and r.checkInDate < :checkOutDate
-       and r.id != :reservationId
-       """)
+            select case when COUNT(r) > 0 then false else true end
+            from Reservation r
+            where r.room.id = :roomId
+            and r.checkOutDate > :checkInDate
+            and r.checkInDate < :checkOutDate
+            and r.id != :reservationId
+            """)
     boolean isRoomAvailableExcludeReservationOn(Long roomId, LocalDate checkOutDate, LocalDate checkInDate, Long reservationId);
 
     @Query("""
-    select case when exists (
-                        select 1
-                        from Feedback f
-                        where f.reservation.id= :reservationId)
-                        then true
-                        else false
-                        end
-    """)
+            select case when exists (
+                                select 1
+                                from Feedback f
+                                where f.reservation.id= :reservationId)
+                                then true
+                                else false
+                                end
+            """)
     boolean doesFeedbackExist(Long reservationId);
 
     @Query("""
-    select case when exists (
-        select 1
-        from Feedback f
-        where f.reservation.id= :reservationId and f.id=:feedbackId)
-        then true
-        else false
-        end
-    """)
+            select case when exists (
+                select 1
+                from Feedback f
+                where f.reservation.id= :reservationId and f.id=:feedbackId)
+                then true
+                else false
+                end
+            """)
     boolean doesFeedbackBelongsToReservation(Long feedbackId, Long reservationId);
 
     @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest g join fetch r.room left join fetch r.feedback left join fetch r.payment
-    where g.id= :guestId
-    """)
+            select r
+            from Reservation r
+            join fetch r.guest g join fetch r.room left join fetch r.feedback left join fetch r.payment
+            where g.id= :guestId
+            """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
     @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
-    where r.id = :reservationId
-    """)
+            select r
+            from Reservation r
+            join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
+            where r.id = :reservationId
+            """)
     Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     //postgre
     @Query(value = """
-        select
-        ro.id as roomId,
-        ro.room_number as roomNumber,
-        round(avg(r.CHECK_OUT_DATE - r.CHECK_IN_DATE)) AS averageDaysPerReservation,
-        coalesce(
-            (
-                select sum(p1.amount)
-                from payments p1
-                inner join reservations r1 on r1.id = p1.reservation_id
-                where r1.room_id = ro.id and p1.payment_status = 'PAID'
-                group by r1.room_id
-            ),
-            0
-        ) as incomeSoFar
-    from reservations r
-    inner join rooms ro on ro.id = r.room_id
-    group by ro.id
-    order by incomeSoFar desc;
-    """, nativeQuery = true)
+                select
+                ro.id as roomId,
+                ro.room_number as roomNumber,
+                round(avg(r.CHECK_OUT_DATE - r.CHECK_IN_DATE)) AS averageDaysPerReservation,
+                coalesce(
+                    (
+                        select sum(p1.amount)
+                        from payments p1
+                        inner join reservations r1 on r1.id = p1.reservation_id
+                        where r1.room_id = ro.id and p1.payment_status = 'PAID'
+                        group by r1.room_id
+                    ),
+                    0
+                ) as incomeSoFar
+            from reservations r
+            inner join rooms ro on ro.id = r.room_id
+            group by ro.id
+            order by incomeSoFar desc;
+            """, nativeQuery = true)
     List<ReservationRoomStatisticsDTO> findReservationRoomStatistics();
 
     //postgre
     @Query(value = """
-        select
-        g.id as guestId,
-        count(r.id) as totalReservations,
-        round(avg(r.check_out_date - r.check_in_date)) as avgStayDuration,
-        coalesce(
-            (
-                select sum(p.amount)
-                from payments p
-                inner join reservations r1 on r1.id = p.reservation_id
-                where r1.guest_id = g.id and p.payment_status = 'PAID'
-                group by r1.guest_id
-            ),
-            0
-        ) as totalIncome
-    from guests g
-    left join reservations r on r.guest_id = g.id
-    group by g.id
-    order by totalIncome desc;;
-    """, nativeQuery = true)
+                select
+                g.id as guestId,
+                count(r.id) as totalReservations,
+                round(avg(r.check_out_date - r.check_in_date)) as avgStayDuration,
+                coalesce(
+                    (
+                        select sum(p.amount)
+                        from payments p
+                        inner join reservations r1 on r1.id = p.reservation_id
+                        where r1.guest_id = g.id and p.payment_status = 'PAID'
+                        group by r1.guest_id
+                    ),
+                    0
+                ) as totalIncome
+            from guests g
+            left join reservations r on r.guest_id = g.id
+            group by g.id
+            order by totalIncome desc;;
+            """, nativeQuery = true)
     List<ReservationGuestStatisticsDTO> findReservationGuestStatistics();
 
     @Query("""
-    select r
-    from Reservation r
-    join fetch r.guest join fetch r.room left join fetch r.payment left join fetch r.feedback
-    """)
+            select r
+            from Reservation r
+            join fetch r.guest join fetch r.room left join fetch r.payment left join fetch r.feedback
+            """)
     List<Reservation> findAllCompleteFetch();
 
     @Query("""
-    select p.paymentStatus
-    from Payment p
-    where p.reservation.id = :reservationId
-    """)
+            select p.paymentStatus
+            from Payment p
+            where p.reservation.id = :reservationId
+            """)
     PaymentStatus getReservationPaymentStatus(Long reservationId);
 
     @Query("""
-    select r.status
-    from Reservation r
-    where r.id = :reservationId
-    """)
+            select r.status
+            from Reservation r
+            where r.id = :reservationId
+            """)
     Optional<ReservationStatus> getReservationStatus(Long reservationId);
 
     @Query("""
-    select r
-    from Reservation r
-    left join fetch r.feedback join fetch r.payment
-    where r.id = :reservationId
-    """)
+            select r
+            from Reservation r
+            left join fetch r.feedback join fetch r.payment
+            where r.id = :reservationId
+            """)
     Optional<Reservation> findByIdMinimalFetch(Long reservationId);
 
     @Query("""
-    select p
-    from Payment p
-    where p.reservation.id= :reservationId
-    """)
+            select p
+            from Payment p
+            where p.reservation.id= :reservationId
+            """)
     Optional<Payment> getPaymentByReservationId(Long reservationId);
 
     @Query("""
-    select f
-    from Feedback f
-    where f.reservation.id = :reservationId
-    """)
+            select f
+            from Feedback f
+            where f.reservation.id = :reservationId
+            """)
     Optional<Feedback> getFeedbackByReservationId(Long reservationId);
 
     @Modifying
     @Query(""" 
-    update Feedback f
-    SET f.message = :message,
-    f.createdAt = :createdAt
-    WHERE f.reservation.id = :reservationId
-    """)
-    void updateFeedback(Long reservationId,String message,LocalDateTime createdAt);
+            update Feedback f
+            SET f.message = :message,
+            f.createdAt = :createdAt
+            WHERE f.reservation.id = :reservationId
+            """)
+    void updateFeedback(Long reservationId, String message, LocalDateTime createdAt);
 
     @Modifying
     @Query("""
-    delete from Feedback f
-    where f.reservation.id= :reservationId
-    """)
+            delete from Feedback f
+            where f.reservation.id= :reservationId
+            """)
     void deleteFeedbackByReservationId(Long reservationId);
 
     @Modifying
     @Query("""
-    delete from Feedback f
-    where f.id = :feedbackId
-    """)
+            delete from Feedback f
+            where f.id = :feedbackId
+            """)
     void deleteFeedbackById(Long feedbackId);
 
 

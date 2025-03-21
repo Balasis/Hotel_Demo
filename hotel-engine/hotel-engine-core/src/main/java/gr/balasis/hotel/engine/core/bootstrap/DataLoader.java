@@ -3,11 +3,13 @@ package gr.balasis.hotel.engine.core.bootstrap;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 import gr.balasis.hotel.context.base.enumeration.BedType;
-import gr.balasis.hotel.context.base.model.*;
+import gr.balasis.hotel.context.base.model.Feedback;
+import gr.balasis.hotel.context.base.model.Guest;
+import gr.balasis.hotel.context.base.model.Reservation;
+import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
-
 import gr.balasis.hotel.engine.core.validation.GuestValidator;
 import gr.balasis.hotel.engine.core.validation.ReservationValidator;
 import gr.balasis.hotel.engine.core.validation.RoomValidator;
@@ -22,24 +24,24 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 @Component
 @AllArgsConstructor
 @Profile({"h2", "postgre"})
 public class DataLoader implements ApplicationRunner {
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
+    private static final Lorem lorem = LoremIpsum.getInstance();
     private final GuestService guestService;
     private final GuestValidator guestValidator;
     private final RoomService roomService;
     private final RoomValidator roomValidator;
     private final ReservationService reservationService;
-    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
-    private static final Lorem lorem = LoremIpsum.getInstance();
     private final Random random = new Random();
     private final MessageSource feedbackMessages;
     private final ReservationValidator reservationValidator;
@@ -56,9 +58,9 @@ public class DataLoader implements ApplicationRunner {
     private void loadRooms() {
         logger.trace("Loading rooms...");
         for (int i = 0; i < 9; i++) {
-            try{
+            try {
                 createRoomTransactional(i);
-             }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn(e.getMessage());
             }
         }
@@ -70,12 +72,12 @@ public class DataLoader implements ApplicationRunner {
     public void createRoomTransactional(int i) {
         roomService.create(
                 roomValidator.validate(
-                Room.builder()
-                        .roomNumber("10" + (i + 1))
-                        .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
-                        .bedType(random.nextBoolean() ? BedType.SINGLE : BedType.DOUBLE)
-                        .floor(random.nextInt(1, 4))
-                        .build()
+                        Room.builder()
+                                .roomNumber("10" + (i + 1))
+                                .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
+                                .bedType(random.nextBoolean() ? BedType.SINGLE : BedType.DOUBLE)
+                                .floor(random.nextInt(1, 4))
+                                .build()
                 )
         );
     }
@@ -83,9 +85,9 @@ public class DataLoader implements ApplicationRunner {
     private void loadGuests() {
         logger.trace("Loading guests...");
         for (int i = 0; i < 5; i++) {
-            try{
+            try {
                 createGuestTransactional();
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn(e.getMessage());
             }
         }
@@ -135,12 +137,12 @@ public class DataLoader implements ApplicationRunner {
         LocalDate checkInDate = LocalDate.now().plusDays(random.nextInt(10) + 1);
         reservationService.create(
                 reservationValidator.validate(
-                Reservation.builder()
-                .guest(guest)
-                .room(room)
-                .checkInDate(checkInDate)
-                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
-                .build())
+                        Reservation.builder()
+                                .guest(guest)
+                                .room(room)
+                                .checkInDate(checkInDate)
+                                .checkOutDate(checkInDate.plusDays(random.nextInt(5) + 1))
+                                .build())
         );
     }
 
@@ -172,7 +174,7 @@ public class DataLoader implements ApplicationRunner {
         for (Reservation reservation : reservations) {
             try {
                 createFeedbackTransactional(reservation);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn(e.getMessage());
             }
 
@@ -188,14 +190,14 @@ public class DataLoader implements ApplicationRunner {
                 reservation.getId(),
                 reservation.getGuest().getId(),
                 Feedback.builder()
-                    .createdAt(LocalDateTime.now())
-                    .reservation(reservation)
-                    .message(feedbackMessages.getMessage(theMessage,new Object[]{reservation.getGuest().getFirstName()},
-                                                        Locale.getDefault()))
-                    .build()
+                        .createdAt(LocalDateTime.now())
+                        .reservation(reservation)
+                        .message(feedbackMessages.getMessage(theMessage, new Object[]{reservation.getGuest().getFirstName()},
+                                Locale.getDefault()))
+                        .build()
         );
 
-        reservationService.createFeedback(reservation.getId(),feedback);
+        reservationService.createFeedback(reservation.getId(), feedback);
     }
 
 }

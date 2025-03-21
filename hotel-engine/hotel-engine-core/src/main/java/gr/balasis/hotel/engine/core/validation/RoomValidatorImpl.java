@@ -1,6 +1,6 @@
 package gr.balasis.hotel.engine.core.validation;
 
-import gr.balasis.hotel.context.base.exception.dublicate.DuplicateRoomException;
+import gr.balasis.hotel.context.base.exception.duplicate.DuplicateRoomException;
 import gr.balasis.hotel.context.base.exception.notfound.RoomNotFoundException;
 import gr.balasis.hotel.context.base.model.Room;
 import gr.balasis.hotel.engine.core.repository.RoomRepository;

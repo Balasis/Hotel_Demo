@@ -8,7 +8,6 @@ import gr.balasis.hotel.context.web.resource.ReservationResource;
 import gr.balasis.hotel.context.web.validation.ResourceDataValidator;
 import gr.balasis.hotel.engine.core.mapper.ReservationMapper;
 import gr.balasis.hotel.engine.core.service.ReservationService;
-
 import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
@@ -30,26 +29,26 @@ public class ReservationController extends BaseController<Reservation, Reservati
 
     @GetMapping
     public ResponseEntity<List<ReservationResource>> findAll() {
-        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAll()) );
+        return ResponseEntity.ok(reservationMapper.toResources(reservationService.findAll()));
     }
 
     @GetMapping(headers = "action=reservationRoomStatisticsDTO")
-    public ResponseEntity<List<ReservationRoomStatisticsDTO>> findReservationsRoomStatistics(){
+    public ResponseEntity<List<ReservationRoomStatisticsDTO>> findReservationsRoomStatistics() {
         return ResponseEntity.ok(reservationService.findRoomStatistics());
     }
 
     @GetMapping(headers = "action=reservationGuestStatisticsDTO")
-    public ResponseEntity<List<ReservationGuestStatisticsDTO>> findReservationsGuestStatistics(){
+    public ResponseEntity<List<ReservationGuestStatisticsDTO>> findReservationsGuestStatistics() {
         return ResponseEntity.ok(reservationService.findGuestStatistics());
     }
 
     @GetMapping(headers = "action=avgPercentageRateOfFeedback")
-    public ResponseEntity<KeyValue<String,Float>> getAvgPercentageRateOfFeedback(){
-        return ResponseEntity.ok(reservationService.getAvgPercentageRateOfFeedback() );
+    public ResponseEntity<KeyValue<String, Float>> getAvgPercentageRateOfFeedback() {
+        return ResponseEntity.ok(reservationService.getAvgPercentageRateOfFeedback());
     }
 
     @Override
-    protected BaseService<Reservation,Long> getBaseService() {
+    protected BaseService<Reservation, Long> getBaseService() {
         return reservationService;
     }
 

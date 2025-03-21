@@ -3,13 +3,12 @@ package gr.balasis.hotel.context.web.advice;
 import gr.balasis.hotel.context.base.exception.HotelException;
 import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
 import gr.balasis.hotel.context.base.exception.corrupted.CorruptedModelException;
-import gr.balasis.hotel.context.base.exception.dublicate.DuplicateException;
+import gr.balasis.hotel.context.base.exception.duplicate.DuplicateException;
 import gr.balasis.hotel.context.base.exception.notfound.EntityNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -50,7 +49,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUnauthorizedAccessException(UnauthorizedAccessException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
-
 
 
 }

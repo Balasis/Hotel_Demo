@@ -13,9 +13,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DateComparison {
     String message() default "Date comparison failed";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
+
     String firstField();
+
     String secondField();
+
     String condition();
 }

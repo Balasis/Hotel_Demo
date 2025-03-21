@@ -1,7 +1,10 @@
 package gr.balasis.hotel.context.base.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -12,8 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "feedback" ,indexes = {
-        @Index(name = "index_feedback_reservation",columnList = "reservation_id")
+@Table(name = "feedback", indexes = {
+        @Index(name = "index_feedback_reservation", columnList = "reservation_id")
 })
 public class Feedback extends BaseModel {
 

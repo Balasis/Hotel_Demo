@@ -5,7 +5,7 @@ import gr.balasis.hotel.context.base.model.Reservation;
 
 import java.time.LocalDate;
 
-public interface ReservationValidator extends BaseValidator<Reservation>{
+public interface ReservationValidator extends BaseValidator<Reservation> {
 
     void validateReservationBelongsToGuest(Long reservationId, Long guestId);
 

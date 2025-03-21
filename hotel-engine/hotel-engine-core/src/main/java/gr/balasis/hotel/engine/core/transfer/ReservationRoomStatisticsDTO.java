@@ -3,7 +3,7 @@ package gr.balasis.hotel.engine.core.transfer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({"ri","rn","adpr","isf"})
+@JsonPropertyOrder({"ri", "rn", "adpr", "isf"})
 public interface ReservationRoomStatisticsDTO {
     @JsonProperty("ri")
     Long getRoomId();

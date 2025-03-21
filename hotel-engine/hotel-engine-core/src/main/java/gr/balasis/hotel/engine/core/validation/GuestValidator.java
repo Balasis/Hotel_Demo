@@ -4,7 +4,7 @@ import gr.balasis.hotel.context.base.model.Guest;
 
 import java.time.LocalDate;
 
-public interface GuestValidator extends BaseValidator<Guest>{
+public interface GuestValidator extends BaseValidator<Guest> {
 
     void validateEmailUnique(String email);
 
