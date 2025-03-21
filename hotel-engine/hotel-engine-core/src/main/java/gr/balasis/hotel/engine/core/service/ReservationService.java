@@ -19,7 +19,7 @@ public interface ReservationService extends BaseService<Reservation,Long> {
     Feedback createFeedback(Long reservationId, Feedback domain);
     Feedback getFeedback(Long reservationId);
     void updateFeedback(Long reservationId, Feedback domain);
-    void deleteFeedback(Long reservationId);
+    void deleteFeedback(Long feedbackId);
 
     KeyValue<String,Float> getAvgPercentageRateOfFeedback();
     List<ReservationRoomStatisticsDTO> findRoomStatistics();

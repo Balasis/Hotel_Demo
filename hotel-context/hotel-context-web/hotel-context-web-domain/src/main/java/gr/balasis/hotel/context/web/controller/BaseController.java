@@ -7,6 +7,7 @@ import gr.balasis.hotel.context.base.service.BaseService;
 import gr.balasis.hotel.context.web.resource.BaseResource;
 import gr.balasis.hotel.context.base.component.BaseComponent;
 
+import gr.balasis.hotel.context.web.validation.ResourceDataValidator;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 public abstract class BaseController<T extends BaseModel, R extends BaseResource> extends BaseComponent {
     protected abstract BaseService<T,Long> getBaseService();
     protected abstract BaseMapper<T, R> getMapper();
+    protected abstract ResourceDataValidator resourceDatavalidator();
 
     @GetMapping("/{id}")
     public ResponseEntity<R> get(
@@ -27,8 +29,9 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
 
     @PostMapping
     public ResponseEntity<R> create(
-            @RequestBody @Valid final R resource) {
+            @RequestBody final R resource) {
 
+        resourceDatavalidator().validateResourceData(resource);
         resource.setId(null);
         return ResponseEntity.ok(
                 getMapper().toResource(
@@ -39,8 +42,9 @@ public abstract class BaseController<T extends BaseModel, R extends BaseResource
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
-            @RequestBody @Valid final R resource) {
+            @RequestBody final R resource) {
 
+        resourceDatavalidator().validateResourceData(resource);
         resource.setId(id);
         T domainObject = getMapper().toDomain(resource);
         domainObject.setId(id);

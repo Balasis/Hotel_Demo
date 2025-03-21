@@ -1,5 +1,6 @@
 package gr.balasis.hotel.context.web.resource;
 
+import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentResource extends BaseResource{
+    @DecimalMin(value = "0", message = "Amount must be greater than or equal to 0")
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String paymentStatus;

@@ -75,6 +75,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean doesFeedbackExist(Long reservationId);
 
     @Query("""
+    select case when exists (
+        select 1
+        from Feedback f
+        where f.reservation.id= :reservationId and f.id=:feedbackId)
+        then true
+        else false
+        end
+    """)
+    boolean doesFeedbackBelongsToReservation(Long feedbackId, Long reservationId);
+
+    @Query("""
     select r
     from Reservation r
     join fetch r.guest g join fetch r.room left join fetch r.feedback left join fetch r.payment
@@ -195,7 +206,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     """)
     void deleteFeedbackByReservationId(Long reservationId);
 
-
+    @Modifying
+    @Query("""
+    delete from Feedback f
+    where f.id = :feedbackId
+    """)
+    void deleteFeedbackById(Long feedbackId);
 
 
     //H2
