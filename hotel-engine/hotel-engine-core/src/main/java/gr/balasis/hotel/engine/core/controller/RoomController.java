@@ -28,10 +28,10 @@ public class RoomController extends BaseController<Room, RoomResource> {
 
     @GetMapping()
     public ResponseEntity<List<RoomResource>> findAll(@RequestParam(required = false) String roomNumber,
-            @RequestParam(required = false) BigDecimal pricePerNight,@RequestParam(required = false) String bedType,
-            @RequestParam(required = false) Integer floor) {
+                                                      @RequestParam(required = false) BigDecimal pricePerNight, @RequestParam(required = false) String bedType,
+                                                      @RequestParam(required = false) Integer floor) {
 
-        List<Room> rooms = roomService.searchBy(roomNumber, pricePerNight,bedType,floor);
+        List<Room> rooms = roomService.searchBy(roomNumber, pricePerNight, bedType, floor);
         return ResponseEntity.ok(roomMapper.toResources(rooms));
     }
 
@@ -49,7 +49,7 @@ public class RoomController extends BaseController<Room, RoomResource> {
 
     @Override
     @PutMapping("{roomId}")
-    public ResponseEntity<Void> update(@PathVariable Long roomId,@RequestBody RoomResource roomResource) {
+    public ResponseEntity<Void> update(@PathVariable Long roomId, @RequestBody RoomResource roomResource) {
 
         resourceDataValidator.validateResourceData(roomResource);
         roomService.update(roomValidator.validate(roomMapper.toDomain(roomResource)));

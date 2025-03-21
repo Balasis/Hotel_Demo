@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.exception.dublicate;
+package gr.balasis.hotel.context.base.exception.duplicate;
 
 import gr.balasis.hotel.context.base.exception.HotelException;
 

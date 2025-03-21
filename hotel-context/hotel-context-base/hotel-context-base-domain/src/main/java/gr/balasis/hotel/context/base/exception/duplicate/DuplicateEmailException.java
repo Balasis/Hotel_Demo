@@ -1,4 +1,4 @@
-package gr.balasis.hotel.context.base.exception.dublicate;
+package gr.balasis.hotel.context.base.exception.duplicate;
 
 public class DuplicateEmailException extends DuplicateException {
     public DuplicateEmailException(String message) {

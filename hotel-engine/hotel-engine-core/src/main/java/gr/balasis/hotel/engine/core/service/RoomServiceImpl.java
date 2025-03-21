@@ -1,8 +1,8 @@
 package gr.balasis.hotel.engine.core.service;
 
 import gr.balasis.hotel.context.base.exception.notfound.RoomNotFoundException;
-import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.context.base.model.Room;
+import gr.balasis.hotel.context.base.service.BasicServiceImpl;
 import gr.balasis.hotel.engine.core.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,13 +16,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
 public class RoomServiceImpl extends BasicServiceImpl<Room, RoomNotFoundException> implements RoomService {
     private final RoomRepository roomRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Room> searchBy(String roomNumber, BigDecimal pricePerNight,String bedType,Integer floor) {
+    public List<Room> searchBy(String roomNumber, BigDecimal pricePerNight, String bedType, Integer floor) {
         return roomRepository.searchBy(roomNumber, pricePerNight, bedType, floor);
     }
 

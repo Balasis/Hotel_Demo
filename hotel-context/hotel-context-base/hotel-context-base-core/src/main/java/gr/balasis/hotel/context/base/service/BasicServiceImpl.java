@@ -8,9 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public abstract class BasicServiceImpl<T extends BaseModel,E extends EntityNotFoundException> extends BaseComponent implements BaseService<T,Long> {
+public abstract class BasicServiceImpl<T extends BaseModel, E extends EntityNotFoundException> extends BaseComponent implements BaseService<T, Long> {
     public abstract JpaRepository<T, Long> getRepository();
+
     public abstract Class<E> getNotFoundExceptionClass();
+
     public abstract String getModelName();
 
     @Override
@@ -22,7 +24,7 @@ public abstract class BasicServiceImpl<T extends BaseModel,E extends EntityNotFo
     public T get(final Long id) {
         return getRepository().findById(id)
                 .orElseThrow(() -> createNotFoundException(
-                        getModelName() +" with ID " + id + " not found."));
+                        getModelName() + " with ID " + id + " not found."));
     }
 
     @Override

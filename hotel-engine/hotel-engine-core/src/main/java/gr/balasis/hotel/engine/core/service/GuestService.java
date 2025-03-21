@@ -7,6 +7,6 @@ import gr.balasis.hotel.context.base.service.BaseService;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface GuestService extends BaseService<Guest,Long> {
+public interface GuestService extends BaseService<Guest, Long> {
     List<Guest> searchBy(String email, String firstName, String lastName, LocalDate birthDate);
 }

@@ -16,8 +16,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-public class GuestServiceImpl extends BasicServiceImpl<Guest,GuestNotFoundException> implements GuestService {
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+public class GuestServiceImpl extends BasicServiceImpl<Guest, GuestNotFoundException> implements GuestService {
     private final GuestRepository guestRepository;
 
     @Override
