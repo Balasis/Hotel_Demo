@@ -119,8 +119,8 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     }
 
     @Override
-    public void deleteFeedback(final Long reservationId) {
-      reservationRepository.deleteFeedbackByReservationId(reservationId);
+    public void deleteFeedback(final Long feedbackId) {
+      reservationRepository.deleteFeedbackById(feedbackId);
     }
 
     @Override

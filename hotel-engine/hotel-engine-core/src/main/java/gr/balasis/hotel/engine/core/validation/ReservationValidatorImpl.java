@@ -76,12 +76,12 @@ public class ReservationValidatorImpl implements ReservationValidator {
 
     @Override
     public Feedback validateFeedback(Long reservationId, Long guestId, Feedback feedback) {
-        return commonFeedbackValidationForUpdateAndCreate(reservationId, guestId, feedback);
+        return commonFeedbackValidationForUpdateAndCreate(reservationId, guestId,feedback);
     }
 
     @Override
     public Feedback validateFeedbackForUpdate(Long reservationId, Long guestId, Feedback feedback) {
-        return commonFeedbackValidationForUpdateAndCreate(reservationId, guestId, feedback);
+        return commonFeedbackValidationForUpdateAndCreate(reservationId, guestId,feedback);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
         }
     }
 
-    private Feedback commonFeedbackValidationForUpdateAndCreate(Long reservationId, Long guestId, Feedback feedback) {
+    private Feedback commonFeedbackValidationForUpdateAndCreate(Long reservationId, Long guestId,Feedback feedback) {
         validateReservationBelongsToGuest(reservationId, guestId);
         var reservationStatus = reservationRepository.getReservationStatus(reservationId).orElseThrow(
                 () -> new CorruptedReservationModelException("Reservation status could not be found (corrupted data)")
@@ -100,6 +100,10 @@ public class ReservationValidatorImpl implements ReservationValidator {
         if (reservationStatus.equals(ReservationStatus.CANCELED)) {
             //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
             throw new HotelException("Feedback is not allowed to canceled reservations");
+        }
+        if (feedback.getId() != null &&
+                !reservationRepository.doesFeedbackBelongsToReservation(feedback.getId(), reservationId) ) {
+            throw new UnauthorizedAccessException("Feedback does not belong to the reservation");
         }
         return feedback;
     }

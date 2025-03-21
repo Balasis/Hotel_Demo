@@ -15,8 +15,7 @@ public interface ReservationValidator extends BaseValidator<Reservation>{
 
     Feedback validateFeedback(Long reservationId, Long guestId, Feedback feedback);
 
-    Feedback validateFeedbackForUpdate(Long reservationId, Long guestId, Feedback feedback);
+    Feedback validateFeedbackForUpdate(Long reservationId, Long guestId, Feedback domain);
 
     void checkIfFeedbackCanBeDeleted(Long reservationId, Long guestId);
-
 }
