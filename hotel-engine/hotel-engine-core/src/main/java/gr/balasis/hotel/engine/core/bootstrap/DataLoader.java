@@ -8,6 +8,8 @@ import gr.balasis.hotel.engine.core.service.GuestService;
 import gr.balasis.hotel.engine.core.service.ReservationService;
 import gr.balasis.hotel.engine.core.service.RoomService;
 
+import gr.balasis.hotel.engine.core.validation.GuestValidator;
+import gr.balasis.hotel.engine.core.validation.RoomValidator;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,9 @@ import java.util.Random;
 @Profile({"h2", "postgre"})
 public class DataLoader implements ApplicationRunner {
     private final GuestService guestService;
+    private final GuestValidator guestValidator;
     private final RoomService roomService;
+    private final RoomValidator roomValidator;
     private final ReservationService reservationService;
     private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
     private static final Lorem lorem = LoremIpsum.getInstance();
@@ -50,16 +54,23 @@ public class DataLoader implements ApplicationRunner {
     private void loadRooms() {
         logger.trace("Loading rooms...");
         for (int i = 0; i < 9; i++) {
-            roomService.create(
-                    Room.builder()
-                            .roomNumber("10" + (i + 1))
-                            .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
-                            .bedType(random.nextBoolean() ? BedType.SINGLE : BedType.DOUBLE)
-                            .floor(random.nextInt(1, 4))
-                            .build()
-            );
+            createRoomTransactional(i);
         }
         logger.trace("Finished loading rooms");
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createRoomTransactional(int i) {
+        roomService.create(
+                roomValidator.validate(
+                Room.builder()
+                        .roomNumber("10" + (i + 1))
+                        .pricePerNight(new BigDecimal("100.00").add(new BigDecimal(i * 10)))
+                        .bedType(random.nextBoolean() ? BedType.SINGLE : BedType.DOUBLE)
+                        .floor(random.nextInt(1, 4))
+                        .build()
+                )
+        );
     }
 
     private void loadGuests() {
@@ -77,6 +88,8 @@ public class DataLoader implements ApplicationRunner {
         }
         logger.trace("Finished loading guests");
     }
+
+
 
     private void loadReservations() {
         logger.trace("Loading reservations...");
