@@ -2,8 +2,10 @@ package gr.balasis.hotel.engine.core.validation;
 
 import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
-import gr.balasis.hotel.context.base.exception.HotelException;
-import gr.balasis.hotel.context.base.exception.conflict.RoomAvailabilityConflictException;
+import gr.balasis.hotel.context.base.exception.business.ReservationFeedbackException;
+import gr.balasis.hotel.context.base.exception.business.ReservationPaymentException;
+import gr.balasis.hotel.context.base.exception.business.ReservationUpdateViolationException;
+import gr.balasis.hotel.context.base.exception.business.RoomAvailabilityConflictException;
 import gr.balasis.hotel.context.base.exception.corrupted.CorruptedReservationModelException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.unauthorized.UnauthorizedAccessException;
@@ -47,7 +49,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
     @Override
     public Reservation validate(Reservation reservation) {
         if (reservation.getPayment() != null) {
-            throw new HotelException("Payment should not be sent since its been exclusively generated server side.");
+            throw new ReservationPaymentException("Payment should not be sent since its been exclusively generated server side.");
         }
         validateRoomAvailability(
                 reservation.getRoom().getId(),
@@ -62,7 +64,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
     public Reservation validateForUpdate(Long id, Reservation reservation) {
         validateReservationBelongsToGuest(reservation.getId(), reservation.getGuest().getId());
         if (reservationRepository.getReservationPaymentStatus(reservation.getId()).equals(PaymentStatus.PAID)) {
-            throw new HotelException("Can not update paid reservation");
+            throw new ReservationUpdateViolationException("Can not update paid reservation");
         }
         validateRoomAvailabilityForUpdate(
                 reservation.getRoom().getId(),
@@ -99,7 +101,7 @@ public class ReservationValidatorImpl implements ReservationValidator {
         );
         if (reservationStatus.equals(ReservationStatus.CANCELED)) {
             //TODO:Change the above to be allowed only at completed reservations. Leave it now for testing as "canceled")
-            throw new HotelException("Feedback is not allowed to canceled reservations");
+            throw new ReservationFeedbackException("Feedback is not allowed to canceled reservations");
         }
         if (feedback.getId() != null &&
                 !reservationRepository.doesFeedbackBelongsToReservation(feedback.getId(), reservationId)) {

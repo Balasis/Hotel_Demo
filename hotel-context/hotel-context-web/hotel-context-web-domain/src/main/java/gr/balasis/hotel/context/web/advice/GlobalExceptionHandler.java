@@ -1,7 +1,7 @@
 package gr.balasis.hotel.context.web.advice;
 
 import gr.balasis.hotel.context.base.exception.HotelException;
-import gr.balasis.hotel.context.base.exception.conflict.ReservationConflictException;
+import gr.balasis.hotel.context.base.exception.business.BusinessLogicException;
 import gr.balasis.hotel.context.base.exception.corrupted.CorruptedModelException;
 import gr.balasis.hotel.context.base.exception.duplicate.DuplicateException;
 import gr.balasis.hotel.context.base.exception.notfound.EntityNotFoundException;
@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
-    @ExceptionHandler(ReservationConflictException.class)
-    public ResponseEntity<String> handleReservationConflictException(ReservationConflictException e) {
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<String> handleBusinessLogicException(BusinessLogicException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
