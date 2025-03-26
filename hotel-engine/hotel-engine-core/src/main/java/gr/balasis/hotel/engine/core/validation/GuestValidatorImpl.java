@@ -1,7 +1,7 @@
 package gr.balasis.hotel.engine.core.validation;
 
 
-import gr.balasis.hotel.context.base.exception.HotelException;
+import gr.balasis.hotel.context.base.exception.business.GuestBirthDateException;
 import gr.balasis.hotel.context.base.exception.duplicate.DuplicateEmailException;
 import gr.balasis.hotel.context.base.exception.notfound.GuestNotFoundException;
 import gr.balasis.hotel.context.base.model.Guest;
@@ -40,11 +40,11 @@ public class GuestValidatorImpl implements GuestValidator {
         LocalDate today = LocalDate.now();
 
         if (birthDate.isAfter(today)) {
-            throw new HotelException("Birth date cannot be in the future");
+            throw new GuestBirthDateException("Birth date cannot be in the future");
         }
 
         if (birthDate.isAfter(today.minusYears(18))) {
-            throw new HotelException("Guest must be at least 18 years old");
+            throw new GuestBirthDateException("Guest must be at least 18 years old");
         }
     }
 
