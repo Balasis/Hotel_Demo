@@ -8,6 +8,7 @@ import gr.balasis.hotel.context.base.model.Reservation;
 import gr.balasis.hotel.engine.core.transfer.KeyValue;
 import gr.balasis.hotel.engine.core.transfer.ReservationGuestStatisticsDTO;
 import gr.balasis.hotel.engine.core.transfer.ReservationRoomStatisticsDTO;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -85,21 +86,29 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     boolean doesFeedbackBelongsToReservation(Long feedbackId, Long reservationId);
 
+    @EntityGraph(attributePaths = {"guest","room","feedback","payment"})
     @Query("""
             select r
             from Reservation r
-            join fetch r.guest g join fetch r.room left join fetch r.feedback left join fetch r.payment
-            where g.id= :guestId
+            where r.guest.id= :guestId
             """)
     List<Reservation> findByGuestIdCompleteFetch(Long guestId);
 
+    @EntityGraph(attributePaths = {"guest","room","feedback","payment"})
     @Query("""
             select r
             from Reservation r
-            join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
             where r.id = :reservationId
             """)
     Optional<Reservation> findByIdCompleteFetch(Long reservationId);
+
+//    @Query("""
+//            select r
+//            from Reservation r
+//            join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
+//            where r.id = :reservationId
+//            """)
+//    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
     //postgre
     @Query(value = """
