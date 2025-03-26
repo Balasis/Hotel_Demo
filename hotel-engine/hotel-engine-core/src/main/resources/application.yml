@@ -3,9 +3,9 @@ spring:
     active: @activeProfile@
   jpa:
     open-in-view: false
-#    properties:
-#      hibernate:
-#        generate_statistics: true
+    properties:
+      hibernate:
+        generate_statistics: true
 
 server:
   port: 3000
