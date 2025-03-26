@@ -4,6 +4,7 @@ import gr.balasis.hotel.context.base.enumeration.PaymentStatus;
 import gr.balasis.hotel.context.base.enumeration.ReservationAction;
 import gr.balasis.hotel.context.base.enumeration.ReservationStatus;
 import gr.balasis.hotel.context.base.exception.HotelException;
+import gr.balasis.hotel.context.base.exception.business.ReservationPaymentException;
 import gr.balasis.hotel.context.base.exception.duplicate.DuplicateException;
 import gr.balasis.hotel.context.base.exception.notfound.FeedbackNotFoundException;
 import gr.balasis.hotel.context.base.exception.notfound.PaymentNotFoundException;
@@ -171,7 +172,7 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
         );
         if (payment.getPaymentStatus().equals(PaymentStatus.PAID)) {
             {
-                throw new HotelException("Reservation is already paid");
+                throw new ReservationPaymentException("Reservation is already paid");
             }
         }
         payment.setPaymentDate(LocalDateTime.now());
