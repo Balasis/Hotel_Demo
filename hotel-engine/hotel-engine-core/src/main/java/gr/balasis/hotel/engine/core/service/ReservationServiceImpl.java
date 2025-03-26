@@ -85,9 +85,10 @@ public class ReservationServiceImpl extends BasicServiceImpl<Reservation, Reserv
     public Feedback createFeedback(final Long reservationId, final Feedback feedback) {
         var savedReservation = reservationRepository.findByIdMinimalFetch(reservationId).orElseThrow(
                 () -> new ReservationNotFoundException("Could not find reservation with id: " + reservationId));
+        feedback.setReservation(savedReservation);
+        feedback.setCreatedAt(LocalDateTime.now());
         savedReservation.setFeedback(feedback);
-        savedReservation.setCreatedAt(LocalDateTime.now());
-        return savedReservation.getFeedback();
+        return feedback;
     }
 
     @Override

@@ -102,14 +102,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     Optional<Reservation> findByIdCompleteFetch(Long reservationId);
 
-//    @Query("""
-//            select r
-//            from Reservation r
-//            join fetch r.guest join fetch r.room left join fetch r.feedback left join fetch r.payment
-//            where r.id = :reservationId
-//            """)
-//    Optional<Reservation> findByIdCompleteFetch(Long reservationId);
-
     //postgre
     @Query(value = """
                 select
@@ -156,10 +148,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """, nativeQuery = true)
     List<ReservationGuestStatisticsDTO> findReservationGuestStatistics();
 
+    @EntityGraph(attributePaths = {"guest","room","feedback","payment"})
     @Query("""
             select r
             from Reservation r
-            join fetch r.guest join fetch r.room left join fetch r.payment left join fetch r.feedback
             """)
     List<Reservation> findAllCompleteFetch();
 
@@ -177,10 +169,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     Optional<ReservationStatus> getReservationStatus(Long reservationId);
 
+    @EntityGraph(attributePaths = {"feedback","payment"})
     @Query("""
             select r
             from Reservation r
-            left join fetch r.feedback join fetch r.payment
             where r.id = :reservationId
             """)
     Optional<Reservation> findByIdMinimalFetch(Long reservationId);
