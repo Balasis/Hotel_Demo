@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BusinessLogicException.class)
-    public ResponseEntity<String> handleReservationConflictException(BusinessLogicException e) {
+    public ResponseEntity<String> handleBusinessLogicException(BusinessLogicException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
