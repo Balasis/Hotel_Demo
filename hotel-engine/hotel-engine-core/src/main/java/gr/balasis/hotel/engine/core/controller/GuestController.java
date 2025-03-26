@@ -122,7 +122,7 @@ public class GuestController extends BaseController<Guest, GuestResource> {
 
     @PostMapping("/{guestId}/reservations/{reservationId}/feedback")
     public ResponseEntity<FeedbackResource> createReservationFeedback(@PathVariable final Long guestId,
-                                                                      @PathVariable final Long reservationId, @RequestBody final FeedbackResource feedbackResource) {
+        @PathVariable final Long reservationId, @RequestBody final FeedbackResource feedbackResource) {
 
         resourceDataValidator.validateResourceData(feedbackResource);
         feedbackResource.setId(null);
