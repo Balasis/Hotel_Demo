@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+//toBedeletedComment
 public abstract class BaseComponent {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
